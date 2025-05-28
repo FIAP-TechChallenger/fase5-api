@@ -1,8 +1,9 @@
+//index
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { initializeFirebase } from "./lib/firebase";
-import router from "./routes";
+import { initializeFirebase } from "@/infra/firebase/firebase-initialize";
+import router from "@/infra/http/routes";
 
 dotenv.config();
 initializeFirebase();

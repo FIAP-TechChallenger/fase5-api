@@ -1,11 +1,10 @@
 import axios from "axios";
-import { admin } from "../lib/firebase";
+import { admin } from "../firebase/firebase-initialize";
+import { IAuthRepository } from "src/domain/repositories/IAuthRepository";
 
-export const authService = {
-  async loginWithEmailAndPassword(email: string, password: string) {
+export class FirebaseAuthRepository implements IAuthRepository {
+  async login(email: string, password: string) {
     const apiKey = process.env.FIREBASE_API_KEY;
-    console.log(apiKey);
-
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
 
     const response = await axios.post(url, {
@@ -14,15 +13,15 @@ export const authService = {
       returnSecureToken: true,
     });
 
-    return response.data; // contém idToken, refreshToken, localId, etc.
-  },
+    return response.data;
+  }
 
-  async registerUser(email: string, password: string) {
+  async register(email: string, password: string) {
     const userRecord = await admin.auth().createUser({ email, password });
     return userRecord;
-  },
+  }
 
-  async revokeUserTokens(uid: string) {
+  async revokeTokens(uid: string) {
     await admin.auth().revokeRefreshTokens(uid);
-  },
-};
+  }
+}
