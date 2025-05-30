@@ -1,24 +1,72 @@
 import axios from "axios";
 import { admin } from "../firebase/firebase-initialize";
 import { IAuthRepository } from "src/domain/repositories/IAuthRepository";
+import { FirebaseSignInResponse } from "../firebase/models/FirebaseSignInResponse";
+import { LoginResponseDTO } from "../../application/dtos/LoginResponseDTO";
+import { FirebaseRefreshTokenResponse } from "../firebase/models/FirebaseRefreshTokenResponse";
 
 export class FirebaseAuthRepository implements IAuthRepository {
-  async login(email: string, password: string) {
-    const apiKey = process.env.FIREBASE_API_KEY;
-    const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
+  private _apiKey = process.env.FIREBASE_API_KEY;
 
-    const response = await axios.post(url, {
-      email,
-      password,
-      returnSecureToken: true,
-    });
+  async login(email: string, password: string): Promise<LoginResponseDTO> {
+    const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${this._apiKey}`;
 
-    return response.data;
+    try {
+      const { data } = await axios.post<FirebaseSignInResponse>(url, {
+        email,
+        password,
+        returnSecureToken: true,
+      });
+      return {
+        token: data.idToken,
+        refreshToken: data.refreshToken,
+        expiresIn: Number.parseInt(data.expiresIn),
+      };
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(
+          `Erro ao fazer login: ${
+            error.response?.data?.error?.message || error.message
+          }`
+        );
+      }
+      throw error;
+    }
+  }
+
+  async refresh(refreshToken: string): Promise<LoginResponseDTO> {
+    const url = `https://securetoken.googleapis.com/v1/token?key=${this._apiKey}`;
+
+    const body = new URLSearchParams();
+    body.append("grant_type", "refresh_token");
+    body.append("refresh_token", refreshToken);
+
+    try {
+      const { data } = await axios.post<FirebaseRefreshTokenResponse>(
+        url,
+        body.toString(),
+        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+      );
+
+      return {
+        token: data.id_token,
+        refreshToken: data.refresh_token,
+        expiresIn: Number.parseInt(data.expires_in),
+      };
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(
+          `Erro ao atualizar token: ${
+            error.response?.data?.error?.message || error.message
+          }`
+        );
+      }
+      throw error;
+    }
   }
 
   async register(email: string, password: string) {
-    const userRecord = await admin.auth().createUser({ email, password });
-    return userRecord;
+    await admin.auth().createUser({ email, password });
   }
 
   async revokeTokens(uid: string) {

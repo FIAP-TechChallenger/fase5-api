@@ -7,8 +7,12 @@ export class AuthService {
     return this.authRepo.login(email, password);
   }
 
+  refresh(refreshToken: string) {
+    return this.authRepo.refresh(refreshToken);
+  }
+
   register(email: string, password: string) {
-    return this.authRepo.register(email, password);
+    this.authRepo.register(email, password);
   }
 
   revokeTokens(uid: string) {

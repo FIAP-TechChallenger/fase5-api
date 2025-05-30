@@ -1,5 +1,8 @@
-import { getAuth } from "firebase-admin/auth";
 import { Request, Response, NextFunction } from "express";
+import { FirebaseAuthProvider } from "@/infra/firebase/FirebaseAuthProvider";
+import { Usuario } from "@/domain/entities/Usuario";
+
+const authProvider = new FirebaseAuthProvider();
 
 export async function authenticate(
   req: Request,
@@ -16,8 +19,8 @@ export async function authenticate(
   const token = authHeader.split("Bearer ")[1];
 
   try {
-    const decoded = await getAuth().verifyIdToken(token);
-    req.user = decoded;
+    const decoded = await authProvider.verifyToken(token);
+    req.user = new Usuario(decoded.uid, decoded.email || "", decoded.name);
     next();
   } catch (error) {
     res.status(401).json({ message: "Invalid token" });

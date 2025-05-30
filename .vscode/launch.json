@@ -7,7 +7,12 @@
       "name": "Debug API (ts-node)",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/src/index.ts",
-      "runtimeArgs": ["-r", "ts-node/register"],
+      "runtimeArgs": [
+        "-r",
+        "tsconfig-paths/register",
+        "-r",
+        "ts-node/register"
+      ],
       "envFile": "${workspaceFolder}/.env"
     }
   ]
