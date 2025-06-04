@@ -17,7 +17,9 @@ export class FirebaseAuthRepository implements IAuthRepository {
         password,
         returnSecureToken: true,
       });
+
       return {
+        userId: data.localId,
         token: data.idToken,
         refreshToken: data.refreshToken,
         expiresIn: Number.parseInt(data.expiresIn),
@@ -49,6 +51,7 @@ export class FirebaseAuthRepository implements IAuthRepository {
       );
 
       return {
+        userId: data.user_id,
         token: data.id_token,
         refreshToken: data.refresh_token,
         expiresIn: Number.parseInt(data.expires_in),

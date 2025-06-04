@@ -11,8 +11,8 @@ export class AuthService {
     return this.authRepo.refresh(refreshToken);
   }
 
-  register(email: string, password: string) {
-    this.authRepo.register(email, password);
+  async register(email: string, password: string): Promise<void> {
+    await this.authRepo.register(email, password);
   }
 
   revokeTokens(uid: string) {
