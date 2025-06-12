@@ -9,14 +9,21 @@ export async function authenticate(
   res: Response,
   next: NextFunction
 ) {
-  const authHeader = req.headers.authorization;
+  let token: string | undefined;
 
-  if (!authHeader?.startsWith("Bearer ")) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
+  const authHeader = req.headers["authorization"];
+  if (authHeader?.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
   }
 
-  const token = authHeader.split("Bearer ")[1];
+  if (!token && req.cookies?.accessToken) {
+    token = req.cookies.accessToken;
+  }
+
+  if (!token) {
+    res.status(401).json({ message: "Sem acesso" });
+    return;
+  }
 
   try {
     const decoded = await authProvider.verifyToken(token);

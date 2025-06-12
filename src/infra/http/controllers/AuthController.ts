@@ -3,6 +3,7 @@ import { AuthService } from "@/application/services/AuthService";
 import { FirebaseAuthRepository } from "@/infra/repositories/FirebaseAuthRepository";
 import { LoginDTO } from "../dtos/LoginDTO";
 import { authenticate } from "../middlewares/auth";
+import { LoginResponseDTO } from "@/application/dtos/LoginResponseDTO";
 
 export class AuthController {
   private _authService = new AuthService(new FirebaseAuthRepository());
@@ -11,10 +12,30 @@ export class AuthController {
     try {
       const dto = LoginDTO.validate(req.body);
       const authData = await this._authService.login(dto.email, dto.password);
+
+      res.cookie("accessToken", authData.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000, // 15 minutos
+      });
+
+      res.cookie("refreshToken", authData.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+      });
+
       res.status(200).json(authData);
     } catch (err: any) {
       res.status(400).json({ message: "Credenciais inválidas" });
     }
+  }
+
+  async getLoggedUser(req: Request, res: Response): Promise<void> {
+    res.json(req.user.uid);
+    return;
   }
 
   async refresh(req: Request, res: Response): Promise<void> {
@@ -64,6 +85,11 @@ export class AuthController {
     router.post("/login", controller.login.bind(controller));
     router.post("/refresh", controller.refresh.bind(controller));
     router.post("/logout", authenticate, controller.logout.bind(controller));
+    router.post(
+      "/getLoggedUser",
+      authenticate,
+      controller.getLoggedUser.bind(controller)
+    );
     return router;
   }
 }
