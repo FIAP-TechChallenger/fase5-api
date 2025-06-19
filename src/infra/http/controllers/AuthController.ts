@@ -3,29 +3,19 @@ import { AuthService } from "@/application/services/AuthService";
 import { FirebaseAuthRepository } from "@/infra/repositories/FirebaseAuthRepository";
 import { LoginDTO } from "../dtos/LoginDTO";
 import { authenticate } from "../middlewares/auth";
-import { LoginResponseDTO } from "@/application/dtos/LoginResponseDTO";
+import { AuthCookieService } from "@/application/services/AuthCookieService";
 
 export class AuthController {
   private _authService = new AuthService(new FirebaseAuthRepository());
+  private _authCookieService = new AuthCookieService();
 
   async login(req: Request, res: Response): Promise<void> {
     try {
       const dto = LoginDTO.validate(req.body);
       const authData = await this._authService.login(dto.email, dto.password);
 
-      res.cookie("accessToken", authData.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 15 * 60 * 1000, // 15 minutos
-      });
-
-      res.cookie("refreshToken", authData.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
-      });
+      this._authCookieService.setToken(res, authData.token);
+      this._authCookieService.setRefreshToken(res, authData.refreshToken);
 
       res.status(200).json(authData);
     } catch (err: any) {
@@ -52,6 +42,13 @@ export class AuthController {
 
     try {
       const refreshResponse = await this._authService.refresh(refreshToken);
+
+      this._authCookieService.setToken(res, refreshResponse.token);
+      this._authCookieService.setRefreshToken(
+        res,
+        refreshResponse.refreshToken
+      );
+
       res.status(200).json(refreshResponse);
     } catch (error: any) {
       res
@@ -68,6 +65,8 @@ export class AuthController {
         return;
       }
 
+      this._authCookieService.clearToken(res);
+      this._authCookieService.clearRefreshToken(res);
       await this._authService.revokeTokens(user.uid);
 
       res.status(200).json({ message: "Logout realizado com sucesso" });
