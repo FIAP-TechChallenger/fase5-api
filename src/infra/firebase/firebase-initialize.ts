@@ -17,8 +17,10 @@ export function initializeFirebase() {
 
     try {
       console.log("Inicializando Firebase Admin SDK...");
+      const serviceAccount = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+
       admin.initializeApp({
-        credential: admin.credential.cert(fullPath),
+        credential: admin.credential.cert(serviceAccount),
       });
     } catch (error) {
       console.error("Erro ao inicializar Firebase Admin SDK:", error);

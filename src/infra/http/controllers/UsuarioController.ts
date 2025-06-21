@@ -1,13 +1,7 @@
 import { Request, Response, Router } from "express";
-import { z } from "zod";
 import { AuthService } from "@/application/services/AuthService";
 import { FirebaseAuthRepository } from "@/infra/repositories/FirebaseAuthRepository";
 import { CriarUsuarioDTO } from "../dtos/CriarUsuarioDTO";
-
-const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
 
 export class UsuarioController {
   private _authService = new AuthService(new FirebaseAuthRepository());

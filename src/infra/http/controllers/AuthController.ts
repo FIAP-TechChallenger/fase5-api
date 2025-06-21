@@ -24,7 +24,7 @@ export class AuthController {
   }
 
   async getLoggedUser(req: Request, res: Response): Promise<void> {
-    res.json(req.user.uid);
+    res.json(req.user.id);
     return;
   }
 
@@ -60,14 +60,14 @@ export class AuthController {
   async logout(req: Request, res: Response): Promise<void> {
     try {
       const user = req.user;
-      if (!user || !user.uid) {
+      if (!user || !user.id) {
         res.status(401).json({ message: "Usuário não autenticado" });
         return;
       }
 
       this._authCookieService.clearToken(res);
       this._authCookieService.clearRefreshToken(res);
-      await this._authService.revokeTokens(user.uid);
+      await this._authService.revokeTokens(user.id);
 
       res.status(200).json({ message: "Logout realizado com sucesso" });
     } catch (error: any) {
