@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MetaStatusEnum, MetaTipoEnum, MetaCalculoPorEnum } from "./enums";
+import { MetaStatusEnum, MetaTipoEnum, MetaCalculoPorEnum } from "./meta.enum";
 
 const MetaTipoEnumValues = [MetaTipoEnum.VENDA, MetaTipoEnum.PRODUCAO] as const;
 

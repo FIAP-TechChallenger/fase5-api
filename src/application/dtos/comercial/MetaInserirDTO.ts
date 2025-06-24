@@ -5,7 +5,6 @@ import {
 } from "@/domain/types/zod.enums";
 import { MetaValidation } from "@/domain/validators/comercial/meta.validation";
 
-// Recria o shape original usado no InserirSchema
 export const MetaInserirSchemaBase = z.object({
   tipo: MetaTipoEnumZod,
   calculoPor: MetaCalculoPorEnumZod,

@@ -1,4 +1,4 @@
-import { MetaTipoEnum } from "@/domain/types/enums";
+import { MetaTipoEnum } from "@/domain/types/meta.enum";
 import { RefinementCtx } from "zod";
 
 export class MetaValidation {

@@ -2,7 +2,7 @@ import {
   MetaStatusEnum,
   MetaTipoEnum,
   MetaCalculoPorEnum,
-} from "../../types/enums";
+} from "@/domain/types/meta.enum";
 
 export class Meta {
   id: string;

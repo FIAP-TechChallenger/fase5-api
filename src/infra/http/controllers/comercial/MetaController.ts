@@ -7,6 +7,16 @@ import { MetaAtualizarSchema } from "@/application/dtos/comercial/MetaAtualizarD
 export class MetaController {
   private _metaService = new MetaService(new FirebaseMetaRepository());
 
+  async buscarTodos(req: Request, res: Response): Promise<void> {
+    try {
+      const metas = await this._metaService.buscarTodos();
+      res.status(200).json(metas);
+    } catch (error) {
+      console.error("Erro ao buscar metas:", error);
+      res.status(500).json({ message: "Erro ao buscar metas" });
+    }
+  }
+
   async inserir(req: Request, res: Response): Promise<void> {
     try {
       const dto = MetaInserirSchema.parse(req.body);
@@ -44,6 +54,7 @@ export class MetaController {
   static routes() {
     const router = Router();
     const controller = new MetaController();
+    router.get("/", controller.buscarTodos.bind(controller));
     router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));
     return router;

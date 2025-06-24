@@ -3,10 +3,14 @@ import { MetaInserirDTO } from "@/application/dtos/comercial/MetaInserirDTO";
 import { MetaAtualizarDTO } from "@/application/dtos/comercial/MetaAtualizarDTO";
 import { Meta } from "@/domain/entities/comercial/Meta";
 import { gerarUUID } from "@/shared/utils/gerarUUID";
-import { MetaStatusEnum } from "@/domain/types/enums";
+import { MetaStatusEnum } from "@/domain/types/meta.enum";
 
 export class MetaService {
   constructor(private readonly metaRepository: IMetaRepository) {}
+
+  async buscarTodos(): Promise<Meta[]> {
+    return this.metaRepository.buscarTodos();
+  }
 
   async inserir(usuarioId: string, dto: MetaInserirDTO): Promise<void> {
     const novaMeta: Meta = {
@@ -27,7 +31,6 @@ export class MetaService {
       criadaEm: new Date(),
       atualizadaEm: new Date(),
     };
-
     await this.metaRepository.inserir(novaMeta);
   }
 
