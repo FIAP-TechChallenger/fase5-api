@@ -2,21 +2,17 @@ import { MetaTipoEnum } from "@/domain/types/meta.enum";
 import { RefinementCtx } from "zod";
 
 export class FazendaValidation {
-  static validarTipoDependencias = (data: any, ctx: RefinementCtx) => {
-    if (data.tipo === MetaTipoEnum.VENDA && !data.vendaId) {
+  static validarCaracteres = (data: any, ctx: RefinementCtx) => {
+    const regex = /^[a-zA-Z0-9\sáàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ'",.!?()-]+$/;
+    
+    if (data.nome && !regex.test(data.nome)) {
       ctx.addIssue({
-        path: ["vendaId"],
-        message: `vendaId é obrigatório quando tipo é "${MetaTipoEnum.VENDA}".`,
-        code: "custom",
-      });
-    }
-
-    if (data.tipo === MetaTipoEnum.PRODUCAO && !data.producaoId) {
-      ctx.addIssue({
-        path: ["producaoId"],
-        message: `producaoId é obrigatório quando tipo é "${MetaTipoEnum.PRODUCAO}".`,
-        code: "custom",
+        path: ["nome"],
+        message: "Nome contém caracteres inválidos",
+        code: "custom"
       });
     }
   };
-}
+ 
+  };
+

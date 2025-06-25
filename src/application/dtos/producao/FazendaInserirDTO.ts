@@ -9,7 +9,7 @@ export const FazendaInserirSchemaBase = z.object({
 });
 
 export const FazendaInserirSchema = FazendaInserirSchemaBase.superRefine(
-  FazendaValidation.validarTipoDependencias
+  FazendaValidation.validarCaracteres
 );
 
 export type FazendaInserirDTO = z.infer<typeof FazendaInserirSchema>;
