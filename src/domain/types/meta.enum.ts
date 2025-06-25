@@ -13,5 +13,5 @@ export enum MetaStatusEnum {
 
 export enum MetaCalculoPorEnum {
   VALOR = "VALOR",
-  QUANTIDADE = "INICIALIZADA",
+  QUANTIDADE = "QUANTIDADE",
 }
