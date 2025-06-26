@@ -10,6 +10,6 @@ const router = Router();
 router.use("/auth", AuthController.routes());
 router.use("/user", authenticate, UsuarioController.routes());
 router.use("/meta", authenticate, MetaController.routes());
-router.use("/fazenda", authenticate, FazendaController.routes());
+router.use("/fazenda",  FazendaController.routes());
 
 export default router;

@@ -46,9 +46,9 @@ export class FazendaController {
   static routes() {
     const router = Router();
     const controller = new FazendaController();
+    
     router.get("/", controller.buscarTodos.bind(controller));
-    router.post("/inserir", controller.inserir.bind(controller));
-  
+    router.post("/", controller.inserir.bind(controller)); 
     
     return router;
   }

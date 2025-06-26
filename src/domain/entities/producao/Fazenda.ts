@@ -1,7 +1,7 @@
 export class Fazenda {
     id: string
     nome: string
-    criadaEm?: Date // Exemplo de campo adicional
+    criadaEm?: Date 
     atualizadaEm?: Date
   
     constructor(obj: Partial<Fazenda>){
