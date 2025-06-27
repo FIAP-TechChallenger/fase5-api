@@ -4,12 +4,16 @@ import { MetaAtualizarDTO } from "@/application/dtos/comercial/MetaAtualizarDTO"
 import { Meta } from "@/domain/entities/comercial/Meta";
 import { gerarUUID } from "@/shared/utils/gerarUUID";
 import { MetaStatusEnum } from "@/domain/types/meta.enum";
+import { MetaBuscarTodosDTO } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
+import { MetaBuscarTodosResponseDTO } from "@/application/dtos/comercial/MetaBuscarTodosResponseDTO";
 
 export class MetaService {
   constructor(private readonly metaRepository: IMetaRepository) {}
 
-  async buscarTodos(): Promise<Meta[]> {
-    return this.metaRepository.buscarTodos();
+  async buscarTodos(
+    dto: MetaBuscarTodosDTO
+  ): Promise<MetaBuscarTodosResponseDTO> {
+    return this.metaRepository.buscarTodos(dto);
   }
 
   async inserir(usuarioId: string, dto: MetaInserirDTO): Promise<void> {
@@ -25,8 +29,6 @@ export class MetaService {
       dataFim: dto.dataFim,
       usuarioId: usuarioId,
       fazendaId: dto.fazendaId ?? null,
-      vendaId: dto.vendaId ?? null,
-      producaoId: dto.producaoId ?? null,
       status: MetaStatusEnum.ATIVA,
       criadaEm: new Date(),
       atualizadaEm: new Date(),

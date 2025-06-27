@@ -3,13 +3,26 @@ import { MetaService } from "@/application/services/comercial/MetaService";
 import { FirebaseMetaRepository } from "@/infra/repositories/comercial/FirebaseMetaRepository";
 import { MetaInserirSchema } from "@/application/dtos/comercial/MetaInserirDTO";
 import { MetaAtualizarSchema } from "@/application/dtos/comercial/MetaAtualizarDTO";
+import { MetaBuscarTodosSchema } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
 
 export class MetaController {
   private _metaService = new MetaService(new FirebaseMetaRepository());
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
-      const metas = await this._metaService.buscarTodos();
+      const dto = MetaBuscarTodosSchema.parse(req.body);
+
+      if (dto.ultimoCriadaEm && !dto.ultimoId) {
+        res
+          .status(500)
+          .json({
+            message:
+              'Necessário especificar "ultimoId" quando especificado "ultimoCriadaEm".',
+          });
+        return;
+      }
+
+      const metas = await this._metaService.buscarTodos(dto);
       res.status(200).json(metas);
     } catch (error) {
       console.error("Erro ao buscar metas:", error);
@@ -54,7 +67,7 @@ export class MetaController {
   static routes() {
     const router = Router();
     const controller = new MetaController();
-    router.get("/", controller.buscarTodos.bind(controller));
+    router.post("/", controller.buscarTodos.bind(controller));
     router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));
     return router;

@@ -18,10 +18,7 @@ export class Meta {
   usuarioId: string;
   criadaEm: Date;
   atualizadaEm: Date;
-  // campos opcionais
   fazendaId: string | null;
-  vendaId: string | null;
-  producaoId: string | null;
 
   constructor(obj: Meta) {
     this.id = obj.id;
@@ -38,7 +35,5 @@ export class Meta {
     this.criadaEm = obj.criadaEm;
     this.atualizadaEm = obj.atualizadaEm;
     this.fazendaId = obj.fazendaId;
-    this.vendaId = obj.vendaId;
-    this.producaoId = obj.producaoId;
   }
 }

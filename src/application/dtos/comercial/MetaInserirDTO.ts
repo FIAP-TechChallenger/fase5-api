@@ -3,9 +3,8 @@ import {
   MetaTipoEnumZod,
   MetaCalculoPorEnumZod,
 } from "@/domain/types/zod.enums";
-import { MetaValidation } from "@/domain/validators/comercial/meta.validation";
 
-export const MetaInserirSchemaBase = z.object({
+export const MetaInserirSchema = z.object({
   tipo: MetaTipoEnumZod,
   calculoPor: MetaCalculoPorEnumZod,
   titulo: z.string().min(1, "Título é obrigatório"),
@@ -14,12 +13,6 @@ export const MetaInserirSchemaBase = z.object({
   dataInicio: z.coerce.date(),
   dataFim: z.coerce.date(),
   fazendaId: z.string().optional(),
-  vendaId: z.string().optional(),
-  producaoId: z.string().optional(),
 });
-
-export const MetaInserirSchema = MetaInserirSchemaBase.superRefine(
-  MetaValidation.validarTipoDependencias
-);
 
 export type MetaInserirDTO = z.infer<typeof MetaInserirSchema>;

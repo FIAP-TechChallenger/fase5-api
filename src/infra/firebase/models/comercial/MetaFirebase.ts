@@ -18,8 +18,5 @@ export interface MetaFirebase {
   usuarioId: string;
   criadaEm: Timestamp;
   atualizadaEm: Timestamp;
-  // campos opcionais
   fazendaId: string | null;
-  vendaId: string | null;
-  producaoId: string | null;
 }
