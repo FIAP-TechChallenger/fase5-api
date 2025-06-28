@@ -4,6 +4,7 @@ import { FirebaseMetaRepository } from "@/infra/repositories/comercial/FirebaseM
 import { MetaInserirSchema } from "@/application/dtos/comercial/MetaInserirDTO";
 import { MetaAtualizarSchema } from "@/application/dtos/comercial/MetaAtualizarDTO";
 import { MetaBuscarTodosSchema } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
+import { ZodError } from "zod";
 
 export class MetaController {
   private _metaService = new MetaService(new FirebaseMetaRepository());
@@ -11,22 +12,14 @@ export class MetaController {
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
       const dto = MetaBuscarTodosSchema.parse(req.body);
-
-      if (dto.ultimoCriadaEm && !dto.ultimoId) {
-        res
-          .status(500)
-          .json({
-            message:
-              'Necessário especificar "ultimoId" quando especificado "ultimoCriadaEm".',
-          });
-        return;
-      }
-
       const metas = await this._metaService.buscarTodos(dto);
       res.status(200).json(metas);
     } catch (error) {
-      console.error("Erro ao buscar metas:", error);
-      res.status(500).json({ message: "Erro ao buscar metas" });
+      let message = "Erro ao buscar metas";
+      if (error instanceof ZodError) {
+        message = error.message;
+      }
+      res.status(500).json({ message });
     }
   }
 

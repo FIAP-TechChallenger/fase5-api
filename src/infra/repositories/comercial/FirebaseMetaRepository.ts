@@ -4,7 +4,6 @@ import { IMetaRepository } from "@/domain/repositories/comercial/IMetaRepository
 import { MetaConverter } from "@/infra/firebase/converters/comercial/MetaConverter";
 import { MetaFirebase } from "@/infra/firebase/models/comercial/MetaFirebase";
 import { MetaBuscarTodosDTO } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
-import { getFirebaseTimeStamp } from "@/shared/utils/getFirebaseTimeStamp";
 import { MetaBuscarTodosResponseDTO } from "@/application/dtos/comercial/MetaBuscarTodosResponseDTO";
 
 export class FirebaseMetaRepository implements IMetaRepository {
@@ -13,13 +12,16 @@ export class FirebaseMetaRepository implements IMetaRepository {
   ): Promise<MetaBuscarTodosResponseDTO> {
     const limite = dto?.limite ?? 10;
 
-    const query = this._getCollection()
+    let query = this._getCollection()
       .orderBy("criadaEm", "desc")
       .orderBy("__name__")
       .limit(limite);
 
-    if (dto?.ultimoCriadaEm) {
-      query.startAfter(getFirebaseTimeStamp(dto.ultimoCriadaEm), dto.ultimoId);
+    if (dto?.ultimoId) {
+      const lastSnap = await this._getCollection().doc(dto.ultimoId).get();
+      if (lastSnap.exists) {
+        query = query.startAfter(lastSnap);
+      }
     }
 
     const snapshot = await query.get();
@@ -29,11 +31,9 @@ export class FirebaseMetaRepository implements IMetaRepository {
     });
 
     const lastVisible = dados[dados.length - 1];
-
     return {
       dados,
-      ultimoCriadaEm: lastVisible.criadaEm,
-      ultimoId: lastVisible.id,
+      ultimoId: lastVisible?.id ?? null,
       temMais: dados.length === limite,
     };
   }
