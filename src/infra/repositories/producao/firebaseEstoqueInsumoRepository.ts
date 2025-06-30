@@ -5,7 +5,7 @@ import { EstoqueInsumoFirebase } from "@/infra/firebase/models/producao/EstoqueI
 import { EstoqueInsumoConverter } from "@/infra/firebase/converters/producao/EstoqueInsumoConverter";
 
 export class FirebaseEstoqueInsumoRepository implements IEstoqueInsumoRepository {
-  private readonly collectionName = "estoqueINsumo";
+  private readonly collectionName = "estoqueInsumo";
 
   private getCollection() {
     return admin.firestore().collection(this.collectionName);

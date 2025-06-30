@@ -7,7 +7,7 @@ import { InsumoInserirDTO } from "@/application/dtos/producao/InsumoInserirDTO";
 export class InsumoService {
   constructor(private readonly insumoRepository: IINsumoRepository) {}
 
-  async getAll(): Promise<Fazenda[]> {
+  async getAll(): Promise<Insumo[]> {
     return this.insumoRepository.getAll();
   }
 

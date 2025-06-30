@@ -5,7 +5,7 @@ import { MedidaConverter } from "@/infra/firebase/converters/producao/MedidaConv
 import { MedidaFirebase } from "@/infra/firebase/models/producao/MedidaFirebase";
 
 export class FirebaseMedidaRepository implements IMedidaRepository {
-  private readonly collectionName = "produtos";
+  private readonly collectionName = "unidadeMedida";
 
   private getCollection() {
     return admin.firestore().collection(this.collectionName);

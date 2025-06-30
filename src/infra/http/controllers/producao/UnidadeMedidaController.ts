@@ -1,10 +1,6 @@
 // src/presentation/controllers/producao/FazendaController.ts
-import { InsumoInserirSchema } from "@/application/dtos/producao/InsumoInserirDTO";
 import { MedidaInserirSchema } from "@/application/dtos/producao/MedidaInserirDTO";
-import { InsumoService } from "@/application/services/producao/InsumoService";
 import { MedidaService } from "@/application/services/producao/MedidaService";
-import { Medida } from "@/domain/entities/producao/Medida";
-import { FirebaseInsumoRepository } from "@/infra/repositories/producao/firebaseInsumoRepository";
 import { FirebaseMedidaRepository } from "@/infra/repositories/producao/firebaseMedidaRepository";
 import { Request, Response, Router } from "express";
 

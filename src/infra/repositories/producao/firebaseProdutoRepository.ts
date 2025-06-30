@@ -1,7 +1,4 @@
 import { admin } from "@/infra/firebase/firebase-initialize";
-import { Fazenda } from "@/domain/entities/producao/Fazenda";
-import { FazendaConverter } from "@/infra/firebase/converters/producao/FazendaConverter";
-import { FazendaFirebase } from "@/infra/firebase/models/producao/FazendaFirebase";import { IProducaoRepository } from "@/domain/repositories/producao/IProducaoRepository";
 import { IProdutoRepository } from "@/domain/repositories/producao/IProdutoRepository";
 import { Produto } from "@/domain/entities/producao/Produto";
 import { ProdutoConverter } from "@/infra/firebase/converters/producao/ProdutoConverter";
