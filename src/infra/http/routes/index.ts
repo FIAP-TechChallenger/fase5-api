@@ -4,6 +4,11 @@ import { authenticate } from "../middlewares/auth";
 import { UsuarioController } from "../controllers/UsuarioController";
 import { MetaController } from "../controllers/comercial/MetaController";
 import { FazendaController } from "../controllers/producao/FazendaController";
+import { ProdutoController } from "../controllers/producao/ProdutoController";
+import { ProducaoController } from "../controllers/producao/ProducaoController";
+import { UnidadeMedidaController } from "../controllers/producao/UnidadeMedidaController";
+import { EstoqueInsumoController } from "../controllers/producao/EstoqueInsumoController";
+import { EstqueProdutoController } from "../controllers/producao/EstoqueProdutoController";
 
 const router = Router();
 
@@ -11,5 +16,11 @@ router.use("/auth", AuthController.routes());
 router.use("/user", authenticate, UsuarioController.routes());
 router.use("/meta", authenticate, MetaController.routes());
 router.use("/fazenda",  FazendaController.routes());
+router.use("/produto",  ProdutoController.routes());
+router.use("/producao",  ProducaoController.routes());
+router.use("/unidadeMedida",  UnidadeMedidaController.routes());
+router.use("/estoqueProduto",  EstqueProdutoController.routes());
+router.use("/estoqueInsumo",  EstoqueInsumoController.routes());
+
 
 export default router;
