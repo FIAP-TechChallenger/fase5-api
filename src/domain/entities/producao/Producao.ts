@@ -7,16 +7,16 @@ export class Producao {
     quantidade: number;
     status: ProducaoStatus;
     criadaEm: Date;
-    produto: Produto;
-    fazenda: Fazenda ;
+    produtoId: string;
+    fazendaId: string ;
 
     constructor(obj:Producao){
         this.id = obj.id;
         this.quantidade = obj.quantidade;
         this.status = obj.status;
         this.criadaEm = obj.criadaEm;
-        this.produto = obj.produto;
-        this.fazenda= obj.fazenda
+        this.produtoId = obj.produtoId;
+        this.fazendaId= obj.fazendaId
 
         
     }
