@@ -3,6 +3,6 @@ import { Timestamp } from "firebase-admin/firestore";
 
 export interface ProdutoFirebase {
     nome:string;
-    unidadeMedida:Medida; 
+    unidadeMedidaId:string; 
     criadaEm?: Timestamp | null
 }

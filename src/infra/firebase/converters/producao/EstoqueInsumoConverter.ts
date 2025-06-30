@@ -5,7 +5,7 @@ import { EstoqueInsumoFirebase } from "../../models/producao/EstoqueInsumoFireba
 export class EstoqueInsumoConverter {
   static toFirestore(estoqueInsumo: EstoqueInsumo): EstoqueInsumoFirebase {
     return {
-        insumo:estoqueInsumo.insumo,
+        insumoId:estoqueInsumo.insumoId,
         quantidade: estoqueInsumo.quantidade,
         preco: estoqueInsumo.preco,
         criadaEm: this._toTimestamp(estoqueInsumo.criadaEm), 
@@ -16,7 +16,7 @@ export class EstoqueInsumoConverter {
   static fromFirestore(data: EstoqueInsumoFirebase, id: string): EstoqueInsumo {
     return new EstoqueInsumo({
       id,
-      insumo:data.insumo,
+      insumoId:data.insumoId,
       quantidade: data.quantidade,
       preco: data.preco,
       criadaEm: data.criadaEm?.toDate() || new Date(),

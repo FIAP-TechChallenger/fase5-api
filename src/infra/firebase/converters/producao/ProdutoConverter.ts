@@ -6,9 +6,8 @@ export class ProdutoConverter {
   static toFirestore(produto: Produto): ProdutoFirebase {
     return {
       nome: produto.nome,
-      unidadeMedida:produto.unidadeMedida,
+      unidadeMedidaId: produto.unidadeMedidaId, 
       criadaEm: this._toTimestamp(produto.criadaEm), 
-     
     };
   }
 
@@ -16,9 +15,8 @@ export class ProdutoConverter {
     return new Produto({
       id,
       nome: data.nome,
-      unidadeMedida: data.unidadeMedida,
+      unidadeMedidaId: data.unidadeMedidaId, 
       criadaEm: data.criadaEm?.toDate() || new Date(),
-      
     });
   }
 

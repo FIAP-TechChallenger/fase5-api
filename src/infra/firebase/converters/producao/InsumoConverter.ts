@@ -6,7 +6,7 @@ export class InsumoConverter {
   static toFirestore(insumo: Insumo): InsumoFirebase {
     return {
       nome: insumo.nome,
-      unidadeMedida:insumo.unidadeMedida,
+      unidadeMedidaId:insumo.unidadeMedidaId,
       criadaEm: this._toTimestamp(insumo.criadaEm), 
      
     };
@@ -16,7 +16,7 @@ export class InsumoConverter {
     return new Insumo({
       id,
       nome: data.nome,
-      unidadeMedida: data.unidadeMedida,
+      unidadeMedidaId: data.unidadeMedidaId,
       criadaEm: data.criadaEm?.toDate() || new Date(),
       
     });

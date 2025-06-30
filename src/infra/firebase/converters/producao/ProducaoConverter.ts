@@ -5,9 +5,9 @@ import { ProducaoFirebase } from "../../models/producao/ProducaoFirebase";
 export class ProducaoConverter {
   static toFirestore(producao: Producao): ProducaoFirebase {
     return {
-        produto:producao.produto,
+        produtoId:producao.produtoId,
         quantidade: producao.quantidade,
-        fazenda: producao.fazenda,
+        fazendaId: producao.fazendaId,
         status: producao.status,
         criadaEm: this._toTimestamp(producao.criadaEm), 
      
@@ -17,9 +17,9 @@ export class ProducaoConverter {
   static fromFirestore(data: ProducaoFirebase, id: string): Producao {
     return new Producao({
       id,
-      produto:data.produto,
+      produtoId:data.produtoId,
       quantidade: data.quantidade,
-      fazenda: data.fazenda,
+      fazendaId: data.fazendaId,
       status: data.status,
       criadaEm: data.criadaEm?.toDate() || new Date(),
       

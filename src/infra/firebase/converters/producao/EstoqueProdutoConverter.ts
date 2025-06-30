@@ -1,12 +1,11 @@
 import { Timestamp } from "firebase-admin/firestore";
-import { Produto } from "@/domain/entities/producao/Produto";
 import { EstoqueProduto } from "@/domain/entities/producao/EstoqueProduto";
 import { EstoqueProdutoFirebase } from "../../models/producao/EstoqueProdutoFirebase";
 
 export class EstoqueProdutoConverter {
   static toFirestore(estoqueProduto: EstoqueProduto): EstoqueProdutoFirebase {
     return {
-        produto:estoqueProduto.produto,
+        produtoId:estoqueProduto.produtoId,
         quantidade: estoqueProduto.quantidade,
         preco: estoqueProduto.preco || 0,
         criadaEm: this._toTimestamp(estoqueProduto.criadaEm), 
@@ -17,7 +16,7 @@ export class EstoqueProdutoConverter {
   static fromFirestore(data: EstoqueProdutoFirebase, id: string): EstoqueProduto {
     return new EstoqueProduto({
       id,
-      produto:data.produto,
+      produtoId:data.produtoId,
       quantidade: data.quantidade,
       preco: data.preco,
       criadaEm: data.criadaEm?.toDate() || new Date(),

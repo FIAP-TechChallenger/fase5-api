@@ -3,7 +3,7 @@ import { Timestamp } from "firebase-admin/firestore";
 
 export interface InsumoFirebase {
     nome:string,
-    unidadeMedida: Medida,
+    unidadeMedidaId: string,
     criadaEm?: Timestamp | null
 
 

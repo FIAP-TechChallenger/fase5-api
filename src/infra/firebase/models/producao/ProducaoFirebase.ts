@@ -7,8 +7,8 @@ import { Timestamp } from "firebase-admin/firestore";
 export interface ProducaoFirebase{
     quantidade: number;
     status: ProducaoStatus;
-    produto:Produto;
-    fazenda: Fazenda;
+    produtoId:string;
+    fazendaId: string;
     criadaEm?: Timestamp | null
 
 }
