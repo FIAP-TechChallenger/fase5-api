@@ -1,4 +1,4 @@
-import { LoginResponseDTO } from "@/application/dtos/LoginResponseDTO";
+import { LoginResponseDTO } from "@/application/dtos/outros/LoginResponseDTO";
 
 export interface IAuthRepository {
   login(email: string, password: string): Promise<LoginResponseDTO>;

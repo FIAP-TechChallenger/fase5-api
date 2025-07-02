@@ -1,13 +1,15 @@
 import { Server } from "http";
-import { NotificationService } from "@/application/services/NotificationService";
 import { createSocketServer } from "../websocket/SocketServer";
-import { NotificationSocketGateway } from "@/application/services/NotificationSocketGateway";
+import { FirebaseNotificacaoRepository } from "@/infra/repositories/outros/FirebaseNotificacaoRepository";
+import { NotificacaoService } from "@/application/services/outros/NotificacaoService";
+import { NotificacaoSocketGateway } from "@/application/services/outros/NotificacaoSocketGateway";
 
 export function initializeNotifications(httpServer: Server) {
   const socket = createSocketServer(httpServer);
+  const repository = new FirebaseNotificacaoRepository();
 
-  const gateway = new NotificationSocketGateway(socket.sendToUser);
-  NotificationService.init(gateway);
+  const gateway = new NotificacaoSocketGateway(socket.send);
+  NotificacaoService.init(gateway, repository);
 
   return socket;
 }

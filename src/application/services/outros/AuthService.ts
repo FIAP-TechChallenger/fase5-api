@@ -1,4 +1,4 @@
-import { IAuthRepository } from "@/domain/repositories/IAuthRepository";
+import { IAuthRepository } from "@/domain/repositories/outros/IAuthRepository";
 
 export class AuthService {
   constructor(private authRepo: IAuthRepository) {}

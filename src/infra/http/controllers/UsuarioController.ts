@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import { AuthService } from "@/application/services/AuthService";
-import { FirebaseAuthRepository } from "@/infra/repositories/FirebaseAuthRepository";
+import { FirebaseAuthRepository } from "@/infra/repositories/outros/FirebaseAuthRepository";
 import { CriarUsuarioDTO } from "../dtos/CriarUsuarioDTO";
 
 export class UsuarioController {

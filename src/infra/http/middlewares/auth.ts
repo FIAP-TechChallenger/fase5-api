@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { FirebaseAuthProvider } from "@/infra/firebase/FirebaseAuthProvider";
-import { Usuario } from "@/domain/entities/Usuario";
+import { Usuario } from "@/domain/entities/outros/Usuario";
 import { AuthService } from "@/application/services/AuthService";
-import { FirebaseAuthRepository } from "@/infra/repositories/FirebaseAuthRepository";
+import { FirebaseAuthRepository } from "@/infra/repositories/outros/FirebaseAuthRepository";
 import { AuthCookieService } from "@/application/services/AuthCookieService";
 
 const authProvider = new FirebaseAuthProvider();
@@ -58,5 +58,10 @@ export async function authenticate(
 
 async function defineReqUser(req: Request, token: string) {
   const decoded = await authProvider.verifyToken(token);
-  req.user = new Usuario(decoded.uid, decoded.email || "", decoded.name);
+  req.user = new Usuario(
+    decoded.uid,
+    decoded.email || "",
+    decoded.name,
+    decoded.setor
+  );
 }

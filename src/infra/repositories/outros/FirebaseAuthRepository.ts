@@ -1,9 +1,9 @@
 import axios from "axios";
-import { admin } from "../firebase/firebase-initialize";
-import { IAuthRepository } from "src/domain/repositories/IAuthRepository";
-import { FirebaseSignInResponse } from "../firebase/models/FirebaseSignInResponse";
-import { LoginResponseDTO } from "../../application/dtos/LoginResponseDTO";
-import { FirebaseRefreshTokenResponse } from "../firebase/models/FirebaseRefreshTokenResponse";
+import { admin } from "../../firebase/firebase-initialize";
+import { IAuthRepository } from "@/domain/repositories/outros/IAuthRepository";
+import { FirebaseSignInResponse } from "../../firebase/models/outros/FirebaseSignInResponse";
+import { LoginResponseDTO } from "../../../application/dtos/outros/LoginResponseDTO";
+import { FirebaseRefreshTokenResponse } from "../../firebase/models/outros/FirebaseRefreshTokenResponse";
 
 export class FirebaseAuthRepository implements IAuthRepository {
   private _apiKey = process.env.FIREBASE_API_KEY;

@@ -1,0 +1,46 @@
+import { INotificacaoRepository } from "@/domain/repositories/outros/INotificacaoRepository";
+import { gerarUUID } from "@/shared/utils/gerarUUID";
+import { NotificacaoSocketGateway } from "./NotificacaoSocketGateway";
+import { Notificacao } from "@/domain/entities/outros/Notificacao";
+import { NotificacaoEnviarDTO } from "@/application/dtos/outros/NotificacaoEnviarDTO";
+
+export class NotificacaoService {
+  private static _instance: NotificacaoService;
+
+  private constructor(
+    private _gateway: NotificacaoSocketGateway,
+    private _repository: INotificacaoRepository
+  ) {}
+
+  // Inicialização obrigatória com o gateway
+  public static init(
+    gateway: NotificacaoSocketGateway,
+    repository: INotificacaoRepository
+  ) {
+    if (!this._instance) {
+      this._instance = new NotificacaoService(gateway, repository);
+    }
+  }
+
+  public static get instance(): NotificacaoService {
+    if (!this._instance) {
+      throw new Error(
+        "NotificacaoService não inicializado. Chame NotificacaoService.init()."
+      );
+    }
+    return this._instance;
+  }
+
+  public send(notification: NotificacaoEnviarDTO): void {
+    const newNotification: Notificacao = {
+      id: gerarUUID(),
+      descricao: notification.descricao,
+      tipo: notification.tipo,
+      titulo: notification.titulo,
+      lida: false,
+      dataEnvio: new Date(),
+    };
+    this._repository.inserir(newNotification);
+    this._gateway.sendNotification(newNotification);
+  }
+}
