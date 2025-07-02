@@ -3,26 +3,52 @@ import { Fazenda } from "@/domain/entities/producao/Fazenda";
 import { IFazendaRepository } from "@/domain/repositories/producao/IFazendaRepository";
 import { FazendaConverter } from "@/infra/firebase/converters/producao/FazendaConverter";
 import { FazendaFirebase } from "@/infra/firebase/models/producao/FazendaFirebase";
+import { FazendaBuscarTodosDTO } from "@/application/dtos/producao/fazenda/FazendaBuscarTodosDTO";
+import { FazendaBuscarTodosResponseDTO } from "@/application/dtos/producao/fazenda/FazendaBuscarTodosResponseDTO";
 
 export class FirebaseFazendaRepository implements IFazendaRepository {
-  private readonly collectionName = "fazendas";
+  
 
-  private getCollection() {
-    return admin.firestore().collection(this.collectionName);
-  }
-
-  async getAll(): Promise<Fazenda[]> {
-    const snapshot = await this.getCollection().get();
-    return snapshot.docs.map(doc => {
+  async buscarTodos(
+    dto: FazendaBuscarTodosDTO
+  ): Promise<FazendaBuscarTodosResponseDTO> {
+    const limite = dto?.limite ?? 10;
+  
+    let query = this._getCollection()
+      .orderBy("criadaEm", "desc")
+      .orderBy("__name__")
+      .limit(limite);
+  
+    if (dto?.ultimoId) {
+      const lastSnap = await this._getCollection().doc(dto.ultimoId).get();
+      if (lastSnap.exists) {
+        query = query.startAfter(lastSnap);
+      }
+    }
+  
+    const snapshot = await query.get();
+    const dados = snapshot.docs.map((doc) => {
       const data = doc.data() as FazendaFirebase;
       return FazendaConverter.fromFirestore(data, doc.id);
     });
+  
+    const lastVisible = dados[dados.length - 1];
+    return {
+      dados,
+      ultimoId: lastVisible?.id ?? null,
+      temMais: dados.length === limite,
+    };
   }
 
   async insert(fazenda: Fazenda): Promise<void> {
-    const data = FazendaConverter.toFirestore(fazenda);
-    await this.getCollection().doc(fazenda.id).set(data);
+    const data:FazendaFirebase = FazendaConverter.toFirestore(fazenda);
+    await this._getCollection().doc(fazenda.id).set(data);
   }
 
+  private _getCollection() {
+    return admin.firestore().collection("fazendas");
+  }
  
 }
+
+

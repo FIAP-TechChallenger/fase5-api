@@ -1,22 +1,28 @@
 // src/presentation/controllers/producao/FazendaController.ts
-import { FazendaInserirSchema } from "@/application/dtos/producao/FazendaInserirDTO";
+import { MetaBuscarTodosSchema } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
+import { FazendaBuscarTodosSchema } from "@/application/dtos/producao/fazenda/FazendaBuscarTodosDTO";
+import { FazendaInserirSchema } from "@/application/dtos/producao/fazenda/FazendaInserirDTO";
 import { FazendaService } from "@/application/services/producao/Fazendaservice";
 import { FirebaseFazendaRepository } from "@/infra/repositories/producao/firebaseFazendaRepository";
 import { Request, Response, Router } from "express";
+import { z, ZodError } from "zod";
 
-import { z } from "zod";
 
 export class FazendaController {
   private _fazendaService = new FazendaService(new FirebaseFazendaRepository());
 
-
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
-      const fazendas = await this._fazendaService.getAll();
+      const dto = FazendaBuscarTodosSchema.parse(req.body);
+      const fazendas = await this._fazendaService.buscarTodos(dto);
       res.status(200).json(fazendas);
     } catch (error) {
-      console.error("Erro ao buscar fazendas:", error);
-      res.status(500).json({ message: "Erro ao buscar fazendas" });
+      console.error("Erro real ao buscar fazendas =>", error); // <-- ADICIONE ISSO
+      let message = "Erro ao buscar fazendas";
+      if (error instanceof ZodError) {
+        message = error.message;
+      }
+      res.status(500).json({ message });
     }
   }
 
@@ -46,9 +52,8 @@ export class FazendaController {
   static routes() {
     const router = Router();
     const controller = new FazendaController();
-    
-    router.get("/", controller.buscarTodos.bind(controller));
-    router.post("/", controller.inserir.bind(controller)); 
+    router.post("/", controller.buscarTodos.bind(controller));
+    router.post("/inserir", controller.inserir.bind(controller)); 
     
     return router;
   }
