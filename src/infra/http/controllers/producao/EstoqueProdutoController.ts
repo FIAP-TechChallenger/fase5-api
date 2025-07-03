@@ -1,10 +1,11 @@
 // src/presentation/controllers/producao/FazendaController.ts
+import { EstoqueProdutoBuscarTodosSchema } from "@/application/dtos/producao/EstoqueProduto/EstoqueProdutoBuscarTodosDTO";
 import { EstoqueProdutoInserirSchema } from "@/application/dtos/producao/EstoqueProduto/EstoqueProdutoInserirDTO";
 import { EstoqueProdutoService } from "@/application/services/producao/EstoqueProdutoService";
 import { FirebaseEstoqueProdutoRepository } from "@/infra/repositories/producao/firebaseEstoqueProdutoRepository";
 import { Request, Response, Router } from "express";
 
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 export class EstqueProdutoController {
   private _EstoqueProdutoService = new EstoqueProdutoService(new FirebaseEstoqueProdutoRepository());
@@ -12,10 +13,15 @@ export class EstqueProdutoController {
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
-      const estoqueProdutos = await this._EstoqueProdutoService.getAll();
+      const dto = EstoqueProdutoBuscarTodosSchema.parse(req.body);
+      const estoqueProdutos = await this._EstoqueProdutoService.buscarTodos(dto);
       res.status(200).json(estoqueProdutos);
     } catch (error) {
       console.error("Erro ao buscar estoque de produtos:", error);
+      let message = "Erro ao buscar estoque de produtos";
+      if (error instanceof ZodError) {
+        message = error.message;
+      }
       res.status(500).json({ message: "Erro ao buscar estoque de produtos" });
     }
   }
@@ -47,8 +53,8 @@ export class EstqueProdutoController {
     const router = Router();
     const controller = new EstqueProdutoController();
     
-    router.get("/", controller.buscarTodos.bind(controller));
-    router.post("/", controller.inserir.bind(controller)); 
+    router.post("/", controller.buscarTodos.bind(controller));
+    router.post("/inserir", controller.inserir.bind(controller)); 
     
     return router;
   }

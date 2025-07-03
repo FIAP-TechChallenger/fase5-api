@@ -1,10 +1,11 @@
 // src/presentation/controllers/producao/FazendaController.ts
+import { ProdutoBuscarTodosSchema } from "@/application/dtos/producao/Produto/ProdutoBuscarTodosDTO";
 import { ProdutoInserirSchema } from "@/application/dtos/producao/Produto/ProdutoInserirDTO";
 import { ProdutoService } from "@/application/services/producao/ProdutoService";
 import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebaseProdutoRepository";
 import { Request, Response, Router } from "express";
 
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 export class ProdutoController {
   private _ProdutoService = new ProdutoService(new FirebaseProdutoRepository());
@@ -12,10 +13,16 @@ export class ProdutoController {
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
-      const produtos = await this._ProdutoService.getAll();
+      
+      const dto = ProdutoBuscarTodosSchema.parse(req.body);
+      const produtos = await this._ProdutoService.buscarTodos(dto);
       res.status(200).json(produtos);
     } catch (error) {
       console.error("Erro ao buscar Produtos:", error);
+      let message = "Erro ao buscar produto";
+      if (error instanceof ZodError) {
+        message = error.message;
+      }
       res.status(500).json({ message: "Erro ao buscar Produtos" });
     }
   }
@@ -47,8 +54,8 @@ export class ProdutoController {
     const router = Router();
     const controller = new ProdutoController();
     
-    router.get("/", controller.buscarTodos.bind(controller));
-    router.post("/", controller.inserir.bind(controller)); 
+    router.post("/", controller.buscarTodos.bind(controller));
+    router.post("/inserir", controller.inserir.bind(controller)); 
     
     return router;
   }

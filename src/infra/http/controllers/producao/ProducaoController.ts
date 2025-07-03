@@ -1,9 +1,12 @@
 // src/presentation/controllers/producao/FazendaController.ts
 
+import { ProducaoBuscarTodosSchema } from "@/application/dtos/producao/Producao/ProducaoBuscarTodosDTO";
 import { ProducaoInserirSchema } from "@/application/dtos/producao/Producao/ProducaoInserirDTO";
 import { ProducaoService } from "@/application/services/producao/ProducaoService";
 import { FirebaseProducaoRepository } from "@/infra/repositories/producao/firebaseProducaoRepository";
 import { Request, Response, Router } from "express";
+import { ZodError } from "zod";
+import { z } from "zod";
 
 export class ProducaoController {
   private _ProducaoService = new ProducaoService(
@@ -12,10 +15,15 @@ export class ProducaoController {
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
-      const producao = await this._ProducaoService.getAll();
+      const dto = ProducaoBuscarTodosSchema.parse(req.body);
+      const producao = await this._ProducaoService.buscarTodos(dto);
       res.status(200).json(producao);
     } catch (error) {
       console.error("Erro ao buscar producao:", error);
+      let message = "Erro ao buscar producao";
+      if (error instanceof ZodError) {
+        message = error.message;
+      }
       res.status(500).json({ message: "Erro ao buscar producao" });
     }
   }
@@ -46,7 +54,7 @@ export class ProducaoController {
     const router = Router();
     const controller = new ProducaoController();
 
-    router.get("/", controller.buscarTodos.bind(controller));
+    router.post("/", controller.buscarTodos.bind(controller));
     router.post("/", controller.inserir.bind(controller));
 
     return router;

@@ -21,7 +21,7 @@ export class EstoqueInsumoController {
       res.status(200).json(estoqueInsumos);
     } catch (error) {
       console.error("Erro ao buscar estoque de insumos:", error);
-      let message = "Erro ao buscar fazendas";
+      let message = "Erro ao buscar estoque de insumos";
       if (error instanceof ZodError) {
         message = error.message;
       }
@@ -56,8 +56,8 @@ export class EstoqueInsumoController {
     const router = Router();
     const controller = new EstoqueInsumoController();
     
-    router.get("/", controller.buscarTodos.bind(controller));
-    router.post("/", controller.inserir.bind(controller)); 
+    router.post("/", controller.buscarTodos.bind(controller));
+    router.post("/inserir", controller.inserir.bind(controller)); 
     
     return router;
   }

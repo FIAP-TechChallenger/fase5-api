@@ -1,10 +1,11 @@
 // src/presentation/controllers/producao/FazendaController.ts
+import { MedidaBuscarTodosSchema } from "@/application/dtos/producao/Medida/MedidaBuscarTodosDTO";
 import { MedidaInserirSchema } from "@/application/dtos/producao/Medida/MedidaInserirDTO";
 import { MedidaService } from "@/application/services/producao/MedidaService";
 import { FirebaseMedidaRepository } from "@/infra/repositories/producao/firebaseMedidaRepository";
 import { Request, Response, Router } from "express";
 
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 export class UnidadeMedidaController {
   private _UnidadeMedidaService = new MedidaService(new FirebaseMedidaRepository());
@@ -12,10 +13,15 @@ export class UnidadeMedidaController {
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
-      const fazendas = await this._UnidadeMedidaService.getAll();
-      res.status(200).json(fazendas);
+      const dto = MedidaBuscarTodosSchema.parse(req.body);
+      const medidas = await this._UnidadeMedidaService.buscarTodos(dto);
+      res.status(200).json(medidas);
     } catch (error) {
       console.error("Erro ao buscar unidade de medidas:", error);
+      let message = "Erro ao buscar medidas";
+      if (error instanceof ZodError) {
+        message = error.message;
+      }
       res.status(500).json({ message: "Erro ao buscar unidade de medidas" });
     }
   }
@@ -47,8 +53,8 @@ export class UnidadeMedidaController {
     const router = Router();
     const controller = new  UnidadeMedidaController();
     
-    router.get("/", controller.buscarTodos.bind(controller));
-    router.post("/", controller.inserir.bind(controller)); 
+    router.post("/", controller.buscarTodos.bind(controller));
+    router.post("/inserir", controller.inserir.bind(controller)); 
     
     return router;
   }

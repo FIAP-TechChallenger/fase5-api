@@ -1,10 +1,11 @@
 // src/presentation/controllers/producao/FazendaController.ts
+import { InsumoBuscarTodosSchema } from "@/application/dtos/producao/Insumo/InsumoBuscarTodosDTO";
 import { InsumoInserirSchema } from "@/application/dtos/producao/Insumo/InsumoInserirDTO";
 import { InsumoService } from "@/application/services/producao/InsumoService";
 import { FirebaseInsumoRepository } from "@/infra/repositories/producao/firebaseInsumoRepository";
 import { Request, Response, Router } from "express";
 
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 export class InsumoController {
   private _InsumoService = new InsumoService(new FirebaseInsumoRepository());
@@ -12,10 +13,15 @@ export class InsumoController {
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
-      const fazendas = await this._InsumoService.getAll();
-      res.status(200).json(fazendas);
+      const dto = InsumoBuscarTodosSchema.parse(req.body);
+      const insumos = await this._InsumoService.buscarTodos(dto);
+      res.status(200).json(insumos);
     } catch (error) {
       console.error("Erro ao buscar Insumos:", error);
+      let message = "Erro ao buscar insumos";
+      if (error instanceof ZodError) {
+        message = error.message;
+      }
       res.status(500).json({ message: "Erro ao buscar insumos" });
     }
   }
@@ -47,8 +53,8 @@ export class InsumoController {
     const router = Router();
     const controller = new InsumoController();
     
-    router.get("/", controller.buscarTodos.bind(controller));
-    router.post("/", controller.inserir.bind(controller)); 
+    router.post("/", controller.buscarTodos.bind(controller));
+    router.post("/inserir", controller.inserir.bind(controller)); 
     
     return router;
   }
