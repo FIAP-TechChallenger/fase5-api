@@ -3,7 +3,6 @@ import { MetaInserirDTO } from "@/application/dtos/comercial/MetaInserirDTO";
 import { MetaAtualizarDTO } from "@/application/dtos/comercial/MetaAtualizarDTO";
 import { Meta } from "@/domain/entities/comercial/Meta";
 import { gerarUUID } from "@/shared/utils/gerarUUID";
-import { MetaStatusEnum } from "@/domain/types/meta.enum";
 import { MetaBuscarTodosDTO } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
 import { MetaBuscarTodosResponseDTO } from "@/application/dtos/comercial/MetaBuscarTodosResponseDTO";
 
@@ -29,7 +28,6 @@ export class MetaService {
       dataFim: dto.dataFim,
       usuarioId: usuarioId,
       fazendaId: dto.fazendaId ?? null,
-      status: MetaStatusEnum.ATIVA,
       criadaEm: new Date(),
       atualizadaEm: new Date(),
     };

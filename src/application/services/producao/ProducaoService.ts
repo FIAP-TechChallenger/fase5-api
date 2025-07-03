@@ -19,9 +19,7 @@ export class ProducaoService {
       criadaEm: new Date(),
       produtoId: dto.produtoId,
       fazendaId: dto.fazendaId,
-      
     };
     await this.producaoRepository.insert(novaProducao);
   }
 }
-;

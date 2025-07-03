@@ -5,6 +5,7 @@ import { MetaConverter } from "@/infra/firebase/converters/comercial/MetaConvert
 import { MetaFirebase } from "@/infra/firebase/models/comercial/MetaFirebase";
 import { MetaBuscarTodosDTO } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
 import { MetaBuscarTodosResponseDTO } from "@/application/dtos/comercial/MetaBuscarTodosResponseDTO";
+import { MetaTipoEnum } from "@/domain/types/meta.enum";
 
 export class FirebaseMetaRepository implements IMetaRepository {
   async buscarTodos(
@@ -44,6 +45,19 @@ export class FirebaseMetaRepository implements IMetaRepository {
 
     const data = doc.data() as MetaFirebase;
     return MetaConverter.fromFirestore(data, doc.id);
+  }
+
+  async buscarPorPeriodoETipo(data: Date, tipo: MetaTipoEnum): Promise<Meta[]> {
+    const snapshot = await this._getCollection()
+      .where("tipo", "==", tipo)
+      .where("dataInicio", "<=", data)
+      .where("dataFim", ">=", data)
+      .get();
+
+    return snapshot.docs.map((doc) => {
+      const data = doc.data() as MetaFirebase;
+      return MetaConverter.fromFirestore(data, doc.id);
+    });
   }
 
   async inserir(meta: Meta): Promise<void> {

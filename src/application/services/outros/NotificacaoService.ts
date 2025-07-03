@@ -1,46 +1,34 @@
 import { INotificacaoRepository } from "@/domain/repositories/outros/INotificacaoRepository";
-import { gerarUUID } from "@/shared/utils/gerarUUID";
-import { NotificacaoSocketGateway } from "./NotificacaoSocketGateway";
-import { Notificacao } from "@/domain/entities/outros/Notificacao";
-import { NotificacaoEnviarDTO } from "@/application/dtos/outros/NotificacaoEnviarDTO";
+import { Usuario } from "@/domain/entities/outros/Usuario";
+import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
+import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
+import { NotificacaoBuscarTodasDTO } from "@/application/dtos/outros/NotificacaoBuscarTodasDTO";
+import { NotificacaoBuscarTodasResponseDTO } from "@/application/dtos/outros/NotificacaoBuscarTodasResponseDTO";
 
 export class NotificacaoService {
-  private static _instance: NotificacaoService;
+  constructor(private authRepo: INotificacaoRepository) {}
 
-  private constructor(
-    private _gateway: NotificacaoSocketGateway,
-    private _repository: INotificacaoRepository
-  ) {}
+  async buscarTodas(
+    usuario: Usuario,
+    dto: NotificacaoBuscarTodasDTO
+  ): Promise<NotificacaoBuscarTodasResponseDTO> {
+    let tipos: NotificacaoTipoEnum[] = [];
 
-  // Inicialização obrigatória com o gateway
-  public static init(
-    gateway: NotificacaoSocketGateway,
-    repository: INotificacaoRepository
-  ) {
-    if (!this._instance) {
-      this._instance = new NotificacaoService(gateway, repository);
+    switch (usuario.setor) {
+      case UsuarioSetorEnum.ADMIN:
+      case UsuarioSetorEnum.COMERCIAL:
+        tipos.push(NotificacaoTipoEnum.META_CONCLUIDA);
+        break;
     }
+
+    return this.authRepo.buscarPorTipos(tipos, dto);
   }
 
-  public static get instance(): NotificacaoService {
-    if (!this._instance) {
-      throw new Error(
-        "NotificacaoService não inicializado. Chame NotificacaoService.init()."
-      );
-    }
-    return this._instance;
+  async marcarTodasComoLidas(userId: string): Promise<void> {
+    this.authRepo.marcarTodasComoLidas(userId);
   }
 
-  public send(notification: NotificacaoEnviarDTO): void {
-    const newNotification: Notificacao = {
-      id: gerarUUID(),
-      descricao: notification.descricao,
-      tipo: notification.tipo,
-      titulo: notification.titulo,
-      lida: false,
-      dataEnvio: new Date(),
-    };
-    this._repository.inserir(newNotification);
-    this._gateway.sendNotification(newNotification);
+  async buscarQtdNaoLidas(userId: string): Promise<number> {
+    return this.authRepo.buscarQtdNaoLidas(userId);
   }
 }

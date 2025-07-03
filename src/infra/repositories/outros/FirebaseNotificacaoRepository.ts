@@ -4,31 +4,74 @@ import { Notificacao } from "@/domain/entities/outros/Notificacao";
 import { NotificacaoConverter } from "@/infra/firebase/converters/outros/NotificacaoConverter";
 import { NotificacaoFirebase } from "@/infra/firebase/models/outros/NotificacaoFirebase";
 import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
+import { getFirebaseTimeStamp } from "@/shared/utils/getFirebaseTimeStamp";
+import { NotificacaoBuscarTodasResponseDTO } from "@/application/dtos/outros/NotificacaoBuscarTodasResponseDTO";
+import { NotificacaoBuscarTodasDTO } from "@/application/dtos/outros/NotificacaoBuscarTodasDTO";
 
 export class FirebaseNotificacaoRepository implements INotificacaoRepository {
-  async buscarTodos(): Promise<Notificacao[]> {
-    const snapshot = await this._getCollection().get();
-    return snapshot.docs.map((doc) => {
-      const data = doc.data() as NotificacaoFirebase;
-      return NotificacaoConverter.fromFirestore(data, doc.id);
-    });
-  }
-
   async inserir(dados: Notificacao): Promise<void> {
     const data: NotificacaoFirebase = NotificacaoConverter.toFirestore(dados);
     await this._getCollection().doc(dados.id).set(data);
   }
 
-  async marcarComoLida(id: string, userId: string): Promise<void> {
-    const leituraRef = this._getCollection()
-      .doc(id)
-      .collection("leituraPorUsuario")
-      .doc(userId);
+  async buscarPorTipos(
+    tipos: NotificacaoTipoEnum[],
+    dto: NotificacaoBuscarTodasDTO
+  ): Promise<NotificacaoBuscarTodasResponseDTO> {
+    if (!tipos?.length) return { dados: [], ultimoId: null, temMais: false };
 
-    await leituraRef.set({
-      lida: true,
-      dataLeitura: admin.firestore.Timestamp.now(),
+    const limite = dto?.limite ?? 10;
+
+    let query = this._getCollection()
+      .where("tipo", "in", tipos)
+      .orderBy("dataEnvio", "desc")
+      .limit(limite);
+
+    if (dto?.ultimoId) {
+      const lastSnap = await this._getCollection().doc(dto.ultimoId).get();
+      if (lastSnap.exists) {
+        query = query.startAfter(lastSnap);
+      }
+    }
+
+    const snapshot = await query.get();
+    const dados = snapshot.docs.map((doc) => {
+      const data = doc.data() as NotificacaoFirebase;
+      return NotificacaoConverter.fromFirestore(data, doc.id);
     });
+
+    const lastVisible = dados[dados.length - 1];
+    return {
+      dados,
+      ultimoId: lastVisible?.id ?? null,
+      temMais: dados.length === limite,
+    };
+  }
+
+  async marcarTodasComoLidas(userId: string): Promise<void> {
+    const snapshot = await this._getCollection()
+      .orderBy("dataEnvio", "desc")
+      .get();
+
+    const batch = admin.firestore().batch();
+
+    for (const doc of snapshot.docs) {
+      const leituraDoc = await doc.ref
+        .collection("leituraPorUsuario")
+        .doc(userId)
+        .get();
+
+      if (!leituraDoc.exists) {
+        const leituraRef = doc.ref.collection("leituraPorUsuario").doc(userId);
+
+        batch.set(leituraRef, {
+          lida: true,
+          dataLeitura: getFirebaseTimeStamp(new Date()),
+        });
+      }
+    }
+
+    await batch.commit();
   }
 
   async buscarQtdNaoLidas(userId: string): Promise<number> {
@@ -45,25 +88,6 @@ export class FirebaseNotificacaoRepository implements INotificacaoRepository {
     }
 
     return count;
-  }
-
-  async buscarPorTipo(tipo: NotificacaoTipoEnum): Promise<Notificacao[]> {
-    const snapshot = await this._getCollection()
-      .where("tipo", "==", tipo)
-      .orderBy("dataEnvio", "desc")
-      .get();
-
-    return snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return new Notificacao({
-        id: doc.id,
-        titulo: data.titulo,
-        descricao: data.descricao,
-        tipo: data.tipo,
-        dataEnvio: data.dataEnvio.toDate(),
-        lida: false,
-      });
-    });
   }
 
   private _getCollection() {

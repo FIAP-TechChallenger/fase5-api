@@ -1,17 +1,13 @@
-// src/presentation/controllers/producao/FazendaController.ts
-import { InsumoInserirSchema } from "@/application/dtos/producao/InsumoInserirDTO";
+import { z } from "zod";
 import { ProducaoInserirSchema } from "@/application/dtos/producao/ProducaoInserirDTO";
-import { InsumoService } from "@/application/services/producao/InsumoService";
 import { ProducaoService } from "@/application/services/producao/ProducaoService";
-import { FirebaseInsumoRepository } from "@/infra/repositories/producao/firebaseInsumoRepository";
 import { FirebaseProducaoRepository } from "@/infra/repositories/producao/firebaseProducaoRepository";
 import { Request, Response, Router } from "express";
 
-import { z } from "zod";
-
 export class ProducaoController {
-  private _ProducaoService = new ProducaoService(new FirebaseProducaoRepository());
-
+  private _ProducaoService = new ProducaoService(
+    new FirebaseProducaoRepository()
+  );
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
@@ -33,10 +29,10 @@ export class ProducaoController {
       if (error instanceof z.ZodError) {
         res.status(400).json({
           message: "Erro de validação",
-          erros: error.errors.map(err => ({
-            campo: err.path.join('.'),
-            mensagem: err.message
-          }))
+          erros: error.errors.map((err) => ({
+            campo: err.path.join("."),
+            mensagem: err.message,
+          })),
         });
         return;
       }
@@ -45,14 +41,13 @@ export class ProducaoController {
     }
   }
 
-
   static routes() {
     const router = Router();
     const controller = new ProducaoController();
-    
+
     router.get("/", controller.buscarTodos.bind(controller));
-    router.post("/", controller.inserir.bind(controller)); 
-    
+    router.post("/", controller.inserir.bind(controller));
+
     return router;
   }
 }

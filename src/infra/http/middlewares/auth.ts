@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { FirebaseAuthProvider } from "@/infra/firebase/FirebaseAuthProvider";
 import { Usuario } from "@/domain/entities/outros/Usuario";
-import { AuthService } from "@/application/services/AuthService";
+import { AuthService } from "@/application/services/outros/AuthService";
 import { FirebaseAuthRepository } from "@/infra/repositories/outros/FirebaseAuthRepository";
-import { AuthCookieService } from "@/application/services/AuthCookieService";
+import { AuthCookieService } from "@/application/services/outros/AuthCookieService";
 
 const authProvider = new FirebaseAuthProvider();
 const authCookieService = new AuthCookieService();

@@ -1,8 +1,4 @@
-import {
-  MetaStatusEnum,
-  MetaTipoEnum,
-  MetaCalculoPorEnum,
-} from "@/domain/types/meta.enum";
+import { MetaTipoEnum, MetaCalculoPorEnum } from "@/domain/types/meta.enum";
 
 export class Meta {
   id: string;
@@ -13,7 +9,6 @@ export class Meta {
   valorAtual: number;
   dataInicio: Date;
   dataFim: Date;
-  status: MetaStatusEnum;
   calculoPor: MetaCalculoPorEnum;
   usuarioId: string;
   criadaEm: Date;
@@ -29,7 +24,6 @@ export class Meta {
     this.valorAtual = obj.valorAtual;
     this.dataInicio = obj.dataInicio;
     this.dataFim = obj.dataFim;
-    this.status = obj.status;
     this.calculoPor = obj.calculoPor;
     this.usuarioId = obj.usuarioId;
     this.criadaEm = obj.criadaEm;

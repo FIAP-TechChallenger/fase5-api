@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   MetaTipoEnumZod,
   MetaCalculoPorEnumZod,
-} from "@/domain/types/zod.enums";
+} from "@/domain/types/meta.enum";
 import { DateUtils } from "@/shared/utils/date.utils";
 
 export const MetaInserirBaseSchema = z.object({

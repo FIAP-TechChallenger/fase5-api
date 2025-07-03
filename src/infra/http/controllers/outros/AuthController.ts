@@ -1,9 +1,9 @@
 import { Request, Response, Router } from "express";
-import { AuthService } from "@/application/services/AuthService";
 import { FirebaseAuthRepository } from "@/infra/repositories/outros/FirebaseAuthRepository";
-import { LoginDTO } from "../dtos/LoginDTO";
-import { authenticate } from "../middlewares/auth";
-import { AuthCookieService } from "@/application/services/AuthCookieService";
+import { authenticate } from "@/infra/http/middlewares/auth";
+import { AuthCookieService } from "@/application/services/outros/AuthCookieService";
+import { AuthService } from "@/application/services/outros/AuthService";
+import { LoginDTO } from "../../dtos/LoginDTO";
 
 export class AuthController {
   private _authService = new AuthService(new FirebaseAuthRepository());
