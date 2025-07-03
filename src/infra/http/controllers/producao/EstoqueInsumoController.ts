@@ -1,4 +1,5 @@
 // src/presentation/controllers/producao/FazendaController.ts
+import { EstoqueInsumoBuscarTodosSchema } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoBuscarTodosDTO";
 import { EstoqueInsumoInserirSchema } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoInserirDTO";
 import { InsumoInserirSchema } from "@/application/dtos/producao/Insumo/InsumoInserirDTO";
 import { EstoqueInsumoService } from "@/application/services/producao/EstoqueInsumoService";
@@ -7,7 +8,7 @@ import { FirebaseEstoqueInsumoRepository } from "@/infra/repositories/producao/f
 import { FirebaseInsumoRepository } from "@/infra/repositories/producao/firebaseInsumoRepository";
 import { Request, Response, Router } from "express";
 
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 export class EstoqueInsumoController {
   private _EstoqueInsumoService = new EstoqueInsumoService(new FirebaseEstoqueInsumoRepository());
@@ -15,10 +16,15 @@ export class EstoqueInsumoController {
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
-      const estoqueInsumos = await this._EstoqueInsumoService.buscarTodos();
+      const dto = EstoqueInsumoBuscarTodosSchema.parse(req.body);
+      const estoqueInsumos = await this._EstoqueInsumoService.buscarTodos(dto);
       res.status(200).json(estoqueInsumos);
     } catch (error) {
       console.error("Erro ao buscar estoque de insumos:", error);
+      let message = "Erro ao buscar fazendas";
+      if (error instanceof ZodError) {
+        message = error.message;
+      }
       res.status(500).json({ message: "Erro ao buscar  estoque de insumos" });
     }
   }
