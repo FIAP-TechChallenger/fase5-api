@@ -46,7 +46,7 @@ export class FirebaseFazendaRepository implements IFazendaRepository {
   }
 
   private _getCollection() {
-    return admin.firestore().collection("fazendas");
+    return admin.firestore().collection("fazenda");
   }
  
 }

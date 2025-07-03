@@ -55,7 +55,7 @@ export class ProducaoController {
     const controller = new ProducaoController();
 
     router.post("/", controller.buscarTodos.bind(controller));
-    router.post("/", controller.inserir.bind(controller));
+    router.post("/inserir", controller.inserir.bind(controller));
 
     return router;
   }

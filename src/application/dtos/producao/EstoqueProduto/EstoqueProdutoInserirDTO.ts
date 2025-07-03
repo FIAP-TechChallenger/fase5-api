@@ -8,7 +8,7 @@ export const EstoqueProdutoInserirSchema = z.object({
     preco: z.number()
     .positive("Preço deve ser positivo")
     .min(0.01, "Preço mínimo: 0.01"),
-    criadoEm: z.coerce.date()
+   
 });
 
 export type EstoqueProdutoInserirDTO = z.infer<typeof EstoqueProdutoInserirSchema>;

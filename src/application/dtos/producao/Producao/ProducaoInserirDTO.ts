@@ -15,7 +15,7 @@ export const ProducaoInserirSchema = z.object({
   status: StatusProducao, 
   produtoId: z.string().uuid("ID do produto inválido"),
   fazendaId: z.string().uuid("ID da fazenda inválido"),
-  criadoEm: z.coerce.date()
+ 
 
 });
 
