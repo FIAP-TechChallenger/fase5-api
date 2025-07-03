@@ -12,7 +12,7 @@ export class NotificacaoController {
   async buscarTodas(req: Request, res: Response) {
     try {
       const dto = NotificacaoBuscarTodasSchema.parse(req.body);
-      const dados = this._notificacaoService.buscarTodas(req.user, dto);
+      const dados = await this._notificacaoService.buscarTodas(req.user, dto);
       res.status(200).json(dados);
     } catch (error: any) {
       let message = "Erro ao buscar metas";
@@ -25,7 +25,7 @@ export class NotificacaoController {
 
   async buscarQtdNaoLidas(req: Request, res: Response) {
     try {
-      const qtd = this._notificacaoService.buscarQtdNaoLidas(req.user.id);
+      const qtd = await this._notificacaoService.buscarQtdNaoLidas(req.user.id);
       res.status(200).json(qtd);
     } catch (error: any) {
       res.status(400).json({
@@ -37,8 +37,8 @@ export class NotificacaoController {
 
   async marcarTodasComoLidas(req: Request, res: Response) {
     try {
-      this._notificacaoService.marcarTodasComoLidas(req.user.id);
-      res.status(200);
+      await this._notificacaoService.marcarTodasComoLidas(req.user.id);
+      res.status(200).json({ message: "Marcado todas como lida" });
     } catch (error: any) {
       res.status(400).json({
         message: "Erro ao marcar todas as notificações como lidas",
