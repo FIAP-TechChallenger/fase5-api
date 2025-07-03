@@ -2,8 +2,6 @@ import { gerarUUID } from "@/shared/utils/gerarUUID";
 import { Fazenda } from "@/domain/entities/producao/Fazenda";
 import { IFazendaRepository } from "@/domain/repositories/producao/IFazendaRepository";
 import { FazendaInserirDTO } from "@/application/dtos/producao/fazenda/FazendaInserirDTO";
-import { MetaBuscarTodosDTO } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
-import { MetaBuscarTodosResponseDTO } from "@/application/dtos/comercial/MetaBuscarTodosResponseDTO";
 import { FazendaBuscarTodosDTO } from "@/application/dtos/producao/fazenda/FazendaBuscarTodosDTO";
 import { FazendaBuscarTodosResponseDTO } from "@/application/dtos/producao/fazenda/FazendaBuscarTodosResponseDTO";
 

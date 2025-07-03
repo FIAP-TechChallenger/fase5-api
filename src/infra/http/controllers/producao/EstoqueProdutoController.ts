@@ -1,5 +1,5 @@
 // src/presentation/controllers/producao/FazendaController.ts
-import { EstoqueProdutoInserirSchema } from "@/application/dtos/producao/EstoqueProdutoInserirDTO";
+import { EstoqueProdutoInserirSchema } from "@/application/dtos/producao/EstoqueProduto/EstoqueProdutoInserirDTO";
 import { EstoqueProdutoService } from "@/application/services/producao/EstoqueProdutoService";
 import { FirebaseEstoqueProdutoRepository } from "@/infra/repositories/producao/firebaseEstoqueProdutoRepository";
 import { Request, Response, Router } from "express";

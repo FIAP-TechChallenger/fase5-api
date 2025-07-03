@@ -1,5 +1,5 @@
 // src/presentation/controllers/producao/FazendaController.ts
-import { InsumoInserirSchema } from "@/application/dtos/producao/InsumoInserirDTO";
+import { InsumoInserirSchema } from "@/application/dtos/producao/Insumo/InsumoInserirDTO";
 import { InsumoService } from "@/application/services/producao/InsumoService";
 import { FirebaseInsumoRepository } from "@/infra/repositories/producao/firebaseInsumoRepository";
 import { Request, Response, Router } from "express";

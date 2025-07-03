@@ -1,14 +1,15 @@
 import { gerarUUID } from "@/shared/utils/gerarUUID";
-import { Fazenda } from "@/domain/entities/producao/Fazenda";
-import { IINsumoRepository } from "@/domain/repositories/producao/IInsumoRepository";
 import { Insumo } from "@/domain/entities/producao/Insumo";
-import { InsumoInserirDTO } from "@/application/dtos/producao/InsumoInserirDTO";
+import { InsumoInserirDTO } from "@/application/dtos/producao/Insumo/InsumoInserirDTO";
+import { InsumoBuscarTodosResponseDTO } from "@/application/dtos/producao/Insumo/InsumoBuscarTodosResponseDTO";
+import { InsumoBuscarTodosDTO } from "@/application/dtos/producao/Insumo/InsumoBuscarTodosDTO";
+import { IInsumoRepository } from "@/domain/repositories/producao/IInsumoRepository";
 
 export class InsumoService {
-  constructor(private readonly insumoRepository: IINsumoRepository) {}
+  constructor(private readonly insumoRepository: IInsumoRepository) {}
 
-  async getAll(): Promise<Insumo[]> {
-    return this.insumoRepository.getAll();
+  async buscarTodos(dto:InsumoBuscarTodosDTO): Promise<InsumoBuscarTodosResponseDTO> {
+    return this.insumoRepository.buscarTodos(dto);
   }
 
   async inserir(dto: InsumoInserirDTO): Promise<void> {

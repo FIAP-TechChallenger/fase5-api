@@ -1,6 +1,6 @@
 // src/presentation/controllers/producao/FazendaController.ts
-import { EstoqueInsumoInserirSchema } from "@/application/dtos/producao/EstoqueInsumoInserirDTO";
-import { InsumoInserirSchema } from "@/application/dtos/producao/InsumoInserirDTO";
+import { EstoqueInsumoInserirSchema } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoInserirDTO";
+import { InsumoInserirSchema } from "@/application/dtos/producao/Insumo/InsumoInserirDTO";
 import { EstoqueInsumoService } from "@/application/services/producao/EstoqueInsumoService";
 import { InsumoService } from "@/application/services/producao/InsumoService";
 import { FirebaseEstoqueInsumoRepository } from "@/infra/repositories/producao/firebaseEstoqueInsumoRepository";
@@ -15,7 +15,7 @@ export class EstoqueInsumoController {
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
-      const estoqueInsumos = await this._EstoqueInsumoService.getAll();
+      const estoqueInsumos = await this._EstoqueInsumoService.buscarTodos();
       res.status(200).json(estoqueInsumos);
     } catch (error) {
       console.error("Erro ao buscar estoque de insumos:", error);

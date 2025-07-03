@@ -1,5 +1,6 @@
-import { z } from "zod";
-import { ProducaoInserirSchema } from "@/application/dtos/producao/ProducaoInserirDTO";
+// src/presentation/controllers/producao/FazendaController.ts
+
+import { ProducaoInserirSchema } from "@/application/dtos/producao/Producao/ProducaoInserirDTO";
 import { ProducaoService } from "@/application/services/producao/ProducaoService";
 import { FirebaseProducaoRepository } from "@/infra/repositories/producao/firebaseProducaoRepository";
 import { Request, Response, Router } from "express";

@@ -2,14 +2,16 @@ import { gerarUUID } from "@/shared/utils/gerarUUID";
 import { Fazenda } from "@/domain/entities/producao/Fazenda";
 import { IMedidaRepository } from "@/domain/repositories/producao/IMedidaRepository";
 import { Medida } from "@/domain/entities/producao/Medida";
-import { MedidaInserirDTO } from "@/application/dtos/producao/MedidaInserirDTO";
+import { MedidaInserirDTO } from "@/application/dtos/producao/Medida/MedidaInserirDTO";
+import { MedidaBuscarTodosDTO } from "@/application/dtos/producao/Medida/MedidaBuscarTodosDTO";
+import { MedidaBuscarTodosResponseDTO } from "@/application/dtos/producao/Medida/MedidaBuscarTodosResponseDTO";
 
 
 export class MedidaService {
   constructor(private readonly medidaRepository: IMedidaRepository) {}
 
-  async getAll(): Promise<Medida[]> {
-    return this.medidaRepository.getAll();
+  async buscarTodos(dto:MedidaBuscarTodosDTO): Promise<MedidaBuscarTodosResponseDTO> {
+    return this.medidaRepository.buscarTodos(dto);
   }
 
   async inserir(dto: MedidaInserirDTO): Promise<void> {

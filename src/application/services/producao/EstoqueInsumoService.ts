@@ -1,13 +1,15 @@
 import { gerarUUID } from "@/shared/utils/gerarUUID";
 import { IEstoqueInsumoRepository } from "@/domain/repositories/producao/IEstoqueInsumoRepository";
 import { EstoqueInsumo } from "@/domain/entities/producao/EstoqueInsumo";
-import { EstoqueInsumoInserirDTO } from "@/application/dtos/producao/EstoqueInsumoInserirDTO";
+import { EstoqueInsumoInserirDTO } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoInserirDTO";
+import { EstoqueInsumoBuscarTodosDTO } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoBuscarTodosDTO";
+import { EstoqueInsumoBuscarTodosResponseDTO } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoBuscarTodosResponseDTO";
 
 export class EstoqueInsumoService {
   constructor(private readonly estoqueInsumoRepository: IEstoqueInsumoRepository) {}
 
-  async getAll(): Promise<EstoqueInsumo[]> {
-    return this.estoqueInsumoRepository.getAll();
+  async buscarTodos(dto:EstoqueInsumoBuscarTodosDTO): Promise<EstoqueInsumoBuscarTodosResponseDTO> {
+    return this.estoqueInsumoRepository.buscarTodos(dto);
   }
 
   async inserir(dto: EstoqueInsumoInserirDTO): Promise<void> {

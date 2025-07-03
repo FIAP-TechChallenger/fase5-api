@@ -1,5 +1,5 @@
 // src/presentation/controllers/producao/FazendaController.ts
-import { ProdutoInserirSchema } from "@/application/dtos/producao/ProdutoInserirDTO";
+import { ProdutoInserirSchema } from "@/application/dtos/producao/Produto/ProdutoInserirDTO";
 import { ProdutoService } from "@/application/services/producao/ProdutoService";
 import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebaseProdutoRepository";
 import { Request, Response, Router } from "express";

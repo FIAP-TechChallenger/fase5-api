@@ -1,5 +1,5 @@
 // src/presentation/controllers/producao/FazendaController.ts
-import { MedidaInserirSchema } from "@/application/dtos/producao/MedidaInserirDTO";
+import { MedidaInserirSchema } from "@/application/dtos/producao/Medida/MedidaInserirDTO";
 import { MedidaService } from "@/application/services/producao/MedidaService";
 import { FirebaseMedidaRepository } from "@/infra/repositories/producao/firebaseMedidaRepository";
 import { Request, Response, Router } from "express";
