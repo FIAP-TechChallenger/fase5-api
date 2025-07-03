@@ -1,4 +1,4 @@
-import { Server } from "socket.io";
+import { DefaultEventsMap, Server, Socket } from "socket.io";
 import http from "http";
 import { FirebaseAuthProvider } from "../firebase/FirebaseAuthProvider";
 import { Usuario } from "@/domain/entities/outros/Usuario";
@@ -8,8 +8,15 @@ import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
 
 interface SocketUserConnected {
   socketId: string;
-  setor: UsuarioSetorEnum;
+  setor: UsuarioSetorEnum | undefined;
 }
+
+type SocketType = Socket<
+  DefaultEventsMap,
+  DefaultEventsMap,
+  DefaultEventsMap,
+  Usuario
+>;
 
 const connectedUsers = new Map<string, SocketUserConnected>();
 const authProvider = new FirebaseAuthProvider();
@@ -23,7 +30,7 @@ export function createSocketServer(server: http.Server) {
   });
 
   // Middleware de autenticação WS
-  io.use(async (socket, next) => {
+  io.use(async (socket: SocketType, next) => {
     try {
       const token = socket.handshake.auth.token || socket.handshake.query.token;
 
@@ -32,20 +39,15 @@ export function createSocketServer(server: http.Server) {
       const user = await authProvider.verifyToken(token);
       if (!user?.id) return next(new Error("Token inválido"));
 
-      socket.data.user = new Usuario(
-        user.id,
-        user.email || "",
-        user.name,
-        user.setor
-      );
+      socket.data = user;
       next();
     } catch (error) {
       next(new Error("Autenticação WS inválida"));
     }
   });
 
-  io.on("connection", (socket) => {
-    const userId = socket.data.userId;
+  io.on("connection", (socket: SocketType) => {
+    const userId = socket.data.id;
 
     connectedUsers.set(userId, {
       socketId: socket.id,

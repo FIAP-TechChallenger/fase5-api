@@ -30,7 +30,7 @@ export async function authenticate(
   }
 
   try {
-    await defineReqUser(req, token);
+    req.user = await authProvider.verifyToken(token);
     next();
   } catch (error) {
     // Token inválido ou expirado
@@ -48,20 +48,10 @@ export async function authenticate(
       authCookieService.setToken(res, refreshResponse.token);
       authCookieService.setRefreshToken(res, refreshResponse.refreshToken);
 
-      await defineReqUser(req, refreshResponse.token);
+      req.user = await authProvider.verifyToken(refreshResponse.token);
       next();
     } catch (refreshError) {
       res.status(401).json({ message: "Token inválido" });
     }
   }
-}
-
-async function defineReqUser(req: Request, token: string) {
-  const decoded = await authProvider.verifyToken(token);
-  req.user = new Usuario(
-    decoded.uid,
-    decoded.email || "",
-    decoded.name,
-    decoded.setor
-  );
 }
