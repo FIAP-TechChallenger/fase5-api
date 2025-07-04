@@ -1,5 +1,4 @@
 import { Insumo } from "@/domain/entities/producao/Insumo";
-import { Produto } from "@/domain/entities/producao/Produto";
 
 
 
