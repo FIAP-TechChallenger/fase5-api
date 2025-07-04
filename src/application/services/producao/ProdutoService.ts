@@ -2,14 +2,31 @@ import { gerarUUID } from "@/shared/utils/gerarUUID";
 import { IProdutoRepository } from "@/domain/repositories/producao/IProdutoRepository";
 import { Produto } from "@/domain/entities/producao/Produto";
 import { ProdutoInserirDTO } from "@/application/dtos/producao/Produto/ProdutoInserirDTO";
-import { ProducaoBuscarTodosDTO } from "@/application/dtos/producao/Producao/ProducaoBuscarTodosDTO";
 import { ProdutoBuscarTodosResponseDTO } from "@/application/dtos/producao/Produto/ProdutoBuscarTodosResponseDTO";
+import { ProdutoBuscarTodosDTO } from "@/application/dtos/producao/Produto/ProdutoBuscarTodosDTO";
+import { IMedidaRepository } from "@/domain/repositories/producao/IMedidaRepository";
 
 export class ProdutoService {
-  constructor(private readonly produtoRepository: IProdutoRepository) {}
+  constructor(
+    private readonly produtoRepository: IProdutoRepository,
+    private readonly unidadeMedidaService: IMedidaRepository,
+  ) {}
 
-  async buscarTodos(dto:ProducaoBuscarTodosDTO): Promise<ProdutoBuscarTodosResponseDTO> {
-    return this.produtoRepository.buscarTodos(dto);
+  async buscarTodos(dto: ProdutoBuscarTodosDTO): Promise<ProdutoBuscarTodosResponseDTO> {
+    const response = await this.produtoRepository.buscarTodos(dto);
+  
+    const produtosComSigla = await Promise.all(
+      response.dados.map(async (produto) => {
+        const sigla = await this.unidadeMedidaService.buscarSigla(produto.unidadeMedidaId);
+        return new Produto({ ...produto, unidadeMedidaSigla: sigla });
+      })
+    );
+  
+    return {
+      dados: produtosComSigla,
+      temMais: response.temMais,
+      ultimoId: response.ultimoId,
+    };
   }
 
   async inserir(dto: ProdutoInserirDTO): Promise<void> {

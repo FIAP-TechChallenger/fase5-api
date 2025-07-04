@@ -38,9 +38,18 @@ export class FirebaseMedidaRepository implements IMedidaRepository {
     };
   }
 
-  async insert(medida:Medida): Promise<void> {
+  async inserir(medida:Medida): Promise<void> {
     const data:MedidaFirebase = MedidaConverter.toFirestore(medida);
     await this._getCollection().doc(medida.id).set(data);
+  }
+  async buscarSigla(medidaId: string): Promise<string> {
+    const doc = await this._getCollection().doc(medidaId).get();
+  
+    if (!doc.exists) {
+      throw new Error(`Medida com ID ${medidaId} não encontrada`);
+    }
+    const data = doc.data() as MedidaFirebase;
+    return data.sigla;
   }
 
   private _getCollection() {

@@ -21,6 +21,9 @@ export class MedidaService {
       sigla: dto.sigla,
       criadaEm: new Date(),
     };
-    await this.medidaRepository.insert(novaMedida);
+    await this.medidaRepository.inserir(novaMedida);
+  }
+  async buscarSigla(medidaId: string): Promise<string> {
+    return this.medidaRepository.buscarSigla(medidaId);
   }
 }

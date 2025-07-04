@@ -1,14 +1,24 @@
 // src/presentation/controllers/producao/FazendaController.ts
 import { ProdutoBuscarTodosSchema } from "@/application/dtos/producao/Produto/ProdutoBuscarTodosDTO";
 import { ProdutoInserirSchema } from "@/application/dtos/producao/Produto/ProdutoInserirDTO";
+import { MedidaService } from "@/application/services/producao/MedidaService";
 import { ProdutoService } from "@/application/services/producao/ProdutoService";
+import { FirebaseMedidaRepository } from "@/infra/repositories/producao/firebaseMedidaRepository";
 import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebaseProdutoRepository";
 import { Request, Response, Router } from "express";
 
 import { z, ZodError } from "zod";
 
 export class ProdutoController {
-  private _ProdutoService = new ProdutoService(new FirebaseProdutoRepository());
+  private _ProdutoService: ProdutoService;
+
+  constructor() {
+    const produtoRepository = new FirebaseProdutoRepository();
+    const medidaRepository = new FirebaseMedidaRepository(); 
+    const medidaService = new MedidaService(medidaRepository); 
+
+    this._ProdutoService = new ProdutoService(produtoRepository, medidaService); 
+  }
 
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
