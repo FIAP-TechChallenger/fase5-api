@@ -3,7 +3,7 @@ import { ProdutoBuscarTodosResponseDTO } from "@/application/dtos/producao/Produ
 import { Produto } from "@/domain/entities/producao/Produto";
 
 export interface IProdutoRepository{
-      // buscarPorId(id: string): Promise<Fazenda | null>;
+      buscarPorId(id: string): Promise<Produto | null>;
       buscarTodos(dto:ProdutoBuscarTodosDTO): Promise<ProdutoBuscarTodosResponseDTO>
       insert(produto:Produto ): Promise<void>;
       // atualizar(fazenda: Fazenda ): Promise<void>;

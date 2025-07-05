@@ -39,6 +39,14 @@ export class FirebaseProdutoRepository implements IProdutoRepository {
     };
   }
 
+  async buscarPorId(id: string): Promise<Produto | null> {
+    const doc = await this._getCollection().doc(id).get();
+    if (!doc.exists) return null;
+
+    const data = doc.data() as ProdutoFirebase;
+    return ProdutoConverter.fromFirestore(data, doc.id);
+    
+  }
   async insert(produto: Produto): Promise<void> {
     const data:ProdutoFirebase = ProdutoConverter.toFirestore(produto);
     await this._getCollection().doc(produto.id).set(data);

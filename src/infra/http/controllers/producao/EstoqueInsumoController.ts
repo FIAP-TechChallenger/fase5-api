@@ -19,7 +19,7 @@ export class EstoqueInsumoController {
     this._EstoqueInsumoService = new EstoqueInsumoService(
       new FirebaseEstoqueInsumoRepository(),
       new FirebaseInsumoRepository(),
-      new FirebaseMedidaRepository() // Novo repositório
+      new FirebaseMedidaRepository() 
     );
   }
 

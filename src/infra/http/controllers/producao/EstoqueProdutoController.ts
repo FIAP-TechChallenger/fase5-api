@@ -3,13 +3,23 @@ import { EstoqueProdutoBuscarTodosSchema } from "@/application/dtos/producao/Est
 import { EstoqueProdutoInserirSchema } from "@/application/dtos/producao/EstoqueProduto/EstoqueProdutoInserirDTO";
 import { EstoqueProdutoService } from "@/application/services/producao/EstoqueProdutoService";
 import { FirebaseEstoqueProdutoRepository } from "@/infra/repositories/producao/firebaseEstoqueProdutoRepository";
+import { FirebaseMedidaRepository } from "@/infra/repositories/producao/firebaseMedidaRepository";
+import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebaseProdutoRepository";
 import { Request, Response, Router } from "express";
 
 import { z, ZodError } from "zod";
 
 export class EstqueProdutoController {
-  private _EstoqueProdutoService = new EstoqueProdutoService(new FirebaseEstoqueProdutoRepository());
+  private _EstoqueProdutoService: EstoqueProdutoService;
 
+  constructor() {
+    // Injetando todas as dependências
+    this._EstoqueProdutoService = new EstoqueProdutoService(
+      new FirebaseEstoqueProdutoRepository(),
+      new FirebaseProdutoRepository(),
+      new FirebaseMedidaRepository() // Novo repositório
+    );
+  }
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
