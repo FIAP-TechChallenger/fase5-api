@@ -39,4 +39,5 @@ export class InsumoService {
     };
     await this.insumoRepository.insert(novoInsumo);
   }
+  
 }

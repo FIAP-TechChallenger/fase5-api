@@ -37,6 +37,14 @@ export class FirebaseInsumoRepository implements IInsumoRepository {
       temMais: dados.length === limite,
     };
   }
+  async buscarPorId(id: string): Promise<Insumo | null> {
+    const doc = await this._getCollection().doc(id).get();
+    if (!doc.exists) return null;
+
+    const data = doc.data() as InsumoFirebase;
+    return InsumoConverter.fromFirestore(data, doc.id);
+    
+  }
 
   async insert(insumo: Insumo): Promise<void> {
     const data:InsumoFirebase = InsumoConverter.toFirestore(insumo);

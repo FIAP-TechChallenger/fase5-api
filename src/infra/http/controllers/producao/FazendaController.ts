@@ -1,5 +1,4 @@
 // src/presentation/controllers/producao/FazendaController.ts
-import { MetaBuscarTodosSchema } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
 import { FazendaBuscarTodosSchema } from "@/application/dtos/producao/fazenda/FazendaBuscarTodosDTO";
 import { FazendaInserirSchema } from "@/application/dtos/producao/fazenda/FazendaInserirDTO";
 import { FazendaService } from "@/application/services/producao/Fazendaservice";

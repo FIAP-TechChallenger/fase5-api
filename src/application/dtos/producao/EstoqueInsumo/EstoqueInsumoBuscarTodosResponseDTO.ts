@@ -1,8 +1,13 @@
 import { EstoqueInsumo } from "@/domain/entities/producao/EstoqueInsumo";
 
+
+export type EstoqueInsumoItemDTO = EstoqueInsumo & {
+  insumoNome?: string;
+  unidadeMedidaSigla?: string;
+};
+
 export interface EstoqueInsumoBuscarTodosResponseDTO {
-    dados: EstoqueInsumo[];
-    ultimoId: string;
-    temMais: boolean;
-  }
-  
+  dados: EstoqueInsumoItemDTO[];
+  ultimoId: string | null;
+  temMais: boolean;
+}

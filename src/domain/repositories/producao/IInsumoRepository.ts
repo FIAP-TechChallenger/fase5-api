@@ -3,8 +3,9 @@ import { InsumoBuscarTodosResponseDTO } from "@/application/dtos/producao/Insumo
 import { Insumo } from "@/domain/entities/producao/Insumo"
 
 export interface IInsumoRepository{
-    // buscarPorId(id: string): Promise<Fazenda | null>;
+    buscarPorId(id: string): Promise<Insumo| null>;
     buscarTodos(dto:InsumoBuscarTodosDTO): Promise<InsumoBuscarTodosResponseDTO>
     insert(insumo: Insumo ): Promise<void>;
     // atualizar(fazenda: Fazenda ): Promise<void>;
+  
 }

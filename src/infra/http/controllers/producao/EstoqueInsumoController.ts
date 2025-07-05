@@ -6,13 +6,22 @@ import { EstoqueInsumoService } from "@/application/services/producao/EstoqueIns
 import { InsumoService } from "@/application/services/producao/InsumoService";
 import { FirebaseEstoqueInsumoRepository } from "@/infra/repositories/producao/firebaseEstoqueInsumoRepository";
 import { FirebaseInsumoRepository } from "@/infra/repositories/producao/firebaseInsumoRepository";
+import { FirebaseMedidaRepository } from "@/infra/repositories/producao/firebaseMedidaRepository";
 import { Request, Response, Router } from "express";
 
 import { z, ZodError } from "zod";
 
 export class EstoqueInsumoController {
-  private _EstoqueInsumoService = new EstoqueInsumoService(new FirebaseEstoqueInsumoRepository());
+  private _EstoqueInsumoService: EstoqueInsumoService;
 
+  constructor() {
+    // Injetando todas as dependências
+    this._EstoqueInsumoService = new EstoqueInsumoService(
+      new FirebaseEstoqueInsumoRepository(),
+      new FirebaseInsumoRepository(),
+      new FirebaseMedidaRepository() // Novo repositório
+    );
+  }
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
