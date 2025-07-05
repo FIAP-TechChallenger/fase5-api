@@ -1,9 +1,9 @@
 import axios from "axios";
-import { admin } from "../../firebase/firebase-initialize";
+import { admin } from "@/infra/firebase/firebase-initialize";
 import { IAuthRepository } from "@/domain/repositories/outros/IAuthRepository";
-import { FirebaseSignInResponse } from "../../firebase/models/outros/FirebaseSignInResponse";
-import { LoginResponseDTO } from "../../../application/dtos/outros/LoginResponseDTO";
-import { FirebaseRefreshTokenResponse } from "../../firebase/models/outros/FirebaseRefreshTokenResponse";
+import { FirebaseSignInResponse } from "@/infra/firebase/models/outros/FirebaseSignInResponse";
+import { LoginResponseDTO } from "@/application/dtos/outros/LoginResponseDTO";
+import { FirebaseRefreshTokenResponse } from "@/infra/firebase/models/outros/FirebaseRefreshTokenResponse";
 
 export class FirebaseAuthRepository implements IAuthRepository {
   private _apiKey = process.env.FIREBASE_API_KEY;
@@ -66,10 +66,6 @@ export class FirebaseAuthRepository implements IAuthRepository {
       }
       throw error;
     }
-  }
-
-  async register(email: string, password: string) {
-    await admin.auth().createUser({ email, password });
   }
 
   async revokeTokens(uid: string) {

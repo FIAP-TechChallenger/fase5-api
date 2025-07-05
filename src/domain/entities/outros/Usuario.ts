@@ -1,10 +1,17 @@
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 
 export class Usuario {
-  constructor(
-    public readonly id: string,
-    public readonly email: string,
-    public readonly name?: string,
-    public readonly setor?: UsuarioSetorEnum
-  ) {}
+  id: string;
+  email: string;
+  nome: string;
+  setor: UsuarioSetorEnum;
+  primeiroAcesso?: boolean;
+
+  constructor(obj: Usuario) {
+    this.id = obj.id;
+    this.email = obj.email;
+    this.nome = obj.nome;
+    this.setor = obj.setor;
+    this.primeiroAcesso = obj.primeiroAcesso;
+  }
 }

@@ -1,24 +1,8 @@
 import { z } from "zod";
 
-const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+export const LoginSchema = z.object({
+  email: z.string().email("E-mail inválido"),
+  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
 });
 
-export class LoginDTO {
-  public email: string;
-  public password: string;
-
-  private constructor(email: string, password: string) {
-    this.email = email;
-    this.password = password;
-  }
-
-  static validate(data: unknown): LoginDTO {
-    const result = schema.safeParse(data);
-    if (!result.success) throw new Error("Dados inválidos");
-
-    const { email, password } = result.data;
-    return new LoginDTO(email, password);
-  }
-}
+export type LoginDTO = z.infer<typeof LoginSchema>;

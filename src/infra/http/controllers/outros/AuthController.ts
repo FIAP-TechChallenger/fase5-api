@@ -3,7 +3,7 @@ import { FirebaseAuthRepository } from "@/infra/repositories/outros/FirebaseAuth
 import { authenticate } from "@/infra/http/middlewares/auth";
 import { AuthCookieService } from "@/application/services/outros/AuthCookieService";
 import { AuthService } from "@/application/services/outros/AuthService";
-import { LoginDTO } from "../../dtos/LoginDTO";
+import { LoginSchema } from "../../dtos/LoginDTO";
 
 export class AuthController {
   private _authService = new AuthService(new FirebaseAuthRepository());
@@ -11,7 +11,7 @@ export class AuthController {
 
   async login(req: Request, res: Response): Promise<void> {
     try {
-      const dto = LoginDTO.validate(req.body);
+      const dto = LoginSchema.parse(req.body);
       const authData = await this._authService.login(dto.email, dto.password);
 
       this._authCookieService.setToken(res, authData.token);
