@@ -3,15 +3,23 @@
 import { ProducaoBuscarTodosSchema } from "@/application/dtos/producao/Producao/ProducaoBuscarTodosDTO";
 import { ProducaoInserirSchema } from "@/application/dtos/producao/Producao/ProducaoInserirDTO";
 import { ProducaoService } from "@/application/services/producao/ProducaoService";
+import { FirebaseFazendaRepository } from "@/infra/repositories/producao/firebaseFazendaRepository";
 import { FirebaseProducaoRepository } from "@/infra/repositories/producao/firebaseProducaoRepository";
+import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebaseProdutoRepository";
 import { Request, Response, Router } from "express";
 import { ZodError } from "zod";
 import { z } from "zod";
 
 export class ProducaoController {
-  private _ProducaoService = new ProducaoService(
-    new FirebaseProducaoRepository()
-  );
+  private _ProducaoService: ProducaoService;
+
+  constructor() {
+    this._ProducaoService = new ProducaoService(
+      new FirebaseProducaoRepository(),
+      new FirebaseFazendaRepository(), 
+      new FirebaseProdutoRepository()
+    )
+  }
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {

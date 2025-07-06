@@ -13,11 +13,10 @@ export class EstqueProdutoController {
   private _EstoqueProdutoService: EstoqueProdutoService;
 
   constructor() {
-    // Injetando todas as dependências
     this._EstoqueProdutoService = new EstoqueProdutoService(
       new FirebaseEstoqueProdutoRepository(),
       new FirebaseProdutoRepository(),
-      new FirebaseMedidaRepository() // Novo repositório
+      new FirebaseMedidaRepository() 
     );
   }
 

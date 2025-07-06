@@ -4,6 +4,7 @@ import { Produto } from "@/domain/entities/producao/Produto";
 
 export interface IProdutoRepository{
       buscarPorId(id: string): Promise<Produto | null>;
+      buscarNome(nomeId: string):Promise<string>;
       buscarTodos(dto:ProdutoBuscarTodosDTO): Promise<ProdutoBuscarTodosResponseDTO>
       insert(produto:Produto ): Promise<void>;
       // atualizar(fazenda: Fazenda ): Promise<void>;

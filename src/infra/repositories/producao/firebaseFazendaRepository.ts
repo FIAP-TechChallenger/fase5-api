@@ -39,7 +39,16 @@ export class FirebaseFazendaRepository implements IFazendaRepository {
       temMais: dados.length === limite,
     };
   }
-
+  async buscarNome(fazendaId: string): Promise<string> {
+    const doc = await this._getCollection().doc(fazendaId).get();
+  
+    if (!doc.exists) {
+      throw new Error(`fazenda com ID ${fazendaId} não encontrada`);
+    }
+    const data = doc.data() as FazendaFirebase;
+    return data.nome;
+    
+  }
   async insert(fazenda: Fazenda): Promise<void> {
     const data:FazendaFirebase = FazendaConverter.toFirestore(fazenda);
     await this._getCollection().doc(fazenda.id).set(data);
