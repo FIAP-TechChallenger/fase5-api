@@ -68,7 +68,14 @@ export class FirebaseUsuarioRepository implements IUsuarioRepository {
     await this._getCollection().doc(userRecord.uid).set(data);
   }
 
-  async gerarEmailPrimeiroAcesso(email: string) {
+  async atualizar(usuario: Usuario): Promise<void> {
+    const data: UsuarioFirebase = UsuarioConverter.toFirestore(usuario);
+    await this._getCollection()
+      .doc(usuario.id)
+      .update({ ...data });
+  }
+
+  async gerarLinkRedefinirSenha(email: string) {
     return admin.auth().generatePasswordResetLink(email);
   }
 

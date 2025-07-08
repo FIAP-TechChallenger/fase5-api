@@ -4,10 +4,14 @@ import { authenticate } from "@/infra/http/middlewares/auth";
 import { AuthCookieService } from "@/application/services/outros/AuthCookieService";
 import { AuthService } from "@/application/services/outros/AuthService";
 import { LoginSchema } from "../../dtos/LoginDTO";
+import { FirebaseUsuarioRepository } from "@/infra/repositories/outros/FirebaseUsuarioRepository";
 
 export class AuthController {
-  private _authService = new AuthService(new FirebaseAuthRepository());
   private _authCookieService = new AuthCookieService();
+  private _authService = new AuthService(
+    new FirebaseAuthRepository(),
+    new FirebaseUsuarioRepository()
+  );
 
   async login(req: Request, res: Response): Promise<void> {
     try {

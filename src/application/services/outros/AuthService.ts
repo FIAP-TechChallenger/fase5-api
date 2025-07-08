@@ -1,10 +1,21 @@
 import { IAuthRepository } from "@/domain/repositories/outros/IAuthRepository";
+import { IUsuarioRepository } from "@/domain/repositories/outros/IUsuarioRepository";
 
 export class AuthService {
-  constructor(private authRepo: IAuthRepository) {}
+  constructor(
+    private authRepo: IAuthRepository,
+    private usuarioRepo: IUsuarioRepository
+  ) {}
 
-  login(email: string, password: string) {
-    return this.authRepo.login(email, password);
+  async login(email: string, password: string) {
+    const result = await this.authRepo.login(email, password);
+    if (result) {
+      const usuarioSalvo = await this.usuarioRepo.buscarPorId(result.userId);
+      if (usuarioSalvo?.primeiroAcesso) {
+        this.usuarioRepo.atualizar({ ...usuarioSalvo, primeiroAcesso: false });
+      }
+    }
+    return result;
   }
 
   refresh(refreshToken: string) {

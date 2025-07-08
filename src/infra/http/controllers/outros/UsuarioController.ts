@@ -49,11 +49,54 @@ export class UsuarioController {
     }
   }
 
+  async atualizar(req: Request, res: Response) {
+    try {
+      if (req.user.setor !== UsuarioSetorEnum.ADMIN) {
+        res.status(401).json({ message: "Usuário sem autorização" });
+        return;
+      }
+
+      const dto = UsuarioInserirSchema.parse(req.body);
+      await this._usuarioCadastro.inserir(dto);
+      res.status(201).json({ message: "Usuario cadastrado com sucesso." });
+    } catch (error: any) {
+      res
+        .status(400)
+        .json({ message: "Erro ao registrar usuário", error: error.message });
+    }
+  }
+
+  async recuperarSenha(req: Request, res: Response) {
+    try {
+      if (req.user.setor !== UsuarioSetorEnum.ADMIN) {
+        res.status(401).json({ message: "Usuário sem autorização" });
+        return;
+      }
+
+      const usuarioId = req.body?.usuarioId;
+      if (!usuarioId) {
+        res
+          .status(401)
+          .json({ message: "Necessário especificar 'usuarioId'." });
+        return;
+      }
+
+      await this._usuarioCadastro.recuperarSenha(usuarioId);
+      res.status(201).json({ message: "Usuario cadastrado com sucesso." });
+    } catch (error: any) {
+      res
+        .status(400)
+        .json({ message: "Erro ao registrar usuário", error: error.message });
+    }
+  }
+
   static routes() {
     const router = Router();
     const controller = new UsuarioController();
     router.post("/", controller.buscarTodos.bind(controller));
     router.post("/inserir", controller.inserir.bind(controller));
+    router.post("/atualizar", controller.atualizar.bind(controller));
+    router.post("/recuperarSenha", controller.recuperarSenha.bind(controller));
     return router;
   }
 }

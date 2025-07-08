@@ -10,5 +10,6 @@ export interface IUsuarioRepository {
   ): Promise<UsuarioBuscarTodosResponseDTO>;
 
   inserir(email: string, nome: string, setor: UsuarioSetorEnum): Promise<void>;
-  gerarEmailPrimeiroAcesso(email: string): Promise<string>;
+  atualizar(usuario: Usuario): Promise<void>;
+  gerarLinkRedefinirSenha(email: string): Promise<string>;
 }

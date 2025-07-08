@@ -4,6 +4,7 @@ import { Usuario } from "@/domain/entities/outros/Usuario";
 import { AuthService } from "@/application/services/outros/AuthService";
 import { FirebaseAuthRepository } from "@/infra/repositories/outros/FirebaseAuthRepository";
 import { AuthCookieService } from "@/application/services/outros/AuthCookieService";
+import { FirebaseUsuarioRepository } from "@/infra/repositories/outros/FirebaseUsuarioRepository";
 
 const authProvider = new FirebaseAuthProvider();
 const authCookieService = new AuthCookieService();
@@ -42,7 +43,10 @@ export async function authenticate(
     }
 
     try {
-      const authService = new AuthService(new FirebaseAuthRepository());
+      const authService = new AuthService(
+        new FirebaseAuthRepository(),
+        new FirebaseUsuarioRepository()
+      );
       const refreshResponse = await authService.refresh(refreshToken);
 
       authCookieService.setToken(res, refreshResponse.token);

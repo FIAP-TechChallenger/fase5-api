@@ -3,6 +3,9 @@ import { IEmailService } from "@/domain/interfaces/IEmailService";
 import { IUsuarioRepository } from "@/domain/repositories/outros/IUsuarioRepository";
 
 export class UsuarioCadastroService {
+  private _primeiroAcessoEmailAssunto = "AgroFlow - Primeiro acesso";
+  private _recuperarSenhaEmailAssunto = "AgroFlow - Recuperação de senha";
+
   constructor(
     private emailService: IEmailService,
     private _usuarioRepo: IUsuarioRepository
@@ -11,13 +14,106 @@ export class UsuarioCadastroService {
   async inserir(usuario: UsuarioInserirDTO) {
     await this._usuarioRepo.inserir(usuario.email, usuario.nome, usuario.setor);
 
-    const emailContent = await this._usuarioRepo.gerarEmailPrimeiroAcesso(
-      usuario.email
-    );
+    const link = await this._usuarioRepo.gerarLinkRedefinirSenha(usuario.email);
+
     await this.emailService.enviar(
       usuario.email,
-      "AgroFlow - Primeiro acesso",
-      emailContent
+      this._primeiroAcessoEmailAssunto,
+      this._getEmailPrimeiroAcesso(usuario.nome, link)
     );
+  }
+
+  async recuperarSenha(usuarioId: string) {
+    const usuario = await this._usuarioRepo.buscarPorId(usuarioId);
+    if (!usuario) throw new Error("Usuário não encontrado.");
+
+    const link = await this._usuarioRepo.gerarLinkRedefinirSenha(usuario.email);
+    const assunto = usuario.primeiroAcesso
+      ? this._primeiroAcessoEmailAssunto
+      : this._recuperarSenhaEmailAssunto;
+
+    await this.emailService.enviar(
+      usuario.email,
+      assunto,
+      this._getEmailRecuperarSenha(usuario.nome, link)
+    );
+  }
+
+  private _getEmailPrimeiroAcesso(nome: string, link: string) {
+    return `
+      <h2 style="color: #154e39; font-family: Arial, sans-serif;">
+        Olá ${nome},
+      </h2>
+
+      <p style="font-family: Arial, sans-serif; color: #333;">
+        Um administrador criou seu acesso à <strong>AgroFlow</strong>.
+      </p>
+
+      <p style="font-family: Arial, sans-serif; color: #333;">
+        Para começar, clique no botão abaixo e defina sua senha:
+      </p>
+
+      <p style="text-align: center; margin: 24px 0;">
+        <a href="${link}" style="
+          background-color: #154e39;
+          color: #fff;
+          padding: 12px 20px;
+          text-decoration: none;
+          border-radius: 5px;
+          font-weight: bold;
+          font-family: Arial, sans-serif;
+        ">
+          Definir Senha
+        </a>
+      </p>
+
+      <p style="font-family: Arial, sans-serif; color: #666;">
+        Se você não solicitou esse acesso, pode ignorar este e-mail.
+      </p>
+
+      <p style="font-family: Arial, sans-serif; color: #333; margin-top: 32px;">
+        Atenciosamente,<br />
+        Equipe AgroFlow
+      </p>
+    `;
+  }
+
+  private _getEmailRecuperarSenha(nome: string, link: string) {
+    return `
+      <h2 style="color: #154e39; font-family: Arial, sans-serif;">
+        Olá ${nome},
+      </h2>
+
+      <p style="font-family: Arial, sans-serif; color: #333;">
+        Recebemos uma solicitação para redefinir sua senha no <strong>AgroFlow</strong>.
+      </p>
+
+      <p style="font-family: Arial, sans-serif; color: #333;">
+        Para criar uma nova senha, clique no botão abaixo:
+      </p>
+
+      <p style="text-align: center; margin: 24px 0;">
+        <a href="${link}" style="
+          background-color: #154e39;
+          color: #fff;
+          padding: 12px 20px;
+          text-decoration: none;
+          border-radius: 5px;
+          font-weight: bold;
+          font-family: Arial, sans-serif;
+        ">
+          Redefinir Senha
+        </a>
+      </p>
+
+      <p style="font-family: Arial, sans-serif; color: #666;">
+        Se você não solicitou a redefinição, pode ignorar este e-mail.
+      </p>
+
+      <p style="font-family: Arial, sans-serif; color: #333; margin-top: 32px;">
+        Atenciosamente,<br />
+        Equipe AgroFlow
+      </p>
+    `;
   }
 }
