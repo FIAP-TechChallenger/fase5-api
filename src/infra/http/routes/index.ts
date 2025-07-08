@@ -15,8 +15,8 @@ import { NotificacaoController } from "../controllers/outros/NotificacaoControll
 const router = Router();
 
 router.use("/auth", AuthController.routes());
-router.use("/user", authenticate, UsuarioController.routes());
-router.use("/meta",authenticate, MetaController.routes());
+router.use("/usuario", authenticate, UsuarioController.routes());
+router.use("/meta", authenticate, MetaController.routes());
 router.use("/notificacao", authenticate, NotificacaoController.routes());
 router.use("/fazenda", FazendaController.routes());
 router.use("/produto", ProdutoController.routes());

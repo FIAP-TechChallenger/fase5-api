@@ -1,5 +1,6 @@
 import { Usuario } from "@/domain/entities/outros/Usuario";
 import { UsuarioFirebase } from "../../models/outros/UsuarioFirebase";
+import { getFirebaseTimeStamp } from "@/shared/utils/getFirebaseTimeStamp";
 
 export class UsuarioConverter {
   static toFirestore(data: Usuario): UsuarioFirebase {
@@ -8,6 +9,7 @@ export class UsuarioConverter {
       nome: data.nome,
       setor: data.setor,
       primeiroAcesso: data.primeiroAcesso,
+      criadaEm: getFirebaseTimeStamp(data.criadaEm),
     };
   }
 
@@ -18,6 +20,7 @@ export class UsuarioConverter {
       nome: data.nome,
       setor: data.setor,
       primeiroAcesso: data.primeiroAcesso,
+      criadaEm: data.criadaEm.toDate(),
     });
   }
 }

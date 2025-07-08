@@ -4,17 +4,41 @@ import { Usuario } from "@/domain/entities/outros/Usuario";
 import { UsuarioFirebase } from "@/infra/firebase/models/outros/UsuarioFirebase";
 import { UsuarioConverter } from "@/infra/firebase/converters/outros/UsuarioConverter";
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
+import { UsuarioBuscarTodosDTO } from "@/application/dtos/outros/UsuarioBuscarTodosDTO";
+import { UsuarioBuscarTodosResponseDTO } from "@/application/dtos/outros/UsuarioBuscarTodosResponseDTO";
 
 export class FirebaseUsuarioRepository implements IUsuarioRepository {
-  async buscarTodos(): Promise<Usuario[]> {
-    const snapshot = await this._getCollection()
-      .where("setor", "!=", UsuarioSetorEnum.ADMIN)
-      .get();
+  async buscarTodos(
+    dto: UsuarioBuscarTodosDTO
+  ): Promise<UsuarioBuscarTodosResponseDTO> {
+    const limite = dto?.limite ?? 10;
 
-    return snapshot.docs.map((doc) => {
-      const data = doc.data() as UsuarioFirebase;
-      return UsuarioConverter.fromFirestore(data, doc.id);
-    });
+    let query = this._getCollection()
+      .orderBy("criadaEm", "desc")
+      .orderBy("__name__")
+      .limit(limite);
+
+    if (dto?.ultimoId) {
+      const lastSnap = await this._getCollection().doc(dto.ultimoId).get();
+      if (lastSnap.exists) {
+        query = query.startAfter(lastSnap);
+      }
+    }
+
+    const snapshot = await query.get();
+    const dados = snapshot.docs
+      .map((doc) => {
+        const data = doc.data() as UsuarioFirebase;
+        return UsuarioConverter.fromFirestore(data, doc.id);
+      })
+      .filter((u) => u.setor !== UsuarioSetorEnum.ADMIN);
+
+    const lastVisible = dados[dados.length - 1];
+    return {
+      dados,
+      ultimoId: lastVisible?.id ?? null,
+      temMais: dados.length === limite,
+    };
   }
 
   async buscarPorId(id: string): Promise<Usuario | null> {
@@ -38,6 +62,7 @@ export class FirebaseUsuarioRepository implements IUsuarioRepository {
         nome,
         setor,
         primeiroAcesso: true,
+        criadaEm: new Date(),
       })
     );
     await this._getCollection().doc(userRecord.uid).set(data);

@@ -5,6 +5,7 @@ export class Usuario {
   email: string;
   nome: string;
   setor: UsuarioSetorEnum;
+  criadaEm: Date;
   primeiroAcesso?: boolean;
 
   constructor(obj: Usuario) {
@@ -12,6 +13,7 @@ export class Usuario {
     this.email = obj.email;
     this.nome = obj.nome;
     this.setor = obj.setor;
+    this.criadaEm = obj.criadaEm;
     this.primeiroAcesso = obj.primeiroAcesso;
   }
 }
