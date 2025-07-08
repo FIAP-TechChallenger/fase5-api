@@ -1,8 +1,10 @@
 // src/presentation/controllers/producao/FazendaController.ts
 
+import { ProducaoAtualizarSchema } from "@/application/dtos/producao/Producao/ProducaoAtualizarDTO";
 import { ProducaoBuscarTodosSchema } from "@/application/dtos/producao/Producao/ProducaoBuscarTodosDTO";
 import { ProducaoInserirSchema } from "@/application/dtos/producao/Producao/ProducaoInserirDTO";
 import { ProducaoService } from "@/application/services/producao/ProducaoService";
+import { FirebaseEstoqueProdutoRepository } from "@/infra/repositories/producao/firebaseEstoqueProdutoRepository";
 import { FirebaseFazendaRepository } from "@/infra/repositories/producao/firebaseFazendaRepository";
 import { FirebaseProducaoRepository } from "@/infra/repositories/producao/firebaseProducaoRepository";
 import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebaseProdutoRepository";
@@ -17,7 +19,8 @@ export class ProducaoController {
     this._ProducaoService = new ProducaoService(
       new FirebaseProducaoRepository(),
       new FirebaseFazendaRepository(), 
-      new FirebaseProdutoRepository()
+      new FirebaseProdutoRepository(),
+      new FirebaseEstoqueProdutoRepository
     )
   }
 
@@ -58,12 +61,32 @@ export class ProducaoController {
     }
   }
 
+
+
+  async atualizar(req: Request, res: Response): Promise<void> {
+    try {
+      const dto = ProducaoAtualizarSchema.parse(req.body);
+      await this._ProducaoService.atualizar(dto);
+
+      res.status(200).json({ message: "Producao atualizada com sucesso" });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        res
+          .status(400)
+          .json({ message: "Erro de validação", erros: error.errors });
+        return;
+      }
+      res.status(500).json({ message: "Erro interno no servidor" });
+    }
+  }
+
   static routes() {
     const router = Router();
     const controller = new ProducaoController();
 
     router.post("/", controller.buscarTodos.bind(controller));
     router.post("/inserir", controller.inserir.bind(controller));
+    router.post("/atualizar", controller.atualizar.bind(controller));
 
     return router;
   }

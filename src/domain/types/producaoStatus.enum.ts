@@ -1,8 +1,9 @@
 export enum ProducaoStatus {
-    PLANEJADO = "planejado",
-    EM_PLANTIO = "em plantio",
-    PLANTADO = "plantado",
-    COLHIDO = "colhido",
-    CANCELADO = "cancelado",
-  }
-
+  PLANEJADA = "planejada",
+  EM_ANDAMENTO = "em andamento",
+  CONCLUIDA = "concluída",
+  CANCELADA = "cancelada",
+  EM_PLANTIO = "em plantio",
+  PLANTADA = "plantada",
+  COLHIDA = "colhida",
+}

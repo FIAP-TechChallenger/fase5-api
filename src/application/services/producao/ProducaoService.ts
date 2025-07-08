@@ -7,12 +7,15 @@ import { ProducaoBuscarTodosDTO } from "@/application/dtos/producao/Producao/Pro
 import { ProducaoBuscarTodosResponseDTO, ProducaoItemDTO } from "@/application/dtos/producao/Producao/ProducaoBuscarTodosResponse";
 import { IProdutoRepository } from "@/domain/repositories/producao/IProdutoRepository";
 import { IFazendaRepository } from "@/domain/repositories/producao/IFazendaRepository";
+import { IEstoqueProdutoRepository } from "@/domain/repositories/producao/IEstoqueProdutoRepository";
+import { ProducaoAtualizarDTO } from "@/application/dtos/producao/Producao/ProducaoAtualizarDTO";
 
 export class ProducaoService {
   constructor(
     private readonly producaoRepository: IProducaoRepository,
     private readonly fazendaRepository: IFazendaRepository,
-    private readonly produtoRepository: IProdutoRepository
+    private readonly produtoRepository: IProdutoRepository,
+    private readonly estoqueProdutoRepository: IEstoqueProdutoRepository
   ) {}
 
 
@@ -37,7 +40,31 @@ export class ProducaoService {
       ultimoId: response.ultimoId,
     };
   }
-
+  async atualizar(dto: ProducaoAtualizarDTO): Promise<void> {
+    const producaoExistente = await this.producaoRepository.buscarPorId(dto.id);
+    if (!producaoExistente) throw new Error("producao não encontrada");
+  
+    const producaoAtualizada: Producao = {
+      ...producaoExistente,
+      ...dto,
+    };
+  
+    await this.producaoRepository.atualizar(producaoAtualizada); // primeiro atualiza
+  
+    // só depois, se estiver COLHIDA, insere no estoque
+    if (producaoAtualizada.status === ProducaoStatus.COLHIDA) {
+      const novoEstoqueProduto = {
+        id: gerarUUID(),
+        produtoId: producaoAtualizada.produtoId,
+        quantidade: producaoAtualizada.quantidade,
+        preco: 0,
+        criadaEm: new Date(),
+      };
+  
+      await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
+    }
+  }
+  
   async inserir(dto: ProducaoInserirDTO): Promise<void> {
     const novaProducao: Producao = {
       id: gerarUUID(),
@@ -49,4 +76,5 @@ export class ProducaoService {
     };
     await this.producaoRepository.insert(novaProducao);
   }
+
 }

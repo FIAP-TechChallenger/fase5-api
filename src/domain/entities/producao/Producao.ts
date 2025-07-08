@@ -5,7 +5,7 @@ import { Produto } from "./Produto";
 export class Producao {
     id: string;
     quantidade: number;
-    status: ProducaoStatus;
+    status: string;
     criadaEm: Date;
     produtoId: string;
     fazendaId: string ;

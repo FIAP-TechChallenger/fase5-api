@@ -37,12 +37,26 @@ export class FirebaseProducaoRepository implements IProducaoRepository {
       temMais: dados.length === limite,
     };
   }
+  async buscarPorId(producaoId: string): Promise<Producao | null> {
+    const doc = await this._getCollection().doc(producaoId).get();
+    if (!doc.exists) return null;
+
+    const data = doc.data() as ProducaoFirebase;
+    return ProducaoConverter.fromFirestore(data, doc.id);
+  }
 
   async insert(producao:Producao): Promise<void> {
     const data:ProducaoFirebase = ProducaoConverter.toFirestore(producao);
     await this._getCollection().doc(producao.id).set(data);
   }
-
+  
+  async atualizar(producao : Producao): Promise<void> {
+    const data: ProducaoFirebase = ProducaoConverter.toFirestore(producao);
+    await this._getCollection()
+      .doc(producao.id)
+      .update({ ...data });
+  }
+  
   private _getCollection() {
     return admin.firestore().collection("producao");
   }
