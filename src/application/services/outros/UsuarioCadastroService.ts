@@ -3,8 +3,8 @@ import { IEmailService } from "@/domain/interfaces/IEmailService";
 import { IUsuarioRepository } from "@/domain/repositories/outros/IUsuarioRepository";
 
 export class UsuarioCadastroService {
-  private _primeiroAcessoEmailAssunto = "AgroFlow - Primeiro acesso";
-  private _recuperarSenhaEmailAssunto = "AgroFlow - Recuperação de senha";
+  private _primeiroAcessoEmailAssunto = "Acesso criado - Defina sua senha";
+  private _recuperarSenhaEmailAssunto = "Recuperação de senha";
 
   constructor(
     private emailService: IEmailService,
@@ -46,29 +46,30 @@ export class UsuarioCadastroService {
       </h2>
 
       <p style="font-family: Arial, sans-serif; color: #333;">
-        Um administrador criou seu acesso à <strong>AgroFlow</strong>.
+        Seu acesso à <strong>AgroFlow</strong> foi criado por um administrador.
       </p>
 
       <p style="font-family: Arial, sans-serif; color: #333;">
-        Para começar, clique no botão abaixo e defina sua senha:
+        Para começar, defina sua senha clicando no botão abaixo:
       </p>
 
       <p style="text-align: center; margin: 24px 0;">
         <a href="${link}" style="
           background-color: #154e39;
-          color: #fff;
-          padding: 12px 20px;
+          color: #ffffff;
+          padding: 12px 24px;
           text-decoration: none;
-          border-radius: 5px;
+          border-radius: 6px;
           font-weight: bold;
           font-family: Arial, sans-serif;
+          display: inline-block;
         ">
-          Definir Senha
+          Definir minha senha
         </a>
       </p>
 
-      <p style="font-family: Arial, sans-serif; color: #666;">
-        Se você não solicitou esse acesso, pode ignorar este e-mail.
+      <p style="font-family: Arial, sans-serif; color: #666; font-size: 13px;">
+        Se você não reconhece este acesso, basta ignorar esta mensagem.
       </p>
 
       <p style="font-family: Arial, sans-serif; color: #333; margin-top: 32px;">

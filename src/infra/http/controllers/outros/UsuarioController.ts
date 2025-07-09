@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import { UsuarioCadastroService } from "@/application/services/outros/UsuarioCadastroService";
-import { ResendEmailService } from "@/infra/email/ResendEmailService";
+import { NodeMailerEmailService } from "@/infra/email/NodeMailerEmailService";
 import { FirebaseUsuarioRepository } from "@/infra/repositories/outros/FirebaseUsuarioRepository";
 import { UsuarioInserirSchema } from "@/application/dtos/outros/UsuarioInserirDTO";
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
@@ -10,7 +10,7 @@ import { UsuarioBuscarTodosSchema } from "@/application/dtos/outros/UsuarioBusca
 export class UsuarioController {
   private _usuarioRepo = new FirebaseUsuarioRepository();
   private _usuarioCadastro = new UsuarioCadastroService(
-    new ResendEmailService(),
+    new NodeMailerEmailService(),
     this._usuarioRepo
   );
   private _usuarioConsulta = new UsuarioConsultaService(this._usuarioRepo);
