@@ -2,13 +2,13 @@ import axios from "axios";
 import { admin } from "@/infra/firebase/firebase-initialize";
 import { IAuthRepository } from "@/domain/repositories/outros/IAuthRepository";
 import { FirebaseSignInResponse } from "@/infra/firebase/models/outros/FirebaseSignInResponse";
-import { LoginResponseDTO } from "@/application/dtos/outros/LoginResponseDTO";
 import { FirebaseRefreshTokenResponse } from "@/infra/firebase/models/outros/FirebaseRefreshTokenResponse";
+import { LoginResult } from "@/domain/models/LoginResult";
 
 export class FirebaseAuthRepository implements IAuthRepository {
   private _apiKey = process.env.FIREBASE_API_KEY;
 
-  async login(email: string, password: string): Promise<LoginResponseDTO> {
+  async login(email: string, password: string): Promise<LoginResult> {
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${this._apiKey}`;
 
     try {
@@ -36,7 +36,7 @@ export class FirebaseAuthRepository implements IAuthRepository {
     }
   }
 
-  async refresh(refreshToken: string): Promise<LoginResponseDTO> {
+  async refresh(refreshToken: string): Promise<LoginResult> {
     const url = `https://securetoken.googleapis.com/v1/token?key=${this._apiKey}`;
 
     const body = new URLSearchParams();
