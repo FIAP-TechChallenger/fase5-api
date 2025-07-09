@@ -1,4 +1,5 @@
 // src/presentation/controllers/producao/FazendaController.ts
+import { InsumoAtualizarSchema } from "@/application/dtos/producao/Insumo/InsumoAtualizarDTO";
 import { InsumoBuscarTodosSchema } from "@/application/dtos/producao/Insumo/InsumoBuscarTodosDTO";
 import { InsumoInserirSchema } from "@/application/dtos/producao/Insumo/InsumoInserirDTO";
 import { InsumoService } from "@/application/services/producao/InsumoService";
@@ -18,7 +19,7 @@ export class InsumoController {
     const medidaRepository = new FirebaseMedidaRepository(); 
     const medidaService = new MedidaService(medidaRepository); 
 
-    this._InsumoService = new InsumoService(insumoRepository, medidaService); 
+    this._InsumoService = new InsumoService(insumoRepository, medidaRepository);; 
   }
 
 
@@ -59,6 +60,23 @@ export class InsumoController {
       res.status(500).json({ message: "Erro interno no servidor" });
     }
   }
+  
+  async atualizar(req: Request, res: Response): Promise<void> {
+    try {
+      const dto = InsumoAtualizarSchema.parse(req.body);
+      await this._InsumoService.atualizar(dto);
+
+      res.status(200).json({ message: "Insumo atualizado com sucesso" });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        res
+          .status(400)
+          .json({ message: "Erro de validação", erros: error.errors });
+        return;
+      }
+      res.status(500).json({ message: "Erro interno no servidor" });
+    }
+  }
 
 
   static routes() {
@@ -67,6 +85,7 @@ export class InsumoController {
     
     router.post("/", controller.buscarTodos.bind(controller));
     router.post("/inserir", controller.inserir.bind(controller)); 
+    router.post("/atualizar", controller.atualizar.bind(controller));
     
     return router;
   }

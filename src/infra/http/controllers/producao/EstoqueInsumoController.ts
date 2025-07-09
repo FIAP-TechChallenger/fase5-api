@@ -1,4 +1,5 @@
 // src/presentation/controllers/producao/FazendaController.ts
+import { EstoqueInsumoAtualizarSchema } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoAtualizarDTO";
 import { EstoqueInsumoBuscarTodosSchema } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoBuscarTodosDTO";
 import { EstoqueInsumoInserirSchema } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoInserirDTO";
 import { InsumoInserirSchema } from "@/application/dtos/producao/Insumo/InsumoInserirDTO";
@@ -59,6 +60,22 @@ export class EstoqueInsumoController {
       res.status(500).json({ message: "Erro interno no servidor" });
     }
   }
+  async atualizar(req: Request, res: Response): Promise<void> {
+    try {
+      const dto = EstoqueInsumoAtualizarSchema.parse(req.body);
+      await this._EstoqueInsumoService.atualizar(dto);
+
+      res.status(200).json({ message: "Producao atualizada com sucesso" });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        res
+          .status(400)
+          .json({ message: "Erro de validação", erros: error.errors });
+        return;
+      }
+      res.status(500).json({ message: "Erro interno no servidor" });
+    }
+  }
 
 
   static routes() {
@@ -66,7 +83,8 @@ export class EstoqueInsumoController {
     const controller = new EstoqueInsumoController();
     
     router.post("/", controller.buscarTodos.bind(controller));
-    router.post("/inserir", controller.inserir.bind(controller)); 
+    router.post("/inserir", controller.inserir.bind(controller));
+    router.post("/atualizar", controller.atualizar.bind(controller)); 
     
     return router;
   }

@@ -61,8 +61,6 @@ export class ProducaoController {
     }
   }
 
-
-
   async atualizar(req: Request, res: Response): Promise<void> {
     try {
       const dto = ProducaoAtualizarSchema.parse(req.body);

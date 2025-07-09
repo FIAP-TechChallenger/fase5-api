@@ -1,4 +1,5 @@
 // src/presentation/controllers/producao/FazendaController.ts
+import { ProdutoAtualizarSchema } from "@/application/dtos/producao/Produto/ProdutoAtualizarDTO";
 import { ProdutoBuscarTodosSchema } from "@/application/dtos/producao/Produto/ProdutoBuscarTodosDTO";
 import { ProdutoInserirSchema } from "@/application/dtos/producao/Produto/ProdutoInserirDTO";
 import { MedidaService } from "@/application/services/producao/MedidaService";
@@ -17,7 +18,7 @@ export class ProdutoController {
     const medidaRepository = new FirebaseMedidaRepository(); 
     const medidaService = new MedidaService(medidaRepository); 
 
-    this._ProdutoService = new ProdutoService(produtoRepository, medidaService); 
+    this._ProdutoService = new ProdutoService(produtoRepository, medidaRepository); 
   }
 
 
@@ -58,6 +59,23 @@ export class ProdutoController {
       res.status(500).json({ message: "Erro interno no servidor" });
     }
   }
+  
+  async atualizar(req: Request, res: Response): Promise<void> {
+    try {
+      const dto = ProdutoAtualizarSchema.parse(req.body);
+      await this._ProdutoService.atualizar(dto);
+
+      res.status(200).json({ message: "Produto atualizada com sucesso" });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        res
+          .status(400)
+          .json({ message: "Erro de validação", erros: error.errors });
+        return;
+      }
+      res.status(500).json({ message: "Erro interno no servidor" });
+    }
+  }
 
 
   static routes() {
@@ -66,6 +84,7 @@ export class ProdutoController {
     
     router.post("/", controller.buscarTodos.bind(controller));
     router.post("/inserir", controller.inserir.bind(controller)); 
+    router.post("/atualizar", controller.atualizar.bind(controller));
     
     return router;
   }
