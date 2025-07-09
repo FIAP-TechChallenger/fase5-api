@@ -61,6 +61,13 @@ export class FirebaseProdutoRepository implements IProdutoRepository {
     const data:ProdutoFirebase = ProdutoConverter.toFirestore(produto);
     await this._getCollection().doc(produto.id).set(data);
   }
+  async atualizar(produto: Produto): Promise<void> {
+    const data: ProdutoFirebase = ProdutoConverter.toFirestore(produto);
+    await this._getCollection()
+      .doc(produto.id)
+      .update({ ...data });
+  }
+
 
   private _getCollection() {
     return admin.firestore().collection("produto");

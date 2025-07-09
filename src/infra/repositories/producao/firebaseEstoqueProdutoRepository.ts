@@ -37,11 +37,25 @@ export class FirebaseEstoqueProdutoRepository implements IEstoqueProdutoReposito
       temMais: dados.length === limite,
     };
   }
+  async buscarPorId(estoqueId: string): Promise<EstoqueProduto | null> {
+    const doc = await this._getCollection().doc(estoqueId).get();
+    if (!doc.exists) return null;
+
+    const data = doc.data() as EstoqueProdutoFirebase;
+    return EstoqueProdutoConverter.fromFirestore(data, doc.id);
+  }
 
   async insert(estoqueProduto: EstoqueProduto): Promise<void> {
     const data:EstoqueProdutoFirebase = EstoqueProdutoConverter.toFirestore(estoqueProduto);
     await this._getCollection().doc(estoqueProduto.id).set(data);
   }
+  async atualizar(estoque: EstoqueProduto): Promise<void> {
+    const data: EstoqueProdutoFirebase = EstoqueProdutoConverter.toFirestore(estoque);
+    await this._getCollection()
+      .doc(estoque.id)
+      .update({ ...data });
+  }
+
 
   private _getCollection() {
     return admin.firestore().collection("estoqueProduto");

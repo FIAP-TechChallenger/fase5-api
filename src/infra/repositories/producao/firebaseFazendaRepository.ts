@@ -47,12 +47,27 @@ export class FirebaseFazendaRepository implements IFazendaRepository {
     }
     const data = doc.data() as FazendaFirebase;
     return data.nome;
-    
+  }
+
+  async buscarPorId(fazendaId: string): Promise<Fazenda | null> {
+    const doc = await this._getCollection().doc(fazendaId).get();
+    if (!doc.exists) return null;
+
+    const data = doc.data() as FazendaFirebase;
+    return FazendaConverter.fromFirestore(data, doc.id);
   }
   async insert(fazenda: Fazenda): Promise<void> {
     const data:FazendaFirebase = FazendaConverter.toFirestore(fazenda);
     await this._getCollection().doc(fazenda.id).set(data);
   }
+  async atualizar(fazenda: Fazenda): Promise<void> {
+    const data: FazendaFirebase = FazendaConverter.toFirestore(fazenda);
+    await this._getCollection()
+      .doc(fazenda.id)
+      .update({ ...data });
+  }
+
+
 
   private _getCollection() {
     return admin.firestore().collection("fazenda");

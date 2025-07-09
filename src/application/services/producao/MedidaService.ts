@@ -5,6 +5,7 @@ import { Medida } from "@/domain/entities/producao/Medida";
 import { MedidaInserirDTO } from "@/application/dtos/producao/Medida/MedidaInserirDTO";
 import { MedidaBuscarTodosDTO } from "@/application/dtos/producao/Medida/MedidaBuscarTodosDTO";
 import { MedidaBuscarTodosResponseDTO } from "@/application/dtos/producao/Medida/MedidaBuscarTodosResponseDTO";
+import { MetaAtualizarDTO } from "@/application/dtos/comercial/MetaAtualizarDTO";
 
 
 export class MedidaService {
@@ -25,5 +26,17 @@ export class MedidaService {
   }
   async buscarSigla(medidaId: string): Promise<string> {
     return this.medidaRepository.buscarSigla(medidaId);
+  }
+  async atualizar(dto: MetaAtualizarDTO): Promise<void> {
+    const medidaExistente = await this.medidaRepository.buscarPorId(dto.id);
+    if (!medidaExistente) throw new Error("Meta não encontrada");
+
+    const medidaAtualizada: Medida = {
+      ...medidaExistente,
+      ...dto,
+     
+    };
+
+    await this.medidaRepository.atualizar(medidaAtualizada);
   }
 }

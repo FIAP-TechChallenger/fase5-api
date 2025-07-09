@@ -3,9 +3,9 @@ import { MedidaBuscarTodosResponseDTO } from "@/application/dtos/producao/Medida
 import { Medida } from "@/domain/entities/producao/Medida";
 
 export interface IMedidaRepository{
-    // buscarPorId(id: string): Promise<Fazenda | null>;
+    buscarPorId(id: string): Promise<Medida| null>;
     buscarTodos(dto:MedidaBuscarTodosDTO): Promise<MedidaBuscarTodosResponseDTO>
     inserir(medida: Medida ): Promise<void>;
     buscarSigla(medidaId:string):Promise<string>
-    // atualizar(fazenda: Fazenda ): Promise<void>;
+    atualizar(medida: Medida ): Promise<void>;
 }

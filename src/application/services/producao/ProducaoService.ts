@@ -49,9 +49,8 @@ export class ProducaoService {
       ...dto,
     };
   
-    await this.producaoRepository.atualizar(producaoAtualizada); // primeiro atualiza
+    await this.producaoRepository.atualizar(producaoAtualizada); 
   
-    // só depois, se estiver COLHIDA, insere no estoque
     if (producaoAtualizada.status === ProducaoStatus.COLHIDA) {
       const novoEstoqueProduto = {
         id: gerarUUID(),
@@ -77,4 +76,5 @@ export class ProducaoService {
     await this.producaoRepository.insert(novaProducao);
   }
 
+  
 }

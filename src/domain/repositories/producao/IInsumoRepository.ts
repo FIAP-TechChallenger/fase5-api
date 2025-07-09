@@ -6,6 +6,6 @@ export interface IInsumoRepository{
     buscarPorId(id: string): Promise<Insumo| null>;
     buscarTodos(dto:InsumoBuscarTodosDTO): Promise<InsumoBuscarTodosResponseDTO>
     insert(insumo: Insumo ): Promise<void>;
-    // atualizar(fazenda: Fazenda ): Promise<void>;
+    atualizar(insumo: Insumo ): Promise<void>;
   
 }

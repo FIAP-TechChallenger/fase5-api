@@ -43,13 +43,19 @@ export class FirebaseInsumoRepository implements IInsumoRepository {
 
     const data = doc.data() as InsumoFirebase;
     return InsumoConverter.fromFirestore(data, doc.id);
-    
   }
 
   async insert(insumo: Insumo): Promise<void> {
     const data:InsumoFirebase = InsumoConverter.toFirestore(insumo);
     await this._getCollection().doc(insumo.id).set(data);
   }
+  async atualizar(insumo: Insumo): Promise<void> {
+    const data: InsumoFirebase = InsumoConverter.toFirestore(insumo);
+    await this._getCollection()
+      .doc(insumo.id)
+      .update({ ...data });
+  }
+
 
   private _getCollection() {
     return admin.firestore().collection("insumo");

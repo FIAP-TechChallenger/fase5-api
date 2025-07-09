@@ -7,8 +7,8 @@ export interface IProdutoRepository{
       buscarNome(nomeId: string):Promise<string>;
       buscarTodos(dto:ProdutoBuscarTodosDTO): Promise<ProdutoBuscarTodosResponseDTO>
       insert(produto:Produto ): Promise<void>;
-      // atualizar(fazenda: Fazenda ): Promise<void>;
-    // exists(userId: string , produtoId: string): Promise<boolean>
+      atualizar(produto: Produto ): Promise<void>;
+  
 
 
 }

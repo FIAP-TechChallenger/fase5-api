@@ -6,6 +6,7 @@ import { EstoqueInsumoBuscarTodosDTO } from "@/application/dtos/producao/Estoque
 import { EstoqueInsumoBuscarTodosResponseDTO, EstoqueInsumoItemDTO } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoBuscarTodosResponseDTO";
 import { IInsumoRepository } from "@/domain/repositories/producao/IInsumoRepository";
 import { IMedidaRepository } from "@/domain/repositories/producao/IMedidaRepository";
+import { EstoqueInsumoAtualizarDTO } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoAtualizarDTO";
 
 export class EstoqueInsumoService {
   constructor(
@@ -58,5 +59,19 @@ export class EstoqueInsumoService {
     };
     await this.estoqueInsumoRepository.insert(novoEstoque);
   }
+  
+  async atualizar(dto: EstoqueInsumoAtualizarDTO): Promise<void> {
+    const estoqueExistente = await this.estoqueInsumoRepository.buscarPorId(dto.id);
+    if (!estoqueExistente) throw new Error("Meta não encontrada");
+
+    const estoqueAtualizado: EstoqueInsumo = {
+      ...estoqueExistente,
+      ...dto,
+      
+    };
+
+    await this.estoqueInsumoRepository.atualizar(estoqueAtualizado);
+  }
 }
+
 

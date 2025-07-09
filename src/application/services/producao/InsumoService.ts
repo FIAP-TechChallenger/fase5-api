@@ -5,6 +5,7 @@ import { InsumoBuscarTodosResponseDTO } from "@/application/dtos/producao/Insumo
 import { InsumoBuscarTodosDTO } from "@/application/dtos/producao/Insumo/InsumoBuscarTodosDTO";
 import { IInsumoRepository } from "@/domain/repositories/producao/IInsumoRepository";
 import { IMedidaRepository } from "@/domain/repositories/producao/IMedidaRepository";
+import { InsumoAtualizarDTO } from "@/application/dtos/producao/Insumo/InsumoAtualizarDTO";
 
 export class InsumoService {
   constructor(
@@ -38,6 +39,18 @@ export class InsumoService {
     
     };
     await this.insumoRepository.insert(novoInsumo);
+  }
+  async atualizar(dto: InsumoAtualizarDTO): Promise<void> {
+    const insumoExistente = await this.insumoRepository.buscarPorId(dto.id);
+    if (!insumoExistente) throw new Error("Meta não encontrada");
+
+    const insumoAtualizado: Insumo = {
+      ...insumoExistente,
+      ...dto,
+      
+    };
+
+    await this.insumoRepository.atualizar(insumoAtualizado);
   }
   
 }

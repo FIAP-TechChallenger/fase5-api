@@ -37,11 +37,25 @@ export class FirebaseEstoqueInsumoRepository implements IEstoqueInsumoRepository
       temMais: dados.length === limite,
     };
   }
+  async buscarPorId(estoqueId: string): Promise<EstoqueInsumo | null> {
+    const doc = await this._getCollection().doc(estoqueId).get();
+    if (!doc.exists) return null;
+
+    const data = doc.data() as EstoqueInsumoFirebase;
+    return EstoqueInsumoConverter.fromFirestore(data, doc.id);
+  }
 
   async insert(estoqueInsumo: EstoqueInsumo): Promise<void> {
     const data:EstoqueInsumoFirebase = EstoqueInsumoConverter.toFirestore(estoqueInsumo);
     await this._getCollection().doc(estoqueInsumo.id).set(data);
   }
+  async atualizar(estoque: EstoqueInsumo): Promise<void> {
+    const data: EstoqueInsumoFirebase = EstoqueInsumoConverter.toFirestore(estoque);
+    await this._getCollection()
+      .doc(estoque.id)
+      .update({ ...data });
+  }
+
 
   private _getCollection() {
     return admin.firestore().collection("estoqueInsumo");

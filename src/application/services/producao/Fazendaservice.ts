@@ -4,6 +4,7 @@ import { IFazendaRepository } from "@/domain/repositories/producao/IFazendaRepos
 import { FazendaInserirDTO } from "@/application/dtos/producao/fazenda/FazendaInserirDTO";
 import { FazendaBuscarTodosDTO } from "@/application/dtos/producao/fazenda/FazendaBuscarTodosDTO";
 import { FazendaBuscarTodosResponseDTO } from "@/application/dtos/producao/fazenda/FazendaBuscarTodosResponseDTO";
+import { FazendaAtualizarDTO } from "@/application/dtos/producao/fazenda/FazendaAtualizarDTO";
 
 export class FazendaService {
   constructor(private readonly fazendaRepository: IFazendaRepository) {}
@@ -21,11 +22,17 @@ export class FazendaService {
     };
     await this.fazendaRepository.insert(novaFazenda);
   }
-}
-// constructor(private readonly metaRepository: IMetaRepository) {}
+  async atualizar(dto: FazendaAtualizarDTO): Promise<void> {
+    const fazendaExistente = await this.fazendaRepository.buscarPorId(dto.id);
+    if (!fazendaExistente) throw new Error("fazenda não encontrada");
 
-// async buscarTodos(
-//   dto: MetaBuscarTodosDTO
-// ): Promise<MetaBuscarTodosResponseDTO> {
-//   return this.metaRepository.buscarTodos(dto);
-// }
+    const fazendaAtualizada: Fazenda = {
+      ...fazendaExistente,
+      ...dto,
+     
+    };
+
+    await this.fazendaRepository.atualizar(fazendaAtualizada);
+  }
+}
+
