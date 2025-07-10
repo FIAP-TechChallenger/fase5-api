@@ -9,6 +9,8 @@ import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebas
 import { Request, Response, Router } from "express";
 
 import { z, ZodError } from "zod";
+import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
+import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 
 export class EstqueProdutoController {
   private _EstoqueProdutoService: EstoqueProdutoService;
@@ -17,14 +19,16 @@ export class EstqueProdutoController {
     this._EstoqueProdutoService = new EstoqueProdutoService(
       new FirebaseEstoqueProdutoRepository(),
       new FirebaseProdutoRepository(),
-      new FirebaseMedidaRepository() 
+      new FirebaseMedidaRepository()
     );
   }
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
       const dto = EstoqueProdutoBuscarTodosSchema.parse(req.body);
-      const estoqueProdutos = await this._EstoqueProdutoService.buscarTodos(dto);
+      const estoqueProdutos = await this._EstoqueProdutoService.buscarTodos(
+        dto
+      );
       res.status(200).json(estoqueProdutos);
     } catch (error) {
       console.error("Erro ao buscar estoque de produtos:", error);
@@ -46,10 +50,10 @@ export class EstqueProdutoController {
       if (error instanceof z.ZodError) {
         res.status(400).json({
           message: "Erro de validação",
-          erros: error.errors.map(err => ({
-            campo: err.path.join('.'),
-            mensagem: err.message
-          }))
+          erros: error.errors.map((err) => ({
+            campo: err.path.join("."),
+            mensagem: err.message,
+          })),
         });
         return;
       }
@@ -62,7 +66,9 @@ export class EstqueProdutoController {
       const dto = EstoqueProdutoAtualizarSchema.parse(req.body);
       await this._EstoqueProdutoService.atualizar(dto);
 
-      res.status(200).json({ message: "estoqueProduto atualizada com sucesso" });
+      res
+        .status(200)
+        .json({ message: "estoqueProduto atualizada com sucesso" });
     } catch (error: any) {
       if (error.name === "ZodError") {
         res
@@ -74,15 +80,18 @@ export class EstqueProdutoController {
     }
   }
 
-
   static routes() {
     const router = Router();
     const controller = new EstqueProdutoController();
-    
+
     router.post("/", controller.buscarTodos.bind(controller));
+
+    router.use(
+      verificarPermissaoSetor(UsuarioSetorEnum.ADMIN, UsuarioSetorEnum.PRODUCAO)
+    );
     router.post("/inserir", controller.inserir.bind(controller));
-    router.post("/atualizar", controller.atualizar.bind(controller)); 
-    
+    router.post("/atualizar", controller.atualizar.bind(controller));
+
     return router;
   }
 }

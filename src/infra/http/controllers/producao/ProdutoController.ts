@@ -9,22 +9,25 @@ import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebas
 import { Request, Response, Router } from "express";
 
 import { z, ZodError } from "zod";
+import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
+import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 
 export class ProdutoController {
   private _ProdutoService: ProdutoService;
 
   constructor() {
     const produtoRepository = new FirebaseProdutoRepository();
-    const medidaRepository = new FirebaseMedidaRepository(); 
-    const medidaService = new MedidaService(medidaRepository); 
+    const medidaRepository = new FirebaseMedidaRepository();
+    const medidaService = new MedidaService(medidaRepository);
 
-    this._ProdutoService = new ProdutoService(produtoRepository, medidaRepository); 
+    this._ProdutoService = new ProdutoService(
+      produtoRepository,
+      medidaRepository
+    );
   }
-
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
-      
       const dto = ProdutoBuscarTodosSchema.parse(req.body);
       const produtos = await this._ProdutoService.buscarTodos(dto);
       res.status(200).json(produtos);
@@ -48,10 +51,10 @@ export class ProdutoController {
       if (error instanceof z.ZodError) {
         res.status(400).json({
           message: "Erro de validação",
-          erros: error.errors.map(err => ({
-            campo: err.path.join('.'),
-            mensagem: err.message
-          }))
+          erros: error.errors.map((err) => ({
+            campo: err.path.join("."),
+            mensagem: err.message,
+          })),
         });
         return;
       }
@@ -59,7 +62,7 @@ export class ProdutoController {
       res.status(500).json({ message: "Erro interno no servidor" });
     }
   }
-  
+
   async atualizar(req: Request, res: Response): Promise<void> {
     try {
       const dto = ProdutoAtualizarSchema.parse(req.body);
@@ -77,15 +80,18 @@ export class ProdutoController {
     }
   }
 
-
   static routes() {
     const router = Router();
     const controller = new ProdutoController();
-    
+
     router.post("/", controller.buscarTodos.bind(controller));
-    router.post("/inserir", controller.inserir.bind(controller)); 
+
+    router.use(
+      verificarPermissaoSetor(UsuarioSetorEnum.ADMIN, UsuarioSetorEnum.PRODUCAO)
+    );
+    router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));
-    
+
     return router;
   }
 }

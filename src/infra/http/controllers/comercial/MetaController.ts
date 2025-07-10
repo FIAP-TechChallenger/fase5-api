@@ -5,6 +5,8 @@ import { MetaInserirSchema } from "@/application/dtos/comercial/MetaInserirDTO";
 import { MetaAtualizarSchema } from "@/application/dtos/comercial/MetaAtualizarDTO";
 import { MetaBuscarTodosSchema } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
 import { ZodError } from "zod";
+import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
+import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
 
 export class MetaController {
   private _metaService = new MetaService(new FirebaseMetaRepository());
@@ -60,6 +62,12 @@ export class MetaController {
   static routes() {
     const router = Router();
     const controller = new MetaController();
+    router.use(
+      verificarPermissaoSetor(
+        UsuarioSetorEnum.ADMIN,
+        UsuarioSetorEnum.COMERCIAL
+      )
+    );
     router.post("/", controller.buscarTodos.bind(controller));
     router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));

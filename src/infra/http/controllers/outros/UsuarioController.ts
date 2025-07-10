@@ -6,6 +6,7 @@ import { UsuarioInserirSchema } from "@/application/dtos/outros/UsuarioInserirDT
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 import { UsuarioConsultaService } from "@/application/services/outros/UsuarioConsultaService";
 import { UsuarioBuscarTodosSchema } from "@/application/dtos/outros/UsuarioBuscarTodosDTO";
+import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
 
 export class UsuarioController {
   private _usuarioRepo = new FirebaseUsuarioRepository();
@@ -68,11 +69,6 @@ export class UsuarioController {
 
   async recuperarSenha(req: Request, res: Response) {
     try {
-      if (req.user.setor !== UsuarioSetorEnum.ADMIN) {
-        res.status(401).json({ message: "Usuário sem autorização" });
-        return;
-      }
-
       const usuarioId = req.body?.usuarioId;
       if (!usuarioId) {
         res
@@ -93,6 +89,7 @@ export class UsuarioController {
   static routes() {
     const router = Router();
     const controller = new UsuarioController();
+    router.use(verificarPermissaoSetor(UsuarioSetorEnum.ADMIN))
     router.post("/", controller.buscarTodos.bind(controller));
     router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));

@@ -11,6 +11,8 @@ import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebas
 import { Request, Response, Router } from "express";
 import { ZodError } from "zod";
 import { z } from "zod";
+import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
+import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 
 export class ProducaoController {
   private _ProducaoService: ProducaoService;
@@ -18,10 +20,10 @@ export class ProducaoController {
   constructor() {
     this._ProducaoService = new ProducaoService(
       new FirebaseProducaoRepository(),
-      new FirebaseFazendaRepository(), 
+      new FirebaseFazendaRepository(),
       new FirebaseProdutoRepository(),
-      new FirebaseEstoqueProdutoRepository
-    )
+      new FirebaseEstoqueProdutoRepository()
+    );
   }
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
@@ -83,6 +85,10 @@ export class ProducaoController {
     const controller = new ProducaoController();
 
     router.post("/", controller.buscarTodos.bind(controller));
+
+    router.use(
+      verificarPermissaoSetor(UsuarioSetorEnum.ADMIN, UsuarioSetorEnum.PRODUCAO)
+    );
     router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));
 

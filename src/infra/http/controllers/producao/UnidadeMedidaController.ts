@@ -7,10 +7,13 @@ import { FirebaseMedidaRepository } from "@/infra/repositories/producao/firebase
 import { Request, Response, Router } from "express";
 
 import { z, ZodError } from "zod";
+import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
+import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 
 export class UnidadeMedidaController {
-  private _UnidadeMedidaService = new MedidaService(new FirebaseMedidaRepository());
-
+  private _UnidadeMedidaService = new MedidaService(
+    new FirebaseMedidaRepository()
+  );
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
@@ -32,15 +35,17 @@ export class UnidadeMedidaController {
       const dto = MedidaInserirSchema.parse(req.body);
       await this._UnidadeMedidaService.inserir(dto);
 
-      res.status(201).json({ message: "unidade de medidas criado com sucesso" });
+      res
+        .status(201)
+        .json({ message: "unidade de medidas criado com sucesso" });
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         res.status(400).json({
           message: "Erro de validação",
-          erros: error.errors.map(err => ({
-            campo: err.path.join('.'),
-            mensagem: err.message
-          }))
+          erros: error.errors.map((err) => ({
+            campo: err.path.join("."),
+            mensagem: err.message,
+          })),
         });
         return;
       }
@@ -48,7 +53,7 @@ export class UnidadeMedidaController {
       res.status(500).json({ message: "Erro interno no servidor" });
     }
   }
-  
+
   // async atualizar(req: Request, res: Response): Promise<void> {
   //   try {
   //     const dto = MedidaAtualizarSchema.parse(req.body);
@@ -66,15 +71,18 @@ export class UnidadeMedidaController {
   //   }
   // }
 
-
   static routes() {
     const router = Router();
-    const controller = new  UnidadeMedidaController();
-    
+    const controller = new UnidadeMedidaController();
+
     router.post("/", controller.buscarTodos.bind(controller));
-    router.post("/inserir", controller.inserir.bind(controller)); 
+
+    router.use(
+      verificarPermissaoSetor(UsuarioSetorEnum.ADMIN, UsuarioSetorEnum.PRODUCAO)
+    );
+    router.post("/inserir", controller.inserir.bind(controller));
     // router.post("/atualizar", controller.atualizar.bind(controller));
-    
+
     return router;
   }
 }

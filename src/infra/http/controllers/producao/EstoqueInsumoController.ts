@@ -11,6 +11,8 @@ import { FirebaseMedidaRepository } from "@/infra/repositories/producao/firebase
 import { Request, Response, Router } from "express";
 
 import { z, ZodError } from "zod";
+import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
+import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 
 export class EstoqueInsumoController {
   private _EstoqueInsumoService: EstoqueInsumoService;
@@ -20,7 +22,7 @@ export class EstoqueInsumoController {
     this._EstoqueInsumoService = new EstoqueInsumoService(
       new FirebaseEstoqueInsumoRepository(),
       new FirebaseInsumoRepository(),
-      new FirebaseMedidaRepository() 
+      new FirebaseMedidaRepository()
     );
   }
 
@@ -49,10 +51,10 @@ export class EstoqueInsumoController {
       if (error instanceof z.ZodError) {
         res.status(400).json({
           message: "Erro de validação",
-          erros: error.errors.map(err => ({
-            campo: err.path.join('.'),
-            mensagem: err.message
-          }))
+          erros: error.errors.map((err) => ({
+            campo: err.path.join("."),
+            mensagem: err.message,
+          })),
         });
         return;
       }
@@ -77,15 +79,18 @@ export class EstoqueInsumoController {
     }
   }
 
-
   static routes() {
     const router = Router();
     const controller = new EstoqueInsumoController();
-    
+
     router.post("/", controller.buscarTodos.bind(controller));
+
+    router.use(
+      verificarPermissaoSetor(UsuarioSetorEnum.ADMIN, UsuarioSetorEnum.PRODUCAO)
+    );
     router.post("/inserir", controller.inserir.bind(controller));
-    router.post("/atualizar", controller.atualizar.bind(controller)); 
-    
+    router.post("/atualizar", controller.atualizar.bind(controller));
+
     return router;
   }
 }

@@ -6,7 +6,8 @@ import { FazendaService } from "@/application/services/producao/Fazendaservice";
 import { FirebaseFazendaRepository } from "@/infra/repositories/producao/firebaseFazendaRepository";
 import { Request, Response, Router } from "express";
 import { z, ZodError } from "zod";
-
+import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
+import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 
 export class FazendaController {
   private _fazendaService = new FazendaService(new FirebaseFazendaRepository());
@@ -36,10 +37,10 @@ export class FazendaController {
       if (error instanceof z.ZodError) {
         res.status(400).json({
           message: "Erro de validação",
-          erros: error.errors.map(err => ({
-            campo: err.path.join('.'),
-            mensagem: err.message
-          }))
+          erros: error.errors.map((err) => ({
+            campo: err.path.join("."),
+            mensagem: err.message,
+          })),
         });
         return;
       }
@@ -64,14 +65,17 @@ export class FazendaController {
     }
   }
 
-
   static routes() {
     const router = Router();
     const controller = new FazendaController();
     router.post("/", controller.buscarTodos.bind(controller));
-    router.post("/inserir", controller.inserir.bind(controller)); 
+
+    router.use(
+      verificarPermissaoSetor(UsuarioSetorEnum.ADMIN, UsuarioSetorEnum.PRODUCAO)
+    );
+    router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));
-    
+
     return router;
   }
 }

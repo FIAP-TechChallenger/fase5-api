@@ -49,14 +49,14 @@ export class NotificacaoController {
     }
   }
 
-  async enviar(req: Request, res: Response) {
-    NotificacaoSendService.instance.send({
-      tipo: NotificacaoTipoEnum.META_CONCLUIDA,
-      titulo: "Meta concluída",
-      descricao: `A meta de "VENDA" com título "Meta fazenda São Paulo" foi alcançada.`,
-    });
-    res.status(200).json({ message: "Notificação enviada com sucesso" });
-  }
+  // async enviar(req: Request, res: Response) {
+  //   NotificacaoSendService.instance.send({
+  //     tipo: NotificacaoTipoEnum.META_CONCLUIDA,
+  //     titulo: "Meta concluída",
+  //     descricao: `A meta de "VENDA" com título "Meta fazenda São Paulo" foi alcançada.`,
+  //   });
+  //   res.status(200).json({ message: "Notificação enviada com sucesso" });
+  // }
 
   static routes() {
     const router = Router();
@@ -70,7 +70,7 @@ export class NotificacaoController {
       "/marcarTodasComoLidas",
       controller.marcarTodasComoLidas.bind(controller)
     );
-    router.post("/enviar", controller.enviar.bind(controller));
+    // router.post("/enviar", controller.enviar.bind(controller));
     return router;
   }
 }
