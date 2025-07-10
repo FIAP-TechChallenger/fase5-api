@@ -54,22 +54,22 @@ export class UnidadeMedidaController {
     }
   }
 
-  // async atualizar(req: Request, res: Response): Promise<void> {
-  //   try {
-  //     const dto = MedidaAtualizarSchema.parse(req.body);
-  //     await this._UnidadeMedidaService.atualizar(dto);
+  async atualizar(req: Request, res: Response): Promise<void> {
+    try {
+      const dto = MedidaAtualizarSchema.parse(req.body);
+      await this._UnidadeMedidaService.atualizar(dto);
 
-  //     res.status(200).json({ message: "Producao atualizada com sucesso" });
-  //   } catch (error: any) {
-  //     if (error.name === "ZodError") {
-  //       res
-  //         .status(400)
-  //         .json({ message: "Erro de validação", erros: error.errors });
-  //       return;
-  //     }
-  //     res.status(500).json({ message: "Erro interno no servidor" });
-  //   }
-  // }
+      res.status(200).json({ message: "Producao atualizada com sucesso" });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        res
+          .status(400)
+          .json({ message: "Erro de validação", erros: error.errors });
+        return;
+      }
+      res.status(500).json({ message: "Erro interno no servidor" });
+    }
+  }
 
   static routes() {
     const router = Router();
@@ -81,7 +81,7 @@ export class UnidadeMedidaController {
       verificarPermissaoSetor(UsuarioSetorEnum.ADMIN, UsuarioSetorEnum.PRODUCAO)
     );
     router.post("/inserir", controller.inserir.bind(controller));
-    // router.post("/atualizar", controller.atualizar.bind(controller));
+    router.post("/atualizar", controller.atualizar.bind(controller));
 
     return router;
   }
