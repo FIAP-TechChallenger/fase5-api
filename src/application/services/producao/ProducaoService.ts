@@ -12,13 +12,15 @@ import { IProdutoRepository } from "@/domain/repositories/producao/IProdutoRepos
 import { IFazendaRepository } from "@/domain/repositories/producao/IFazendaRepository";
 import { IEstoqueProdutoRepository } from "@/domain/repositories/producao/IEstoqueProdutoRepository";
 import { ProducaoAtualizarDTO } from "@/application/dtos/producao/Producao/ProducaoAtualizarDTO";
+import { IMetaAtualizarValorTipoProducaoService } from "@/domain/interfaces/IMetaAtualizarValorTipoProducaoService";
 
 export class ProducaoService {
   constructor(
     private readonly producaoRepository: IProducaoRepository,
     private readonly fazendaRepository: IFazendaRepository,
     private readonly produtoRepository: IProdutoRepository,
-    private readonly estoqueProdutoRepository: IEstoqueProdutoRepository
+    private readonly estoqueProdutoRepository: IEstoqueProdutoRepository,
+    private readonly metaAtualizarValorTipoProducaoService: IMetaAtualizarValorTipoProducaoService
   ) {}
 
   async buscarTodos(
@@ -69,6 +71,13 @@ export class ProducaoService {
       };
 
       await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
+
+      // this.metaAtualizarValorTipoProducaoService.executar({
+      //   quantidade: producaoAtualizada.quantidade,
+      //   usuarioId: "",
+      //   valorTotal: 0,
+      //   data: novoEstoqueProduto.criadaEm,
+      // });
     }
   }
 
