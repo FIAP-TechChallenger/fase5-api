@@ -15,11 +15,18 @@ import { FirebaseProducaoRepository } from "../repositories/producao/firebasePro
 import { FirebaseFazendaRepository } from "../repositories/producao/firebaseFazendaRepository";
 import { FirebaseProdutoRepository } from "../repositories/producao/firebaseProdutoRepository";
 import { FirebaseEstoqueProdutoRepository } from "../repositories/producao/firebaseEstoqueProdutoRepository";
+import { FirebaseInsumoRepository } from "../repositories/producao/firebaseInsumoRepository";
+import { InsumoService } from "@/application/services/producao/InsumoService";
+import { FirebaseMedidaRepository } from "../repositories/producao/firebaseMedidaRepository";
 
 const authRepository = new FirebaseAuthRepository();
 const usuarioRepository = new FirebaseUsuarioRepository();
 const notificacaoRepository = new FirebaseNotificacaoRepository();
 const metaRepository = new FirebaseMetaRepository();
+const insumoRepository = new FirebaseInsumoRepository();
+const medidaRepository = new FirebaseMedidaRepository();
+const insumoService = new InsumoService(insumoRepository, medidaRepository);
+
 
 const producaoRepository = new FirebaseProducaoRepository();
 const fazendaRepository = new FirebaseFazendaRepository();
@@ -46,7 +53,8 @@ const producaoService = new ProducaoService(
   fazendaRepository,
   produtoRepository,
   estoqueProdutoRepository,
-  metaAtualizarValorTipoProducaoService
+  metaAtualizarValorTipoProducaoService,
+  
 );
 
 export const container = {

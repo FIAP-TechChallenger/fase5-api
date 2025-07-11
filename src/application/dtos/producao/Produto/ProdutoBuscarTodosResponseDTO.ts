@@ -1,8 +1,19 @@
 import { Produto } from "@/domain/entities/producao/Produto";
 
+// ProdutoItemDTO.ts
+export interface InsumoDetalhadoDTO {
+  id: string;
+  nome: string;
+}
+
+export type ProdutoItemDTO = Produto & {
+  unidadeMedidaSigla?: string;
+  insumosDetalhados?: InsumoDetalhadoDTO[];
+};
+
+// ProdutoBuscarTodosResponseDTO.ts
 export interface ProdutoBuscarTodosResponseDTO {
-    dados: Produto[];
-    ultimoId: string;
-    temMais: boolean;
-  }
-  
+  dados: ProdutoItemDTO[];
+  ultimoId: string | null;
+  temMais: boolean;
+}

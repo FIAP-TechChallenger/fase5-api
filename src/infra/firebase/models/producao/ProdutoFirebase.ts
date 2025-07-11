@@ -5,4 +5,5 @@ export interface ProdutoFirebase {
     nome:string;
     unidadeMedidaId:string; 
     criadaEm?: Timestamp | null
+    insumos?: string[]; // <-- adicionar isso
 }

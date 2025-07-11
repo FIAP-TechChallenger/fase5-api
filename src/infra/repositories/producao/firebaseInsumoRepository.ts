@@ -44,7 +44,25 @@ export class FirebaseInsumoRepository implements IInsumoRepository {
     const data = doc.data() as InsumoFirebase;
     return InsumoConverter.fromFirestore(data, doc.id);
   }
-
+  async buscarPorIds(ids: string[]): Promise<Insumo[]> {
+    if (ids.length === 0) return [];
+  
+    const snapshot = await admin.firestore()
+      .collection("insumo")
+      .where(admin.firestore.FieldPath.documentId(), "in", ids)
+      .get();
+  
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      return new Insumo({
+        id: doc.id,
+        nome: data.nome,
+        unidadeMedidaId: data.unidadeMedidaId,
+        unidadeMedidaSigla: data.unidadeMedidaSigla,
+        criadaEm: data.criadaEm?.toDate() || new Date(),
+      });
+    });
+  }
   async insert(insumo: Insumo): Promise<void> {
     const data:InsumoFirebase = InsumoConverter.toFirestore(insumo);
     await this._getCollection().doc(insumo.id).set(data);

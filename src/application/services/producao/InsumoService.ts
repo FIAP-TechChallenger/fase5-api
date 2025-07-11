@@ -29,6 +29,10 @@ export class InsumoService {
       ultimoId: response.ultimoId,
     };
   }
+  async buscarPorIds(ids: string[]): Promise<Insumo[]> {
+    return this.insumoRepository.buscarPorIds(ids);
+  }
+
 
   async inserir(dto: InsumoInserirDTO): Promise<void> {
     const novoInsumo: Insumo = {

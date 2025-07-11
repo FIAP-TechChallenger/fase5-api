@@ -6,25 +6,41 @@ import { ProdutoBuscarTodosResponseDTO } from "@/application/dtos/producao/Produ
 import { ProdutoBuscarTodosDTO } from "@/application/dtos/producao/Produto/ProdutoBuscarTodosDTO";
 import { IMedidaRepository } from "@/domain/repositories/producao/IMedidaRepository";
 import { ProdutoAtualizarDTO } from "@/application/dtos/producao/Produto/ProdutoAtualizarDTO";
+import { InsumoService } from "./InsumoService";
 
 export class ProdutoService {
   constructor(
     private readonly produtoRepository: IProdutoRepository,
     private readonly unidadeMedidaService: IMedidaRepository,
+    private readonly insumoService: InsumoService
+  
   ) {}
 
   async buscarTodos(dto: ProdutoBuscarTodosDTO): Promise<ProdutoBuscarTodosResponseDTO> {
     const response = await this.produtoRepository.buscarTodos(dto);
+
+    const todosInsumoIds = response.dados.flatMap(p => p.insumos ?? []);
+    const insumos = await this.insumoService.buscarPorIds(todosInsumoIds);
+    const insumoMap = new Map(insumos.map(insumo => [insumo.id, insumo.nome]));
   
-    const produtosComSigla = await Promise.all(
+    const produtosComDetalhes = await Promise.all(
       response.dados.map(async (produto) => {
         const sigla = await this.unidadeMedidaService.buscarSigla(produto.unidadeMedidaId);
-        return new Produto({ ...produto, unidadeMedidaSigla: sigla });
+        const insumosDetalhados = (produto.insumos ?? []).map(id => ({
+          id,
+          nome: insumoMap.get(id) ?? "Insumo não encontrado"
+        }));
+
+        return {
+          ...produto,
+          unidadeMedidaSigla: sigla,
+          insumosDetalhados,
+        };
       })
     );
-  
+
     return {
-      dados: produtosComSigla,
+      dados: produtosComDetalhes,
       temMais: response.temMais,
       ultimoId: response.ultimoId,
     };
@@ -35,6 +51,7 @@ export class ProdutoService {
       id: gerarUUID(),
       nome:dto.nome,
       unidadeMedidaId:dto.unidadeMedidaId,
+      insumos:dto.insumos,
       criadaEm: new Date(),
      
     };

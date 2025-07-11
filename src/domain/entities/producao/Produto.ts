@@ -6,6 +6,7 @@ export class Produto {
     unidadeMedidaId:string; 
     unidadeMedidaSigla?: string; 
     criadaEm: Date;
+    insumos?: string[];
 
     constructor(obj:Produto){
         this.id= obj.id
@@ -13,6 +14,7 @@ export class Produto {
         this.unidadeMedidaId = obj.unidadeMedidaId
         this.unidadeMedidaSigla = obj.unidadeMedidaSigla
         this.criadaEm = obj.criadaEm
+        this.insumos = obj.insumos??[]
 
     }
 }

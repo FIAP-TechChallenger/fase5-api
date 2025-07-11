@@ -8,6 +8,7 @@ export class ProdutoConverter {
       nome: produto.nome,
       unidadeMedidaId: produto.unidadeMedidaId, 
       criadaEm: this._toTimestamp(produto.criadaEm), 
+      insumos: produto.insumos ?? [] // <-- incluir aqui
     };
   }
 
@@ -17,6 +18,7 @@ export class ProdutoConverter {
       nome: data.nome,
       unidadeMedidaId: data.unidadeMedidaId, 
       criadaEm: data.criadaEm?.toDate() || new Date(),
+      insumos: data.insumos ?? [],
     });
   }
 

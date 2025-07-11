@@ -11,6 +11,8 @@ import { Request, Response, Router } from "express";
 import { z, ZodError } from "zod";
 import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
+import { FirebaseInsumoRepository } from "@/infra/repositories/producao/firebaseInsumoRepository";
+import { InsumoService } from "@/application/services/producao/InsumoService";
 
 export class ProdutoController {
   private _ProdutoService: ProdutoService;
@@ -19,10 +21,13 @@ export class ProdutoController {
     const produtoRepository = new FirebaseProdutoRepository();
     const medidaRepository = new FirebaseMedidaRepository();
     const medidaService = new MedidaService(medidaRepository);
+    const insumoRepository = new FirebaseInsumoRepository();
+    const insumoService = new InsumoService(insumoRepository, medidaRepository);
 
     this._ProdutoService = new ProdutoService(
       produtoRepository,
-      medidaRepository
+      medidaRepository,
+      insumoService
     );
   }
 
