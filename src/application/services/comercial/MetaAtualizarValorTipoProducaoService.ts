@@ -1,15 +1,16 @@
 import { IMetaRepository } from "@/domain/repositories/comercial/IMetaRepository";
 import { MetaCalculoPorEnum, MetaTipoEnum } from "@/domain/types/meta.enum";
 import { DateUtils } from "@/shared/utils/date.utils";
+import { NotificacaoSendService } from "../outros/NotificacaoSendService";
+import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
+import {
+  IMetaAtualizarValorTipoProducaoService,
+  MetaAtualizarValorTipoProducaoParams,
+} from "@/domain/interfaces/IMetaAtualizarValorTipoProducaoService";
 
-interface MetaAtualizarValorTipoProducaoParams {
-  usuarioId: string;
-  quantidade: number;
-  valorTotal: number; // usado apenas se calculoPor === VALOR
-  data?: Date; // opcional (padrão: hoje)
-}
-
-export class MetaAtualizarValorTipoProducaoService {
+export class MetaAtualizarValorTipoProducaoService
+  implements IMetaAtualizarValorTipoProducaoService
+{
   constructor(private readonly metaRepository: IMetaRepository) {}
 
   async executar(dados: MetaAtualizarValorTipoProducaoParams): Promise<void> {
@@ -29,6 +30,21 @@ export class MetaAtualizarValorTipoProducaoService {
       }
 
       await this.metaRepository.atualizar(meta);
+
+      if (meta.valorAtual >= meta.valorAlvo) {
+        await this._notificarMetaConcluida(meta.tipo, meta.titulo);
+      }
     }
+  }
+
+  private async _notificarMetaConcluida(
+    metaTipo: MetaTipoEnum,
+    metaTitulo: string
+  ) {
+    NotificacaoSendService.instance.send({
+      tipo: NotificacaoTipoEnum.META_CONCLUIDA,
+      titulo: "Meta concluída",
+      descricao: `A meta de "${metaTipo}" com título "${metaTitulo}" foi alcançada.`,
+    });
   }
 }

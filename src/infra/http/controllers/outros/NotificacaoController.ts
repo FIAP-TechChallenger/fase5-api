@@ -1,23 +1,19 @@
 import { ZodError } from "zod";
 import { Request, Response, Router } from "express";
-import { NotificacaoService } from "@/application/services/outros/NotificacaoService";
-import { FirebaseNotificacaoRepository } from "@/infra/repositories/outros/FirebaseNotificacaoRepository";
 import { NotificacaoBuscarTodasSchema } from "@/application/dtos/outros/NotificacaoBuscarTodasDTO";
-import { NotificacaoSendService } from "@/application/services/outros/NotificacaoSendService";
-import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
+import { container } from "@/infra/container/container";
 
 export class NotificacaoController {
-  private _notificacaoService = new NotificacaoService(
-    new FirebaseNotificacaoRepository()
-  );
-
   async buscarTodas(req: Request, res: Response) {
     try {
       const dto = NotificacaoBuscarTodasSchema.parse(req.body);
-      const dados = await this._notificacaoService.buscarTodas(req.user, dto);
+      const dados = await container.notificacaoService.buscarTodas(
+        req.user,
+        dto
+      );
       res.status(200).json(dados);
     } catch (error: any) {
-      let message = "Erro ao buscar metas";
+      let message = error?.message ?? "Erro ao buscar metas";
       if (error instanceof ZodError) {
         message = error.message;
       }
@@ -27,7 +23,9 @@ export class NotificacaoController {
 
   async buscarQtdNaoLidas(req: Request, res: Response) {
     try {
-      const qtd = await this._notificacaoService.buscarQtdNaoLidas(req.user.id);
+      const qtd = await container.notificacaoService.buscarQtdNaoLidas(
+        req.user.id
+      );
       res.status(200).json(qtd);
     } catch (error: any) {
       res.status(400).json({
@@ -39,7 +37,7 @@ export class NotificacaoController {
 
   async marcarTodasComoLidas(req: Request, res: Response) {
     try {
-      await this._notificacaoService.marcarTodasComoLidas(req.user.id);
+      await container.notificacaoService.marcarTodasComoLidas(req.user.id);
       res.status(200).json({ message: "Marcado todas como lida" });
     } catch (error: any) {
       res.status(400).json({
@@ -48,15 +46,6 @@ export class NotificacaoController {
       });
     }
   }
-
-  // async enviar(req: Request, res: Response) {
-  //   NotificacaoSendService.instance.send({
-  //     tipo: NotificacaoTipoEnum.META_CONCLUIDA,
-  //     titulo: "Meta concluída",
-  //     descricao: `A meta de "VENDA" com título "Meta fazenda São Paulo" foi alcançada.`,
-  //   });
-  //   res.status(200).json({ message: "Notificação enviada com sucesso" });
-  // }
 
   static routes() {
     const router = Router();

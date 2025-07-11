@@ -1,21 +1,11 @@
 import { Request, Response, Router } from "express";
-import { UsuarioCadastroService } from "@/application/services/outros/UsuarioCadastroService";
-import { NodeMailerEmailService } from "@/infra/email/NodeMailerEmailService";
-import { FirebaseUsuarioRepository } from "@/infra/repositories/outros/FirebaseUsuarioRepository";
 import { UsuarioInserirSchema } from "@/application/dtos/outros/UsuarioInserirDTO";
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
-import { UsuarioConsultaService } from "@/application/services/outros/UsuarioConsultaService";
 import { UsuarioBuscarTodosSchema } from "@/application/dtos/outros/UsuarioBuscarTodosDTO";
 import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
+import { container } from "@/infra/container/container";
 
 export class UsuarioController {
-  private _usuarioRepo = new FirebaseUsuarioRepository();
-  private _usuarioCadastro = new UsuarioCadastroService(
-    new NodeMailerEmailService(),
-    this._usuarioRepo
-  );
-  private _usuarioConsulta = new UsuarioConsultaService(this._usuarioRepo);
-
   async buscarTodos(req: Request, res: Response) {
     try {
       if (req.user.setor !== UsuarioSetorEnum.ADMIN) {
@@ -23,7 +13,7 @@ export class UsuarioController {
         return;
       }
       const dto = UsuarioBuscarTodosSchema.parse(req.body);
-      const dados = await this._usuarioConsulta.buscarTodos(dto);
+      const dados = await container.usuarioConsultaService.buscarTodos(dto);
       res.status(201).json(dados);
     } catch (error: any) {
       res.status(400).json({
@@ -41,7 +31,7 @@ export class UsuarioController {
       }
 
       const dto = UsuarioInserirSchema.parse(req.body);
-      await this._usuarioCadastro.inserir(dto);
+      await container.usuarioCadastroService.inserir(dto);
       res.status(201).json({ message: "Usuario cadastrado com sucesso." });
     } catch (error: any) {
       res
@@ -58,7 +48,7 @@ export class UsuarioController {
       }
 
       const dto = UsuarioInserirSchema.parse(req.body);
-      await this._usuarioCadastro.inserir(dto);
+      await container.usuarioCadastroService.inserir(dto);
       res.status(201).json({ message: "Usuario cadastrado com sucesso." });
     } catch (error: any) {
       res
@@ -77,7 +67,7 @@ export class UsuarioController {
         return;
       }
 
-      await this._usuarioCadastro.recuperarSenha(usuarioId);
+      await container.usuarioCadastroService.recuperarSenha(usuarioId);
       res.status(201).json({ message: "Usuario cadastrado com sucesso." });
     } catch (error: any) {
       res
@@ -89,7 +79,7 @@ export class UsuarioController {
   static routes() {
     const router = Router();
     const controller = new UsuarioController();
-    router.use(verificarPermissaoSetor(UsuarioSetorEnum.ADMIN))
+    router.use(verificarPermissaoSetor(UsuarioSetorEnum.ADMIN));
     router.post("/", controller.buscarTodos.bind(controller));
     router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));

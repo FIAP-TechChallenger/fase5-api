@@ -1,35 +1,18 @@
-// src/presentation/controllers/producao/FazendaController.ts
-
 import { ProducaoAtualizarSchema } from "@/application/dtos/producao/Producao/ProducaoAtualizarDTO";
 import { ProducaoBuscarTodosSchema } from "@/application/dtos/producao/Producao/ProducaoBuscarTodosDTO";
 import { ProducaoInserirSchema } from "@/application/dtos/producao/Producao/ProducaoInserirDTO";
-import { ProducaoService } from "@/application/services/producao/ProducaoService";
-import { FirebaseEstoqueProdutoRepository } from "@/infra/repositories/producao/firebaseEstoqueProdutoRepository";
-import { FirebaseFazendaRepository } from "@/infra/repositories/producao/firebaseFazendaRepository";
-import { FirebaseProducaoRepository } from "@/infra/repositories/producao/firebaseProducaoRepository";
-import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebaseProdutoRepository";
 import { Request, Response, Router } from "express";
 import { ZodError } from "zod";
 import { z } from "zod";
 import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
+import { container } from "@/infra/container/container";
 
 export class ProducaoController {
-  private _ProducaoService: ProducaoService;
-
-  constructor() {
-    this._ProducaoService = new ProducaoService(
-      new FirebaseProducaoRepository(),
-      new FirebaseFazendaRepository(),
-      new FirebaseProdutoRepository(),
-      new FirebaseEstoqueProdutoRepository()
-    );
-  }
-
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
       const dto = ProducaoBuscarTodosSchema.parse(req.body);
-      const producao = await this._ProducaoService.buscarTodos(dto);
+      const producao = await container.producaoService.buscarTodos(dto);
       res.status(200).json(producao);
     } catch (error) {
       console.error("Erro ao buscar producao:", error);
@@ -44,7 +27,7 @@ export class ProducaoController {
   async inserir(req: Request, res: Response): Promise<void> {
     try {
       const dto = ProducaoInserirSchema.parse(req.body);
-      await this._ProducaoService.inserir(dto);
+      await container.producaoService.inserir(dto);
 
       res.status(201).json({ message: "producao criado com sucesso" });
     } catch (error: any) {
@@ -66,7 +49,7 @@ export class ProducaoController {
   async atualizar(req: Request, res: Response): Promise<void> {
     try {
       const dto = ProducaoAtualizarSchema.parse(req.body);
-      await this._ProducaoService.atualizar(dto);
+      await container.producaoService.atualizar(dto);
 
       res.status(200).json({ message: "Producao atualizada com sucesso" });
     } catch (error: any) {

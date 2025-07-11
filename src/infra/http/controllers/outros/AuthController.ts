@@ -1,25 +1,19 @@
 import { Request, Response, Router } from "express";
-import { FirebaseAuthRepository } from "@/infra/repositories/outros/FirebaseAuthRepository";
 import { authenticate } from "@/infra/http/middlewares/auth";
-import { AuthCookieService } from "@/application/services/outros/AuthCookieService";
-import { AuthService } from "@/application/services/outros/AuthService";
 import { LoginSchema } from "../../dtos/LoginDTO";
-import { FirebaseUsuarioRepository } from "@/infra/repositories/outros/FirebaseUsuarioRepository";
+import { container } from "@/infra/container/container";
 
 export class AuthController {
-  private _authCookieService = new AuthCookieService();
-  private _authService = new AuthService(
-    new FirebaseAuthRepository(),
-    new FirebaseUsuarioRepository()
-  );
-
   async login(req: Request, res: Response): Promise<void> {
     try {
       const dto = LoginSchema.parse(req.body);
-      const authData = await this._authService.login(dto.email, dto.password);
+      const authData = await container.authService.login(
+        dto.email,
+        dto.password
+      );
 
-      this._authCookieService.setToken(res, authData.token);
-      this._authCookieService.setRefreshToken(res, authData.refreshToken);
+      container.authCookieService.setToken(res, authData.token);
+      container.authCookieService.setRefreshToken(res, authData.refreshToken);
 
       res.status(200).json(authData);
     } catch (err: any) {
@@ -45,10 +39,10 @@ export class AuthController {
     }
 
     try {
-      const refreshResponse = await this._authService.refresh(refreshToken);
+      const refreshResponse = await container.authService.refresh(refreshToken);
 
-      this._authCookieService.setToken(res, refreshResponse.token);
-      this._authCookieService.setRefreshToken(
+      container.authCookieService.setToken(res, refreshResponse.token);
+      container.authCookieService.setRefreshToken(
         res,
         refreshResponse.refreshToken
       );
@@ -69,9 +63,9 @@ export class AuthController {
         return;
       }
 
-      this._authCookieService.clearToken(res);
-      this._authCookieService.clearRefreshToken(res);
-      await this._authService.revokeTokens(user.id);
+      container.authCookieService.clearToken(res);
+      container.authCookieService.clearRefreshToken(res);
+      await container.authService.revokeTokens(user.id);
 
       res.status(200).json({ message: "Logout realizado com sucesso" });
     } catch (error: any) {
