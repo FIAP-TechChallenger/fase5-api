@@ -7,5 +7,8 @@ export interface IEstoqueInsumoRepository{
    buscarTodos(dto:EstoqueInsumoBuscarTodosDTO): Promise<EstoqueInsumoBuscarTodosResponseDTO>
    insert(estoqueInsumo: EstoqueInsumo ): Promise<void>;
    atualizar(estoque: EstoqueInsumo): Promise<void>;
+   buscarPorInsumoId(insumoId: string): Promise<EstoqueInsumo | null>;
+   atualizarQuantidade(estoqueId: string, novaQuantidade: number): Promise<void>;
+ }
 
-}
+

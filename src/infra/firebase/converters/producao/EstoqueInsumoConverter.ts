@@ -1,6 +1,7 @@
 import { EstoqueInsumo } from "@/domain/entities/producao/EstoqueInsumo";
 import { Timestamp } from "firebase-admin/firestore";
 import { EstoqueInsumoFirebase } from "../../models/producao/EstoqueInsumoFirebase";
+import { getFirebaseTimeStamp } from "@/shared/utils/getFirebaseTimeStamp";
 
 export class EstoqueInsumoConverter {
   static toFirestore(estoqueInsumo: EstoqueInsumo): EstoqueInsumoFirebase {
@@ -8,7 +9,8 @@ export class EstoqueInsumoConverter {
         insumoId:estoqueInsumo.insumoId,
         quantidade: estoqueInsumo.quantidade,
         preco: estoqueInsumo.preco,
-        criadaEm: this._toTimestamp(estoqueInsumo.criadaEm), 
+        atualizadaEm: getFirebaseTimeStamp(estoqueInsumo.atualizadaEm),
+      criadaEm: getFirebaseTimeStamp(estoqueInsumo.criadaEm),
      
     };
   }
@@ -20,6 +22,7 @@ export class EstoqueInsumoConverter {
       quantidade: data.quantidade,
       preco: data.preco,
       criadaEm: data.criadaEm?.toDate() || new Date(),
+      atualizadaEm:data.atualizadaEm.toDate()|| new Date(),
       
     });
   }

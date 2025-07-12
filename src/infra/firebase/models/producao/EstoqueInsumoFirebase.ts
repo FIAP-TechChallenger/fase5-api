@@ -6,4 +6,5 @@ export interface EstoqueInsumoFirebase{
     quantidade: number,
     preco:number, 
     criadaEm?: Timestamp | null
+    atualizadaEm: Timestamp;
 }

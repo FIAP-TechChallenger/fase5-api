@@ -7,6 +7,7 @@ import { EstoqueInsumoBuscarTodosResponseDTO, EstoqueInsumoItemDTO } from "@/app
 import { IInsumoRepository } from "@/domain/repositories/producao/IInsumoRepository";
 import { IMedidaRepository } from "@/domain/repositories/producao/IMedidaRepository";
 import { EstoqueInsumoAtualizarDTO } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoAtualizarDTO";
+import { admin } from "@/infra/firebase/firebase-initialize";
 
 export class EstoqueInsumoService {
   constructor(
@@ -20,7 +21,6 @@ export class EstoqueInsumoService {
     
     const dadosEnriquecidos = await Promise.all(
       response.dados.map(async (estoque) => {
-        // Busca o insumo completo pelo ID
         const insumo = await this.insumoRepository.buscarPorId(estoque.insumoId);
         
         if (!insumo) {
@@ -31,7 +31,6 @@ export class EstoqueInsumoService {
           } as EstoqueInsumoItemDTO;
         }
         
-        // Busca a sigla usando o ID da unidade do insumo
         const sigla = await this.medidaRepository.buscarSigla(insumo.unidadeMedidaId);
 
         return {
@@ -55,6 +54,7 @@ export class EstoqueInsumoService {
       quantidade:dto.quantidade,
       preco:dto.preco,
       criadaEm: new Date(),
+      atualizadaEm: new Date(),
    
     };
     await this.estoqueInsumoRepository.insert(novoEstoque);
@@ -72,6 +72,26 @@ export class EstoqueInsumoService {
 
     await this.estoqueInsumoRepository.atualizar(estoqueAtualizado);
   }
+  async debitarQuantidade(insumoId: string, quantidadeNecessaria: number): Promise<void> {
+    return admin.firestore().runTransaction(async (transaction) => {
+      const estoque = await this.estoqueInsumoRepository.buscarPorInsumoId(insumoId);
+      
+      if (!estoque) {
+        throw new Error("Estoque do insumo não encontrado");
+      }
+      
+      if (estoque.quantidade < quantidadeNecessaria) {
+        throw new Error(`Estoque insuficiente para insumo ${insumoId}. 
+                         Disponível: ${estoque.quantidade}, 
+                         Necessário: ${quantidadeNecessaria}`);
+      }
+      
+      const novaQuantidade = estoque.quantidade - quantidadeNecessaria;
+      await this.estoqueInsumoRepository.atualizarQuantidade(estoque.id, novaQuantidade);
+    });
+  }
+
+  
 }
 
 

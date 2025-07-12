@@ -1,4 +1,3 @@
-import { Insumo } from "./Insumo";
 
 export class EstoqueInsumo {
     id: string ;
@@ -6,14 +5,16 @@ export class EstoqueInsumo {
     quantidade:number;
     preco:number;
     criadaEm: Date;
+    atualizadaEm: Date;
 
 
     constructor(obj:EstoqueInsumo){
         this.id = obj.id,
         this.insumoId = obj.insumoId,
         this.quantidade = obj.quantidade,
-        this.preco = obj.preco;
-        this.criadaEm = obj.criadaEm
+        this.preco = obj.preco,
+        this.criadaEm = obj.criadaEm,
+        this.atualizadaEm = obj.atualizadaEm
 
 
     }

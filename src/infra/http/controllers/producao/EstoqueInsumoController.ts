@@ -13,12 +13,13 @@ import { Request, Response, Router } from "express";
 import { z, ZodError } from "zod";
 import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
+import { EstoqueInsumoDebitarSchema } from "@/application/dtos/producao/EstoqueInsumo/EstoqueInsumoDebitarSchema";
 
 export class EstoqueInsumoController {
   private _EstoqueInsumoService: EstoqueInsumoService;
 
   constructor() {
-    // Injetando todas as dependências
+    
     this._EstoqueInsumoService = new EstoqueInsumoService(
       new FirebaseEstoqueInsumoRepository(),
       new FirebaseInsumoRepository(),
@@ -78,6 +79,30 @@ export class EstoqueInsumoController {
       res.status(500).json({ message: "Erro interno no servidor" });
     }
   }
+  async debitar(req: Request, res: Response): Promise<void> {
+    try {
+      const dto = EstoqueInsumoDebitarSchema.parse(req.body);
+      await this._EstoqueInsumoService.debitarQuantidade(dto.insumoId, dto.quantidade);
+      
+      res.status(200).json({ message: "Débito realizado com sucesso" });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({
+          message: "Erro de validação",
+          erros: error.errors.map((err) => ({
+            campo: err.path.join("."),
+            mensagem: err.message,
+          })),
+        });
+        return;
+      }
+      console.error("Erro ao debitar estoque de insumo:", error);
+      res.status(500).json({ 
+        message: error.message || "Erro interno no servidor" 
+      });
+    }
+  }
+
 
   static routes() {
     const router = Router();
@@ -90,6 +115,7 @@ export class EstoqueInsumoController {
     );
     router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));
+    router.post("/debitar", controller.debitar.bind(controller)); 
 
     return router;
   }
