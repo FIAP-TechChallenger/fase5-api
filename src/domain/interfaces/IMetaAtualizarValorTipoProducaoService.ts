@@ -1,7 +1,5 @@
 export interface MetaAtualizarValorTipoProducaoParams {
-  usuarioId: string;
-  quantidade: number;
-  valorTotal: number; // usado apenas se calculoPor === VALOR
+  qtdColhida: number;
   data?: Date; // opcional (padrão: hoje)
 }
 

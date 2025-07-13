@@ -85,9 +85,7 @@ export class ProducaoService {
       await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
 
       // this.metaAtualizarValorTipoProducaoService.executar({
-      //   quantidade: producaoAtualizada.quantidade,
-      //   usuarioId: "",
-      //   valorTotal: 0,
+      //   qtdColhida: 0, //adicionar
       //   data: novoEstoqueProduto.criadaEm,
       // });
     }

@@ -23,11 +23,14 @@ export class MetaAtualizarValorTipoProducaoService
     );
 
     for (const meta of metas) {
-      if (meta.calculoPor === MetaCalculoPorEnum.QUANTIDADE) {
-        meta.valorAtual += dados.quantidade;
-      } else if (meta.calculoPor === MetaCalculoPorEnum.VALOR) {
-        meta.valorAtual += dados.valorTotal;
-      }
+      meta.valorAtual += dados.qtdColhida;
+
+      // valor sera apenas para venda
+      // if (meta.calculoPor === MetaCalculoPorEnum.QUANTIDADE) {
+      //   meta.valorAtual += dados.quantidade;
+      // } else if (meta.calculoPor === MetaCalculoPorEnum.VALOR) {
+      //   meta.valorAtual += dados.valorTotal;
+      // }
 
       await this.metaRepository.atualizar(meta);
 
