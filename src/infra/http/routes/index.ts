@@ -11,12 +11,14 @@ import { EstoqueInsumoController } from "../controllers/producao/EstoqueInsumoCo
 import { EstqueProdutoController } from "../controllers/producao/EstoqueProdutoController";
 import { InsumoController } from "../controllers/producao/InsumoController";
 import { NotificacaoController } from "../controllers/outros/NotificacaoController";
+import { DashboardController } from "../controllers/outros/DashboardController";
 
 const router = Router();
 
 router.use("/auth", AuthController.routes());
 router.use("/usuario", authenticate, UsuarioController.routes());
 router.use("/meta", authenticate, MetaController.routes());
+router.use("/dashboard", authenticate, DashboardController.routes());
 router.use("/notificacao", authenticate, NotificacaoController.routes());
 router.use("/fazenda", FazendaController.routes());
 router.use("/produto", ProdutoController.routes());

@@ -1,5 +1,5 @@
-import { NotificacaoBuscarTodasDTO } from "@/application/dtos/outros/NotificacaoBuscarTodasDTO";
-import { NotificacaoBuscarTodasResponseDTO } from "@/application/dtos/outros/NotificacaoBuscarTodasResponseDTO";
+import { NotificacaoBuscarTodasDTO } from "@/application/dtos/outros/notificacao/NotificacaoBuscarTodasDTO";
+import { NotificacaoBuscarTodasResponseDTO } from "@/application/dtos/outros/notificacao/NotificacaoBuscarTodasResponseDTO";
 import { Notificacao } from "@/domain/entities/outros/Notificacao";
 import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
 

@@ -1,8 +1,8 @@
 import { INotificacaoRepository } from "@/domain/repositories/outros/INotificacaoRepository";
 import { gerarUUID } from "@/shared/utils/gerarUUID";
-import { NotificacaoSocketGateway } from "./NotificacaoSocketGateway";
 import { Notificacao } from "@/domain/entities/outros/Notificacao";
-import { NotificacaoEnviarDTO } from "@/application/dtos/outros/NotificacaoEnviarDTO";
+import { NotificacaoEnviarDTO } from "@/application/dtos/outros/notificacao/NotificacaoEnviarDTO";
+import { NotificacaoSocketGateway } from "./NotificacaoSocketGateway";
 
 export class NotificacaoSendService {
   private static _instance: NotificacaoSendService;

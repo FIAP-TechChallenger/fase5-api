@@ -3,7 +3,7 @@ import { AuthService } from "@/application/services/outros/AuthService";
 import { FirebaseUsuarioRepository } from "../repositories/outros/FirebaseUsuarioRepository";
 import { FirebaseAuthRepository } from "../repositories/outros/FirebaseAuthRepository";
 import { FirebaseNotificacaoRepository } from "../repositories/outros/FirebaseNotificacaoRepository";
-import { NotificacaoService } from "@/application/services/outros/NotificacaoService";
+import { NotificacaoService } from "@/application/services/outros/notificacao/NotificacaoService";
 import { UsuarioCadastroService } from "@/application/services/outros/UsuarioCadastroService";
 import { UsuarioConsultaService } from "@/application/services/outros/UsuarioConsultaService";
 import { NodeMailerEmailService } from "../email/NodeMailerEmailService";
@@ -18,15 +18,17 @@ import { FirebaseEstoqueProdutoRepository } from "../repositories/producao/fireb
 import { FirebaseInsumoRepository } from "../repositories/producao/firebaseInsumoRepository";
 import { InsumoService } from "@/application/services/producao/InsumoService";
 import { FirebaseMedidaRepository } from "../repositories/producao/firebaseMedidaRepository";
+import { FirebaseDashboardProducaoRepository } from "../repositories/outros/FirebaseDashboardProducaoRepository";
+import { DashboardProducaoService } from "@/application/services/outros/dashboard/IDashboardProducaoService";
 
 const authRepository = new FirebaseAuthRepository();
 const usuarioRepository = new FirebaseUsuarioRepository();
 const notificacaoRepository = new FirebaseNotificacaoRepository();
 const metaRepository = new FirebaseMetaRepository();
+const dashboardProducaoRepository = new FirebaseDashboardProducaoRepository();
 const insumoRepository = new FirebaseInsumoRepository();
 const medidaRepository = new FirebaseMedidaRepository();
 const insumoService = new InsumoService(insumoRepository, medidaRepository);
-
 
 const producaoRepository = new FirebaseProducaoRepository();
 const fazendaRepository = new FirebaseFazendaRepository();
@@ -43,6 +45,9 @@ const usuarioCadastroService = new UsuarioCadastroService(
   usuarioRepository
 );
 const usuarioConsultaService = new UsuarioConsultaService(usuarioRepository);
+const dashboardProducaoService = new DashboardProducaoService(
+  dashboardProducaoRepository
+);
 const metaService = new MetaService(metaRepository);
 
 const metaAtualizarValorTipoProducaoService =
@@ -54,7 +59,7 @@ const producaoService = new ProducaoService(
   produtoRepository,
   estoqueProdutoRepository,
   metaAtualizarValorTipoProducaoService,
-  
+  dashboardProducaoService
 );
 
 export const container = {
@@ -66,6 +71,7 @@ export const container = {
   emailService,
   authCookieService,
   authService,
+  dashboardProducaoService,
   notificacaoService,
   usuarioCadastroService,
   usuarioConsultaService,

@@ -4,8 +4,8 @@ import { Usuario } from "@/domain/entities/outros/Usuario";
 import { UsuarioFirebase } from "@/infra/firebase/models/outros/UsuarioFirebase";
 import { UsuarioConverter } from "@/infra/firebase/converters/outros/UsuarioConverter";
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
-import { UsuarioBuscarTodosDTO } from "@/application/dtos/outros/UsuarioBuscarTodosDTO";
-import { UsuarioBuscarTodosResponseDTO } from "@/application/dtos/outros/UsuarioBuscarTodosResponseDTO";
+import { UsuarioBuscarTodosDTO } from "@/application/dtos/outros/usuario/UsuarioBuscarTodosDTO";
+import { UsuarioBuscarTodosResponseDTO } from "@/application/dtos/outros/usuario/UsuarioBuscarTodosResponseDTO";
 
 export class FirebaseUsuarioRepository implements IUsuarioRepository {
   async buscarTodos(

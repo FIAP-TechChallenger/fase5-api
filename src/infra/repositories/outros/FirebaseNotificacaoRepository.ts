@@ -5,8 +5,8 @@ import { NotificacaoConverter } from "@/infra/firebase/converters/outros/Notific
 import { NotificacaoFirebase } from "@/infra/firebase/models/outros/NotificacaoFirebase";
 import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
 import { getFirebaseTimeStamp } from "@/shared/utils/getFirebaseTimeStamp";
-import { NotificacaoBuscarTodasResponseDTO } from "@/application/dtos/outros/NotificacaoBuscarTodasResponseDTO";
-import { NotificacaoBuscarTodasDTO } from "@/application/dtos/outros/NotificacaoBuscarTodasDTO";
+import { NotificacaoBuscarTodasResponseDTO } from "@/application/dtos/outros/notificacao/NotificacaoBuscarTodasResponseDTO";
+import { NotificacaoBuscarTodasDTO } from "@/application/dtos/outros/notificacao/NotificacaoBuscarTodasDTO";
 
 export class FirebaseNotificacaoRepository implements INotificacaoRepository {
   async inserir(dados: Notificacao): Promise<void> {

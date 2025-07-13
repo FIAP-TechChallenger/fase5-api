@@ -2,8 +2,8 @@ import { INotificacaoRepository } from "@/domain/repositories/outros/INotificaca
 import { Usuario } from "@/domain/entities/outros/Usuario";
 import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
-import { NotificacaoBuscarTodasDTO } from "@/application/dtos/outros/NotificacaoBuscarTodasDTO";
-import { NotificacaoBuscarTodasResponseDTO } from "@/application/dtos/outros/NotificacaoBuscarTodasResponseDTO";
+import { NotificacaoBuscarTodasDTO } from "@/application/dtos/outros/notificacao/NotificacaoBuscarTodasDTO";
+import { NotificacaoBuscarTodasResponseDTO } from "@/application/dtos/outros/notificacao/NotificacaoBuscarTodasResponseDTO";
 
 export class NotificacaoService {
   constructor(private authRepo: INotificacaoRepository) {}

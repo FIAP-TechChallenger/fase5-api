@@ -2,7 +2,7 @@ import { gerarUUID } from "@/shared/utils/gerarUUID";
 import { Producao } from "@/domain/entities/producao/Producao";
 import { IProducaoRepository } from "@/domain/repositories/producao/IProducaoRepository";
 import { ProducaoInserirDTO } from "@/application/dtos/producao/Producao/ProducaoInserirDTO";
-import { ProducaoStatus } from "@/domain/types/producaoStatus.enum";
+import { ProducaoStatusEnum } from "@/domain/types/producao.enum";
 import { ProducaoBuscarTodosDTO } from "@/application/dtos/producao/Producao/ProducaoBuscarTodosDTO";
 import {
   ProducaoBuscarTodosResponseDTO,
@@ -13,6 +13,7 @@ import { IFazendaRepository } from "@/domain/repositories/producao/IFazendaRepos
 import { IEstoqueProdutoRepository } from "@/domain/repositories/producao/IEstoqueProdutoRepository";
 import { ProducaoAtualizarDTO } from "@/application/dtos/producao/Producao/ProducaoAtualizarDTO";
 import { IMetaAtualizarValorTipoProducaoService } from "@/domain/interfaces/IMetaAtualizarValorTipoProducaoService";
+import { IDashboardProducaoService } from "@/domain/interfaces/IDashboardProducaoService";
 
 export class ProducaoService {
   constructor(
@@ -20,7 +21,8 @@ export class ProducaoService {
     private readonly fazendaRepository: IFazendaRepository,
     private readonly produtoRepository: IProdutoRepository,
     private readonly estoqueProdutoRepository: IEstoqueProdutoRepository,
-    private readonly metaAtualizarValorTipoProducaoService: IMetaAtualizarValorTipoProducaoService
+    private readonly metaAtualizarValorTipoProducaoService: IMetaAtualizarValorTipoProducaoService,
+    private readonly dashboardService: IDashboardProducaoService
   ) {}
 
   async buscarTodos(
@@ -50,6 +52,7 @@ export class ProducaoService {
       ultimoId: response.ultimoId,
     };
   }
+
   async atualizar(dto: ProducaoAtualizarDTO): Promise<void> {
     const producaoExistente = await this.producaoRepository.buscarPorId(dto.id);
     if (!producaoExistente) throw new Error("producao não encontrada");
@@ -61,7 +64,15 @@ export class ProducaoService {
 
     await this.producaoRepository.atualizar(producaoAtualizada);
 
-    if (producaoAtualizada.status === ProducaoStatus.COLHIDA) {
+    this.dashboardService.atualizar({
+      qtdPerdas: 0,
+      qtdProduzido: 0,
+      statusAnterior: producaoExistente.status,
+      statusAtual: producaoAtualizada.status,
+      data: new Date(),
+    });
+
+    if (producaoAtualizada.status === ProducaoStatusEnum.COLHIDA) {
       const novoEstoqueProduto = {
         id: gerarUUID(),
         produtoId: producaoAtualizada.produtoId,
@@ -85,7 +96,7 @@ export class ProducaoService {
     const novaProducao: Producao = {
       id: gerarUUID(),
       quantidade: dto.quantidade,
-      status: dto.status as ProducaoStatus,
+      status: dto.status as ProducaoStatusEnum,
       criadaEm: new Date(),
       produtoId: dto.produtoId,
       fazendaId: dto.fazendaId,

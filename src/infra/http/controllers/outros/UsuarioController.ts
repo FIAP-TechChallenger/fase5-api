@@ -1,17 +1,13 @@
 import { Request, Response, Router } from "express";
-import { UsuarioInserirSchema } from "@/application/dtos/outros/UsuarioInserirDTO";
+import { UsuarioInserirSchema } from "@/application/dtos/outros/usuario/UsuarioInserirDTO";
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
-import { UsuarioBuscarTodosSchema } from "@/application/dtos/outros/UsuarioBuscarTodosDTO";
+import { UsuarioBuscarTodosSchema } from "@/application/dtos/outros/usuario/UsuarioBuscarTodosDTO";
 import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
 import { container } from "@/infra/container/container";
 
 export class UsuarioController {
   async buscarTodos(req: Request, res: Response) {
     try {
-      if (req.user.setor !== UsuarioSetorEnum.ADMIN) {
-        res.status(401).json({ message: "Usuário sem autorização" });
-        return;
-      }
       const dto = UsuarioBuscarTodosSchema.parse(req.body);
       const dados = await container.usuarioConsultaService.buscarTodos(dto);
       res.status(201).json(dados);
@@ -25,11 +21,6 @@ export class UsuarioController {
 
   async inserir(req: Request, res: Response) {
     try {
-      if (req.user.setor !== UsuarioSetorEnum.ADMIN) {
-        res.status(401).json({ message: "Usuário sem autorização" });
-        return;
-      }
-
       const dto = UsuarioInserirSchema.parse(req.body);
       await container.usuarioCadastroService.inserir(dto);
       res.status(201).json({ message: "Usuario cadastrado com sucesso." });
@@ -42,11 +33,6 @@ export class UsuarioController {
 
   async atualizar(req: Request, res: Response) {
     try {
-      if (req.user.setor !== UsuarioSetorEnum.ADMIN) {
-        res.status(401).json({ message: "Usuário sem autorização" });
-        return;
-      }
-
       const dto = UsuarioInserirSchema.parse(req.body);
       await container.usuarioCadastroService.inserir(dto);
       res.status(201).json({ message: "Usuario cadastrado com sucesso." });

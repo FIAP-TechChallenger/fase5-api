@@ -1,7 +1,7 @@
 import { IMetaRepository } from "@/domain/repositories/comercial/IMetaRepository";
 import { MetaCalculoPorEnum, MetaTipoEnum } from "@/domain/types/meta.enum";
 import { DateUtils } from "@/shared/utils/date.utils";
-import { NotificacaoSendService } from "../outros/NotificacaoSendService";
+import { NotificacaoSendService } from "../outros/notificacao/NotificacaoSendService";
 import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
 import {
   IMetaAtualizarValorTipoProducaoService,

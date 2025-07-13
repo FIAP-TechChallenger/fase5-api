@@ -1,6 +1,6 @@
 import { ZodError } from "zod";
 import { Request, Response, Router } from "express";
-import { NotificacaoBuscarTodasSchema } from "@/application/dtos/outros/NotificacaoBuscarTodasDTO";
+import { NotificacaoBuscarTodasSchema } from "@/application/dtos/outros/notificacao/NotificacaoBuscarTodasDTO";
 import { container } from "@/infra/container/container";
 
 export class NotificacaoController {

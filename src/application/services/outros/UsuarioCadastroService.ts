@@ -1,4 +1,4 @@
-import { UsuarioInserirDTO } from "@/application/dtos/outros/UsuarioInserirDTO";
+import { UsuarioInserirDTO } from "@/application/dtos/outros/usuario/UsuarioInserirDTO";
 import { IEmailService } from "@/domain/interfaces/IEmailService";
 import { IUsuarioRepository } from "@/domain/repositories/outros/IUsuarioRepository";
 

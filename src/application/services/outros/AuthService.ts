@@ -1,4 +1,4 @@
-import { LoginResponseDTO } from "@/application/dtos/outros/LoginResponseDTO";
+import { LoginResponseDTO } from "@/application/dtos/outros/usuario/LoginResponseDTO";
 import { LoginResult } from "@/domain/models/LoginResult";
 import { IAuthRepository } from "@/domain/repositories/outros/IAuthRepository";
 import { IUsuarioRepository } from "@/domain/repositories/outros/IUsuarioRepository";
