@@ -5,6 +5,7 @@ import {
   DashboardProducaoAtualizarParams,
   IDashboardProducaoService,
 } from "@/domain/interfaces/IDashboardProducaoService";
+import { DashboardProducaoProduzidoVsPerdasDTO } from "@/application/dtos/outros/dashboard/DashboardProducaoProduzidoVsPerdasDTO";
 
 export class DashboardProducaoService implements IDashboardProducaoService {
   constructor(private readonly _dashProdRepo: IDashboardProducaoRepository) {}
@@ -18,11 +19,31 @@ export class DashboardProducaoService implements IDashboardProducaoService {
     }));
   }
 
+  async getProduzidoVsPerdas(): Promise<DashboardProducaoProduzidoVsPerdasDTO> {
+    const dados = await this._dashProdRepo.getPerdas();
+
+    let totalProduzido = 0;
+    let totalPerdas = 0;
+
+    for (const item of dados) {
+      totalProduzido += item.quantidadeColhida || 0;
+      totalPerdas += item.quantidadePerdida || 0;
+    }
+
+    return { perdas: totalPerdas, produzido: totalProduzido };
+  }
+
   async atualizar(params: DashboardProducaoAtualizarParams): Promise<void> {
     await Promise.all([
       this._dashProdRepo.updateStatusChange(
         params.statusAnterior,
         params.statusAtual
+      ),
+      this._dashProdRepo.addPerdas(
+        params.producaoId,
+        params.qtdPlanejada,
+        params.qtdColhida,
+        params.data
       ),
     ]);
   }

@@ -2,6 +2,7 @@ import { admin } from "@/infra/firebase/firebase-initialize";
 import { Timestamp } from "firebase-admin/firestore";
 import { IDashboardProducaoRepository } from "@/domain/repositories/outros/IDashboardProducaoRepository";
 import { ProducaoStatusEnum } from "@/domain/types/producao.enum";
+import { DashboardProducaoPerdaFirebase } from "@/infra/firebase/models/outros/dashboard/DashboardProducaoPerda";
 
 export class FirebaseDashboardProducaoRepository
   implements IDashboardProducaoRepository
@@ -22,6 +23,13 @@ export class FirebaseDashboardProducaoRepository
     };
   }
 
+  async getPerdas(): Promise<DashboardProducaoPerdaFirebase[]> {
+    const snapshot = await this._getPerdasCollection().get();
+    return snapshot.docs.map(
+      (doc) => doc.data() as DashboardProducaoPerdaFirebase
+    );
+  }
+
   async updateStatusChange(
     statusAnterior: ProducaoStatusEnum | null,
     statusAtual: ProducaoStatusEnum
@@ -40,7 +48,31 @@ export class FirebaseDashboardProducaoRepository
     });
   }
 
+  async addPerdas(
+    producaoId: string,
+    qtdPlanejada: number,
+    qtdColhida: number,
+    dataColheita: Date
+  ): Promise<void> {
+    const docData: DashboardProducaoPerdaFirebase = {
+      producaoId,
+      quantidadeColhida: qtdColhida,
+      quantidadePerdida: qtdPlanejada - qtdColhida,
+      dataColheita: Timestamp.fromDate(dataColheita),
+    };
+
+    await this._getPerdasCollection().doc(producaoId).set(docData);
+  }
+
   private _getPorStatusCollection() {
-    return admin.firestore().collection("dashboard").doc("producaoPorStatus");
+    return this._getCollection().doc("producaoPorStatus");
+  }
+
+  private _getPerdasCollection() {
+    return this._getCollection().doc("producaoPerdas").collection("colhidas");
+  }
+
+  private _getCollection() {
+    return admin.firestore().collection("dashboard");
   }
 }

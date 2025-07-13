@@ -65,8 +65,9 @@ export class ProducaoService {
     await this.producaoRepository.atualizar(producaoAtualizada);
 
     this.dashboardService.atualizar({
-      qtdPerdas: 0,
-      qtdProduzido: 0,
+      producaoId: producaoExistente.id,
+      qtdPlanejada: producaoExistente.quantidade,
+      qtdColhida: 0, //adicionar
       statusAnterior: producaoExistente.status,
       statusAtual: producaoAtualizada.status,
       data: new Date(),

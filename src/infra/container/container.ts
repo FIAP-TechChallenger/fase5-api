@@ -19,7 +19,7 @@ import { FirebaseInsumoRepository } from "../repositories/producao/firebaseInsum
 import { InsumoService } from "@/application/services/producao/InsumoService";
 import { FirebaseMedidaRepository } from "../repositories/producao/firebaseMedidaRepository";
 import { FirebaseDashboardProducaoRepository } from "../repositories/outros/FirebaseDashboardProducaoRepository";
-import { DashboardProducaoService } from "@/application/services/outros/dashboard/IDashboardProducaoService";
+import { DashboardProducaoService } from "@/application/services/outros/dashboard/DashboardProducaoService";
 
 const authRepository = new FirebaseAuthRepository();
 const usuarioRepository = new FirebaseUsuarioRepository();

@@ -14,12 +14,29 @@ export class DashboardController {
     }
   }
 
+  async buscarProducaoProduzidoVsPerdas(req: Request, res: Response) {
+    try {
+      const dados =
+        await container.dashboardProducaoService.getProduzidoVsPerdas();
+      res.status(201).json(dados);
+    } catch (error: any) {
+      res.status(400).json({
+        message: "Erro ao buscar dados de produção produzida vs perdas",
+        error: error.message,
+      });
+    }
+  }
+
   static routes() {
     const router = Router();
     const controller = new DashboardController();
     router.get(
       "/producaoPorStatus",
       controller.buscarProducaoPorStatus.bind(controller)
+    );
+    router.get(
+      "/producaoProduzidoVsPerdas",
+      controller.buscarProducaoProduzidoVsPerdas.bind(controller)
     );
     return router;
   }

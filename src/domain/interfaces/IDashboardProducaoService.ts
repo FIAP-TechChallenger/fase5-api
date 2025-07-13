@@ -1,10 +1,11 @@
 import { ProducaoStatusEnum } from "../types/producao.enum";
 
 export interface DashboardProducaoAtualizarParams {
+  producaoId: string;
   statusAnterior: ProducaoStatusEnum | null;
   statusAtual: ProducaoStatusEnum;
-  qtdProduzido: number;
-  qtdPerdas: number;
+  qtdPlanejada: number;
+  qtdColhida: number;
   data: Date;
 }
 
