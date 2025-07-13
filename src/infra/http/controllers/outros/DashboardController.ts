@@ -27,6 +27,19 @@ export class DashboardController {
     }
   }
 
+  async buscarLucroPorProduto(req: Request, res: Response) {
+    try {
+      const dados =
+        await container.dashboardComercialService.getLucroPorProduto();
+      res.status(201).json(dados);
+    } catch (error: any) {
+      res.status(400).json({
+        message: "Erro ao buscar dados lucro por produto vendido",
+        error: error.message,
+      });
+    }
+  }
+
   static routes() {
     const router = Router();
     const controller = new DashboardController();
@@ -37,6 +50,10 @@ export class DashboardController {
     router.get(
       "/producaoProduzidoVsPerdas",
       controller.buscarProducaoProduzidoVsPerdas.bind(controller)
+    );
+    router.get(
+      "/lucroPorProduto",
+      controller.buscarLucroPorProduto.bind(controller)
     );
     return router;
   }

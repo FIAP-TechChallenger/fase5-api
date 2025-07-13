@@ -20,12 +20,15 @@ import { InsumoService } from "@/application/services/producao/InsumoService";
 import { FirebaseMedidaRepository } from "../repositories/producao/firebaseMedidaRepository";
 import { FirebaseDashboardProducaoRepository } from "../repositories/outros/FirebaseDashboardProducaoRepository";
 import { DashboardProducaoService } from "@/application/services/outros/dashboard/DashboardProducaoService";
+import { DashboardComercialService } from "@/application/services/outros/dashboard/DashboardComercialService";
+import { FirebaseDashboardComercialRepository } from "../repositories/outros/FirebaseDashboardComercialRepository";
 
 const authRepository = new FirebaseAuthRepository();
 const usuarioRepository = new FirebaseUsuarioRepository();
 const notificacaoRepository = new FirebaseNotificacaoRepository();
 const metaRepository = new FirebaseMetaRepository();
 const dashboardProducaoRepository = new FirebaseDashboardProducaoRepository();
+const dashboardComercialRepository = new FirebaseDashboardComercialRepository();
 const insumoRepository = new FirebaseInsumoRepository();
 const medidaRepository = new FirebaseMedidaRepository();
 const insumoService = new InsumoService(insumoRepository, medidaRepository);
@@ -47,6 +50,10 @@ const usuarioCadastroService = new UsuarioCadastroService(
 const usuarioConsultaService = new UsuarioConsultaService(usuarioRepository);
 const dashboardProducaoService = new DashboardProducaoService(
   dashboardProducaoRepository
+);
+const dashboardComercialService = new DashboardComercialService(
+  dashboardComercialRepository,
+  produtoRepository
 );
 const metaService = new MetaService(metaRepository);
 
@@ -72,6 +79,7 @@ export const container = {
   authCookieService,
   authService,
   dashboardProducaoService,
+  dashboardComercialService,
   notificacaoService,
   usuarioCadastroService,
   usuarioConsultaService,

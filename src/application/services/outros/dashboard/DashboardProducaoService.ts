@@ -8,10 +8,10 @@ import {
 import { DashboardProducaoProduzidoVsPerdasDTO } from "@/application/dtos/outros/dashboard/DashboardProducaoProduzidoVsPerdasDTO";
 
 export class DashboardProducaoService implements IDashboardProducaoService {
-  constructor(private readonly _dashProdRepo: IDashboardProducaoRepository) {}
+  constructor(private readonly _dashRepo: IDashboardProducaoRepository) {}
 
   async getPorStatus(): Promise<DashboardProducaoPorStatusDTO[]> {
-    const statusMap = await this._dashProdRepo.getPorStatus();
+    const statusMap = await this._dashRepo.getPorStatus();
 
     return Object.entries(statusMap).map(([status, qtd]) => ({
       status: status as ProducaoStatusEnum,
@@ -20,7 +20,7 @@ export class DashboardProducaoService implements IDashboardProducaoService {
   }
 
   async getProduzidoVsPerdas(): Promise<DashboardProducaoProduzidoVsPerdasDTO> {
-    const dados = await this._dashProdRepo.getPerdas();
+    const dados = await this._dashRepo.getPerdas();
 
     let totalProduzido = 0;
     let totalPerdas = 0;
@@ -35,11 +35,11 @@ export class DashboardProducaoService implements IDashboardProducaoService {
 
   async atualizar(params: DashboardProducaoAtualizarParams): Promise<void> {
     await Promise.all([
-      this._dashProdRepo.updateStatusChange(
+      this._dashRepo.updateStatusChange(
         params.statusAnterior,
         params.statusAtual
       ),
-      this._dashProdRepo.addPerdas(
+      this._dashRepo.addPerdas(
         params.producaoId,
         params.qtdPlanejada,
         params.qtdColhida,
