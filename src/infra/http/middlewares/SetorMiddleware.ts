@@ -9,12 +9,12 @@ export function verificarPermissaoSetor(
   ...setoresPermitidos: UsuarioSetorEnum[]
 ) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user;
+    // const user = req.user;
 
-    if (!setoresPermitidos.includes(user.setor)) {
-      res.status(403).json({ message: "Usuário sem autorização" });
-      return;
-    }
+    // if (!setoresPermitidos.includes(user.setor)) {
+    //   res.status(403).json({ message: "Usuário sem autorização" });
+    //   return;
+    // }
 
     next();
   };

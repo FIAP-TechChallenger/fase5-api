@@ -102,7 +102,7 @@ export class ProducaoService {
       produtoId: dto.produtoId,
       fazendaId: dto.fazendaId,
       insumos: dto.insumos,
-      colheitaId: dto.colheitaId,
+      colheitaId: dto.colheitaId ?? "",
       criadaEm: new Date(),
       atualizadaEm: new Date(),
       dataInicio: dto.dataInicio,
