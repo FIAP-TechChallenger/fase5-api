@@ -4,6 +4,9 @@ import { Timestamp } from "firebase-admin/firestore";
 export interface EstoqueProdutoFirebase {
     produtoId: string;
     quantidade: number;
-    preco: number;
-    criadaEm?: Timestamp | null
-} 
+    preco?: number;
+    lote?: string;
+    criadaEm?: Timestamp | null;
+    atualizadaEm?: Timestamp | null;
+    producaoId: string;
+  }

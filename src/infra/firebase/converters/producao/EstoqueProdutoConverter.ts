@@ -5,22 +5,26 @@ import { EstoqueProdutoFirebase } from "../../models/producao/EstoqueProdutoFire
 export class EstoqueProdutoConverter {
   static toFirestore(estoqueProduto: EstoqueProduto): EstoqueProdutoFirebase {
     return {
-        produtoId:estoqueProduto.produtoId,
-        quantidade: estoqueProduto.quantidade,
-        preco: estoqueProduto.preco || 0,
-        criadaEm: this._toTimestamp(estoqueProduto.criadaEm), 
-     
+      produtoId: estoqueProduto.produtoId,
+      quantidade: estoqueProduto.quantidade,
+      preco: estoqueProduto.preco ?? 0,
+      lote: estoqueProduto.lote,
+      producaoId: estoqueProduto.producaoId,
+      criadaEm: this._toTimestamp(estoqueProduto.criadaEm),
+      atualizadaEm: this._toTimestamp(estoqueProduto.atualizadaEm),
     };
   }
 
   static fromFirestore(data: EstoqueProdutoFirebase, id: string): EstoqueProduto {
     return new EstoqueProduto({
       id,
-      produtoId:data.produtoId,
+      produtoId: data.produtoId,
       quantidade: data.quantidade,
       preco: data.preco,
+      lote: data.lote,
+      producaoId: data.producaoId,
       criadaEm: data.criadaEm?.toDate() || new Date(),
-      
+      atualizadaEm: data.atualizadaEm?.toDate() || new Date(),
     });
   }
 

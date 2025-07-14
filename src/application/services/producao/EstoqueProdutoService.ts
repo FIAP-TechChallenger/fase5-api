@@ -51,10 +51,13 @@ export class EstoqueProdutoService {
   async inserir(dto: EstoqueProdutoInserirDTO): Promise<void> {
     const novoEstoque: EstoqueProduto = {
       id: gerarUUID(),
-      produtoId:dto.produtoId,
-      quantidade:dto.quantidade,
-      preco:dto.preco,
+      produtoId: dto.produtoId,
+      quantidade: dto.quantidade,
+      preco: dto.preco,
+      lote: dto.lote ?? "",
+      producaoId: dto.producaoId,
       criadaEm: new Date(),
+      atualizadaEm: new Date(),
     }
       await this.estoqueProdutoRepository.insert(novoEstoque)
   }
@@ -65,6 +68,7 @@ export class EstoqueProdutoService {
     const metaAtualizada: EstoqueProduto = {
       ...estoqueExistente,
       ...dto,
+      atualizadaEm: new Date()
      
     };
 

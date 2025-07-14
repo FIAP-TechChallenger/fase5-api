@@ -60,45 +60,53 @@ export class ProducaoService {
     const producaoAtualizada: Producao = {
       ...producaoExistente,
       ...dto,
+      atualizadaEm: new Date(),
     };
 
     await this.producaoRepository.atualizar(producaoAtualizada);
 
     this.dashboardService.atualizar({
       producaoId: producaoExistente.id,
-      qtdPlanejada: producaoExistente.quantidade,
+      qtdPlanejada: producaoExistente.quantidadePlanejada,
       qtdColhida: 0, //adicionar
       statusAnterior: producaoExistente.status,
       statusAtual: producaoAtualizada.status,
       data: new Date(),
     });
 
-    if (producaoAtualizada.status === ProducaoStatusEnum.COLHIDA) {
-      const novoEstoqueProduto = {
-        id: gerarUUID(),
-        produtoId: producaoAtualizada.produtoId,
-        quantidade: producaoAtualizada.quantidade,
-        preco: 0,
-        criadaEm: new Date(),
-      };
+    // if (producaoAtualizada.status === ProducaoStatusEnum.COLHIDA) {
+    //   const novoEstoqueProduto = {
+    //     id: gerarUUID(),
+    //     produtoId: producaoAtualizada.produtoId,
+    //     quantidade: producaoAtualizada.quantidadePlanejada,
+    //     preco: 0,
+    //     criadaEm: new Date(),
+    //   };
 
-      await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
+    //   await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
 
-      // this.metaAtualizarValorTipoProducaoService.executar({
-      //   qtdColhida: 0, //adicionar
-      //   data: novoEstoqueProduto.criadaEm,
-      // });
-    }
+    //   // this.metaAtualizarValorTipoProducaoService.executar({
+    //   //   qtdColhida: 0, //adicionar
+    //   //   data: novoEstoqueProduto.criadaEm,
+    //   // });
+    // }
   }
 
   async inserir(dto: ProducaoInserirDTO): Promise<void> {
     const novaProducao: Producao = {
       id: gerarUUID(),
-      quantidade: dto.quantidade,
+      quantidadePlanejada: dto.quantidadePlanejada,
+      precoPlanejado: dto.precoPlanejado ?? 0,
       status: dto.status as ProducaoStatusEnum,
-      criadaEm: new Date(),
+      lote: dto.lote,
       produtoId: dto.produtoId,
       fazendaId: dto.fazendaId,
+      insumos: dto.insumos,
+      colheitaId: dto.colheitaId,
+      criadaEm: new Date(),
+      atualizadaEm: new Date(),
+      dataInicio: dto.dataInicio,
+      dataFim: dto.dataFim,
     };
     await this.producaoRepository.insert(novaProducao);
   }

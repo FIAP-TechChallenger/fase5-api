@@ -46,10 +46,12 @@ export class FirebaseEstoqueProdutoRepository implements IEstoqueProdutoReposito
   }
 
   async insert(estoqueProduto: EstoqueProduto): Promise<void> {
+    estoqueProduto.atualizadaEm = new Date();
     const data:EstoqueProdutoFirebase = EstoqueProdutoConverter.toFirestore(estoqueProduto);
     await this._getCollection().doc(estoqueProduto.id).set(data);
   }
   async atualizar(estoque: EstoqueProduto): Promise<void> {
+    estoque.atualizadaEm = new Date();
     const data: EstoqueProdutoFirebase = EstoqueProdutoConverter.toFirestore(estoque);
     await this._getCollection()
       .doc(estoque.id)
