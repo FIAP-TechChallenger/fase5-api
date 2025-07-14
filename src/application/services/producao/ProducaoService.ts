@@ -14,6 +14,8 @@ import { IEstoqueProdutoRepository } from "@/domain/repositories/producao/IEstoq
 import { ProducaoAtualizarDTO } from "@/application/dtos/producao/Producao/ProducaoAtualizarDTO";
 import { IMetaAtualizarValorTipoProducaoService } from "@/domain/interfaces/IMetaAtualizarValorTipoProducaoService";
 import { IDashboardProducaoService } from "@/domain/interfaces/IDashboardProducaoService";
+import { EstoqueInsumo } from "@/domain/entities/producao/EstoqueInsumo";
+import { EstoqueProduto } from "@/domain/entities/producao/EstoqueProduto";
 
 export class ProducaoService {
   constructor(
@@ -68,28 +70,31 @@ export class ProducaoService {
     this.dashboardService.atualizar({
       producaoId: producaoExistente.id,
       qtdPlanejada: producaoExistente.quantidadePlanejada,
-      qtdColhida: 0, //adicionar
+      qtdColhida: 0, 
       statusAnterior: producaoExistente.status,
       statusAtual: producaoAtualizada.status,
       data: new Date(),
     });
 
-    // if (producaoAtualizada.status === ProducaoStatusEnum.COLHIDA) {
-    //   const novoEstoqueProduto = {
-    //     id: gerarUUID(),
-    //     produtoId: producaoAtualizada.produtoId,
-    //     quantidade: producaoAtualizada.quantidadePlanejada,
-    //     preco: 0,
-    //     criadaEm: new Date(),
-    //   };
+    if (producaoAtualizada.status === ProducaoStatusEnum.COLHIDA) {
+      const novoEstoqueProduto : EstoqueProduto = {
+        id: gerarUUID(),
+        produtoId: producaoAtualizada.produtoId,
+        quantidade: producaoAtualizada.quantidadePlanejada,
+        preco: producaoAtualizada.precoPlanejado,
+        lote: producaoAtualizada.lote ?? "",
+        criadaEm: new Date(),
+        atualizadaEm: new Date(),            
+        producaoId: producaoAtualizada.id, 
+      };
 
-    //   await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
+      await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
 
-    //   // this.metaAtualizarValorTipoProducaoService.executar({
-    //   //   qtdColhida: 0, //adicionar
-    //   //   data: novoEstoqueProduto.criadaEm,
-    //   // });
-    // }
+      // this.metaAtualizarValorTipoProducaoService.executar({
+      //   qtdColhida: 0, //adicionar
+      //   data: novoEstoqueProduto.criadaEm,
+      // });
+    }
   }
 
   async inserir(dto: ProducaoInserirDTO): Promise<void> {
