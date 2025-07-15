@@ -69,7 +69,7 @@ export class ProducaoService {
     this.dashboardService.atualizar({
       producaoId: producaoExistente.id,
       qtdPlanejada: producaoExistente.quantidadePlanejada,
-      qtdColhida: 0, 
+      qtdColhida: producaoAtualizada.quantidadeColhida ?? 0, 
       statusAnterior: producaoExistente.status,
       statusAtual: producaoAtualizada.status,
       data: new Date(),
