@@ -6,7 +6,7 @@ export class ProducaoConverter {
   static toFirestore(producao: Producao): ProducaoFirebase {
     return {
       quantidadePlanejada: producao.quantidadePlanejada,
-      precoPlanejado: producao.precoPlanejado,
+      precoPlanejado: producao.precoPlanejado ?? 0,
       status: producao.status,
       produtoId: producao.produtoId,
       fazendaId: producao.fazendaId,

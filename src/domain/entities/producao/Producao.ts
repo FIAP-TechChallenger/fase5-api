@@ -1,5 +1,5 @@
 import { ProducaoStatusEnum } from "@/domain/types/producao.enum";
-import { Colheita } from "./Colheita";
+
 
 export class Producao {
   id: string;
@@ -15,7 +15,7 @@ export class Producao {
     insumoId: string;
     quantidade: number;
 }[];
-  precoPlanejado:number;
+  precoPlanejado?:number;
   dataInicio: Date;
   dataFim: Date;
 
@@ -28,7 +28,7 @@ export class Producao {
     this.produtoId = obj.produtoId;
     this.fazendaId = obj.fazendaId;
     this.insumos = obj.insumos || [];
-    this.precoPlanejado = obj.precoPlanejado;
+    this.precoPlanejado = obj.precoPlanejado ?? 0;
     this.atualizadaEm = obj.atualizadaEm;
     this.dataInicio = obj.dataInicio;
     this.dataFim = obj.dataFim;

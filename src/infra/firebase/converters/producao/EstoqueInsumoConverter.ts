@@ -10,7 +10,7 @@ export class EstoqueInsumoConverter {
         quantidade: estoqueInsumo.quantidade,
         preco: estoqueInsumo.preco,
         atualizadaEm: getFirebaseTimeStamp(estoqueInsumo.atualizadaEm),
-      criadaEm: getFirebaseTimeStamp(estoqueInsumo.criadaEm),
+        criadaEm: getFirebaseTimeStamp(estoqueInsumo.criadaEm),
      
     };
   }

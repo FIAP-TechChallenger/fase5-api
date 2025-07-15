@@ -14,7 +14,6 @@ import { IEstoqueProdutoRepository } from "@/domain/repositories/producao/IEstoq
 import { ProducaoAtualizarDTO } from "@/application/dtos/producao/Producao/ProducaoAtualizarDTO";
 import { IMetaAtualizarValorTipoProducaoService } from "@/domain/interfaces/IMetaAtualizarValorTipoProducaoService";
 import { IDashboardProducaoService } from "@/domain/interfaces/IDashboardProducaoService";
-import { EstoqueInsumo } from "@/domain/entities/producao/EstoqueInsumo";
 import { EstoqueProduto } from "@/domain/entities/producao/EstoqueProduto";
 
 export class ProducaoService {

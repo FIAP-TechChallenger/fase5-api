@@ -1,4 +1,5 @@
 export class Colheita {
+    id: string; 
     quantidadeColhida: number;
     perdas: number;
     custoProducao?: number;
@@ -6,8 +7,10 @@ export class Colheita {
     producaoId:string;
     dataInicio: Date;
     dataFim: Date;
+    criadaEm: Date;
 
     constructor(obj: Colheita) {
+        this.id = obj.id;
         this.quantidadeColhida = obj.quantidadeColhida;
         this.perdas = obj.perdas;
         this.custoProducao = obj.custoProducao;
@@ -15,6 +18,7 @@ export class Colheita {
         this.producaoId = obj.producaoId;
         this.dataInicio = obj.dataInicio;
         this.dataFim = obj.dataFim;
+        this.criadaEm = obj.criadaEm
         
     }
 }
