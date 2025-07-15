@@ -19,10 +19,10 @@ export class ProducaoConverter {
       atualizadaEm: this._toTimestamp(producao.atualizadaEm)!,
       dataInicio: this._toTimestamp(producao.dataInicio)!,
       dataFim: this._toTimestamp(producao.dataFim)!,
-      quantidadeColhida: producao.quantidadeColhida,
-      perdas: producao.perdas,
-      custoProducao: producao.custoProducao,
-      precoFinal: producao.precoFinal,
+      quantidadeColhida: producao.quantidadeColhida ?? 0,
+      perdas: producao.perdas ?? 0,
+      custoProducao: producao.custoProducao ?? 0,
+      precoFinal: producao.precoFinal ?? 0,
     };
   }
 
