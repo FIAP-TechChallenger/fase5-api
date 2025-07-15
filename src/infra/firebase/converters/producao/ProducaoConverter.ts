@@ -15,11 +15,14 @@ export class ProducaoConverter {
         insumoId: i.insumoId,
         quantidade: i.quantidade
       })),
-      colheitaId: producao.colheitaId,
       criadaEm: this._toTimestamp(producao.criadaEm)!,
       atualizadaEm: this._toTimestamp(producao.atualizadaEm)!,
       dataInicio: this._toTimestamp(producao.dataInicio)!,
       dataFim: this._toTimestamp(producao.dataFim)!,
+      quantidadeColhida: producao.quantidadeColhida,
+      perdas: producao.perdas,
+      custoProducao: producao.custoProducao,
+      precoFinal: producao.precoFinal,
     };
   }
 
@@ -36,11 +39,14 @@ export class ProducaoConverter {
         insumoId: i.insumoId,
         quantidade: i.quantidade,
       })),
-      colheitaId: data.colheitaId,
       criadaEm: data.criadaEm.toDate(),
       atualizadaEm: data.atualizadaEm.toDate(),
       dataInicio: data.dataInicio.toDate(),
       dataFim: data.dataFim.toDate(),
+      quantidadeColhida: data.quantidadeColhida,
+      perdas: data.perdas,
+      custoProducao: data.custoProducao,
+      precoFinal: data.precoFinal,
     });
   }
 

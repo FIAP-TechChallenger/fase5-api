@@ -12,9 +12,12 @@ export interface ProducaoFirebase {
     insumoId: string;
     quantidade: number;
   }[];
-  colheitaId?: string
   criadaEm: Timestamp;
   atualizadaEm: Timestamp;
   dataInicio: Timestamp;
   dataFim: Timestamp;
+  perdas?: number;
+  custoProducao?: number;
+  precoFinal?: number;
+  quantidadeColhida?: number;
 }

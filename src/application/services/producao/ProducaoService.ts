@@ -106,11 +106,14 @@ export class ProducaoService {
       produtoId: dto.produtoId,
       fazendaId: dto.fazendaId,
       insumos: dto.insumos,
-      colheitaId: dto.colheitaId ?? "",
       criadaEm: new Date(),
       atualizadaEm: new Date(),
       dataInicio: dto.dataInicio,
       dataFim: dto.dataFim,
+      perdas:dto.perdas ,
+      custoProducao: dto.custoProducao,
+      precoFinal: dto.precoFinal,
+      quantidadeColhida: dto.quantidadeColhida
     };
     await this.producaoRepository.insert(novaProducao);
   }

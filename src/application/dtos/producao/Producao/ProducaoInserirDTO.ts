@@ -25,6 +25,9 @@ export const ProducaoInserirSchema = z.object({
         .min(0.01, "Quantidade muito baixa"),
     })
   ),
-  colheitaId: z.string().uuid("ID da colheita inválido").optional(),
+  quantidadeColhida: z.number().optional(),
+  perdas: z.number().optional(),
+  custoProducao: z.number().optional(),
+  precoFinal: z.number().optional(),
 });
 export type ProducaoInserirDTO = z.infer<typeof ProducaoInserirSchema>;
