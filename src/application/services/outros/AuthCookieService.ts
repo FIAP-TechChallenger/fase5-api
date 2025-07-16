@@ -1,28 +1,32 @@
 import { CookieOptions, Response } from "express";
 
 export class AuthCookieService {
-  private _cookieTokenName = "accessToken";
-  private _cookieRefreshTokenName = "refreshToken";
+  static readonly cookieTokenName = "accessToken";
+  static readonly cookieRefreshTokenName = "refreshToken";
 
   setToken(res: Response, token: string) {
-    res.cookie(this._cookieTokenName, token, this._getTokenOptions());
+    res.cookie(
+      AuthCookieService.cookieTokenName,
+      token,
+      this._getTokenOptions()
+    );
   }
 
   setRefreshToken(res: Response, refreshToken: string) {
     res.cookie(
-      this._cookieRefreshTokenName,
+      AuthCookieService.cookieRefreshTokenName,
       refreshToken,
       this._getRefreshTokenOptions()
     );
   }
 
   clearToken(res: Response) {
-    res.clearCookie(this._cookieTokenName, this._getTokenOptions());
+    res.clearCookie(AuthCookieService.cookieTokenName, this._getTokenOptions());
   }
 
   clearRefreshToken(res: Response) {
     res.clearCookie(
-      this._cookieRefreshTokenName,
+      AuthCookieService.cookieRefreshTokenName,
       this._getRefreshTokenOptions()
     );
   }

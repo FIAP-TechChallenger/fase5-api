@@ -5,6 +5,8 @@ import { Usuario } from "@/domain/entities/outros/Usuario";
 import { Notificacao } from "@/domain/entities/outros/Notificacao";
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
+import cookie from "cookie";
+import { AuthCookieService } from "@/application/services/outros/AuthCookieService";
 
 interface SocketUserConnected {
   socketId: string;
@@ -32,9 +34,18 @@ export function createSocketServer(server: http.Server) {
   // Middleware de autenticação WS
   io.use(async (socket: SocketType, next) => {
     try {
-      const token = socket.handshake.auth.token || socket.handshake.query.token;
+      let token = socket.handshake.auth.token || socket.handshake.query.token;
 
-      if (!token) return next(new Error("Token não fornecido"));
+      if (!token) {
+        const rawCookie = socket.handshake.headers.cookie;
+
+        if (rawCookie) {
+          const parsed = cookie.parse(rawCookie);
+          token = parsed[AuthCookieService.cookieTokenName];
+        }
+
+        if (!token) return next(new Error("Token não fornecido"));
+      }
 
       const user = await authProvider.verifyToken(token);
       if (!user?.id) return next(new Error("Token inválido"));
