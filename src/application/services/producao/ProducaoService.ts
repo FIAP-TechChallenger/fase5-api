@@ -55,6 +55,7 @@ export class ProducaoService {
   }
 
   async atualizar(dto: ProducaoAtualizarDTO): Promise<void> {
+   
     const producaoExistente = await this.producaoRepository.buscarPorId(dto.id);
     if (!producaoExistente) throw new Error("producao não encontrada");
 
@@ -115,6 +116,17 @@ export class ProducaoService {
       precoFinal: dto.precoFinal,
       quantidadeColhida: dto.quantidadeColhida
     };
+
     await this.producaoRepository.insert(novaProducao);
+
+    await this.dashboardService.atualizar({
+      producaoId: novaProducao.id,
+      qtdPlanejada: novaProducao.quantidadePlanejada,
+      qtdColhida: novaProducao.quantidadeColhida ?? 0,
+      statusAnterior: novaProducao.status,
+      statusAtual: novaProducao.status,
+      data: new Date(),
+    });
   }
+  
 }
