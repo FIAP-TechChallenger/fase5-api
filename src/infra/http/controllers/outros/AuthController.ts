@@ -2,6 +2,8 @@ import { Request, Response, Router } from "express";
 import { authenticate } from "@/infra/http/middlewares/auth";
 import { LoginSchema } from "../../dtos/LoginDTO";
 import { container } from "@/infra/container/container";
+import { LoginResponseDTO } from "@/application/dtos/outros/usuario/LoginResponseDTO";
+import { CookieConstants } from "@/shared/constants/cookies.consts";
 
 export class AuthController {
   async login(req: Request, res: Response): Promise<void> {
@@ -22,8 +24,15 @@ export class AuthController {
   }
 
   async getLoggedUser(req: Request, res: Response): Promise<void> {
-    res.json(req.user.id);
-    return;
+    const refreshResponse = await container.authService.refresh(
+      req.cookies?.[CookieConstants.cookieRefreshTokenName]
+    );
+    container.authCookieService.setToken(res, refreshResponse.token);
+    container.authCookieService.setRefreshToken(
+      res,
+      refreshResponse.refreshToken
+    );
+    res.status(200).json(refreshResponse);
   }
 
   async refresh(req: Request, res: Response): Promise<void> {

@@ -7,6 +7,7 @@ import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
 import cookie from "cookie";
 import { AuthCookieService } from "@/application/services/outros/AuthCookieService";
+import { CookieConstants } from "@/shared/constants/cookies.consts";
 
 interface SocketUserConnected {
   socketId: string;
@@ -41,7 +42,7 @@ export function createSocketServer(server: http.Server) {
 
         if (rawCookie) {
           const parsed = cookie.parse(rawCookie);
-          token = parsed[AuthCookieService.cookieTokenName];
+          token = parsed[CookieConstants.cookieTokenName];
         }
 
         if (!token) return next(new Error("Token não fornecido"));
