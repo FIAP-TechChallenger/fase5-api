@@ -70,9 +70,9 @@ export class FazendaController {
     const controller = new FazendaController();
     router.post("/", controller.buscarTodos.bind(controller));
 
-    router.use(
-      verificarPermissaoSetor(UsuarioSetorEnum.ADMIN, UsuarioSetorEnum.PRODUCAO)
-    );
+    // router.use(
+    //   verificarPermissaoSetor(UsuarioSetorEnum.ADMIN, UsuarioSetorEnum.PRODUCAO)
+    // );
     router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));
 

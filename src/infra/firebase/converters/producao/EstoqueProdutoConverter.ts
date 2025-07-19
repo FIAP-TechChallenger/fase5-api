@@ -13,6 +13,7 @@ export class EstoqueProdutoConverter {
       fazendaId:estoqueProduto.fazendaId,
       criadaEm: this._toTimestamp(estoqueProduto.criadaEm),
       atualizadaEm: this._toTimestamp(estoqueProduto.atualizadaEm),
+      precoUnitario:estoqueProduto.precoUnitario
     };
   }
 
@@ -21,12 +22,13 @@ export class EstoqueProdutoConverter {
       id,
       produtoId: data.produtoId,
       quantidade: data.quantidade,
-      preco: data.preco,
+      preco: data.preco ?? 0,
       lote: data.lote,
       producaoId: data.producaoId,
       fazendaId:data.fazendaId,
       criadaEm: data.criadaEm?.toDate() || new Date(),
       atualizadaEm: data.atualizadaEm?.toDate() || new Date(),
+      precoUnitario: data.precoUnitario,
     });
   }
 

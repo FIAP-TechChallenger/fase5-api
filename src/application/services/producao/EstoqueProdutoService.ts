@@ -59,6 +59,7 @@ export class EstoqueProdutoService {
       producaoId: dto.producaoId,
       criadaEm: new Date(),
       atualizadaEm: new Date(),
+      precoUnitario: dto.precoUnitario
     }
       await this.estoqueProdutoRepository.insert(novoEstoque)
   }

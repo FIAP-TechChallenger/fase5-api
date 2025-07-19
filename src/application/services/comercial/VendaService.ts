@@ -5,35 +5,73 @@ import { VendaBuscarTodosResponseDTO } from "@/application/dtos/comercial/Venda/
 import { Venda } from "@/domain/entities/comercial/Venda";
 import { gerarUUID } from "@/shared/utils/gerarUUID";
 import { VendaAtualizarDTO } from "@/application/dtos/comercial/Venda/VendaAtualizarDTO";
+import { IProdutoRepository } from "@/domain/repositories/producao/IProdutoRepository";
 
 export class VendaService {
-  constructor(private readonly vendaRepository: IVendaRepository) {}
+  constructor(
+    private readonly vendaRepository: IVendaRepository,
+    private readonly produtoRepository: IProdutoRepository) {}
 
   async buscarTodos(
     dto: VendaBuscarTodosDTO
   ): Promise<VendaBuscarTodosResponseDTO> {
-    return this.vendaRepository.buscarTodos(dto);
+    const response = await this.vendaRepository.buscarTodos(dto);
+  
+    const vendasComNomeProduto = await Promise.all(
+      response.dados.map(async (venda) => {
+        const itensComNome = await Promise.all(
+          venda.itens.map(async (item) => {
+            let produtoNome = "";
+            try {
+              produtoNome = await this.produtoRepository.buscarNome(item.produtoId);
+            } catch {
+              produtoNome = "Produto não encontrado";
+            }
+            return {
+              ...item,
+              produtoNome
+            };
+          })
+        );
+        return {
+          ...venda,
+          itens: itensComNome
+        };
+      })
+    );
+  
+    return {
+      ...response,
+      dados: vendasComNomeProduto
+    };
   }
 
   async inserir(dto: VendaInserirDTO): Promise<void> {
+    const itensCalculados = dto.itens.map(item => ({
+      id: gerarUUID(),
+      desconto: item.desconto,
+      quantidade: item.quantidade,
+      produtoId: item.produtoId,
+      fazendaId: item.fazendaId === null ? undefined : item.fazendaId,
+      precoUnitario: item.precoUnitario,
+      lucroUnitario: item.lucroUnitario,
+    }));
+  
+    const valorTotal = itensCalculados.reduce((total, item) => {
+      return total + (item.quantidade * item.precoUnitario);
+    }, 0);
+  
     const novaVenda: Venda = {
       id: gerarUUID(),
       criadaEm: new Date(),
       dataVenda: dto.dataVenda,
       cliente: dto.cliente,
       imposto: dto.imposto ?? 0,
-      valorTotal: dto.valorTotal,
+      valorTotal,
       status: dto.status,
-      itens: dto.itens.map(item => ({
-        id: gerarUUID(),
-        desconto: item.desconto,
-        quantidade: item.quantidade,
-        produtoId: item.produtoId,
-        fazendaId: item.fazendaId === null ? undefined : item.fazendaId, // <-- aqui!
-        precoUnitario: item.precoUnitario,
-        lucroUnitario: item.lucroUnitario,
-      })),
+      itens: itensCalculados,
     };
+  
     await this.vendaRepository.inserir(novaVenda);
   }
 

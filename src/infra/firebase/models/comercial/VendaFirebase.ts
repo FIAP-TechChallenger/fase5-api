@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase-admin/firestore";
-import { VendaEnum } from "@/domain/types/venda.enum";
+import { VendaStatusEnum } from "@/domain/types/venda.enum";
 import { ItemVenda } from "@/domain/entities/comercial/ItemVenda";
 
 export interface VendaFirebase {
@@ -9,6 +9,7 @@ export interface VendaFirebase {
   cliente: string;
   imposto?: number;
   valorTotal: number;
-  status: VendaEnum;
+  status: VendaStatusEnum;
   itens: ItemVenda[];
+  
 }

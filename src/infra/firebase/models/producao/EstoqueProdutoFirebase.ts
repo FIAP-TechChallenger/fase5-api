@@ -10,4 +10,5 @@ export interface EstoqueProdutoFirebase {
     atualizadaEm?: Timestamp | null;
     producaoId: string;
     fazendaId:string;
+    precoUnitario: number
   }

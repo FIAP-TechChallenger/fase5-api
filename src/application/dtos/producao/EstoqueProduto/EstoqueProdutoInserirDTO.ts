@@ -11,6 +11,9 @@ export const EstoqueProdutoInserirSchema = z.object({
     lote: z.string().min(1, "Lote é obrigatório"),
     producaoId: z.string().uuid("ProducaoId inválido"),
     fazendaId: z.string().uuid("ID da fazenda inválido"),
+    precoUnitario:z.number()
+    .positive("Preço deve ser positivo")
+    .min(0.01, "Preço mínimo: 0.01"),
 });
 
 export type EstoqueProdutoInserirDTO = z.infer<typeof EstoqueProdutoInserirSchema>;

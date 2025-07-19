@@ -8,9 +8,14 @@ import { VendaAtualizarSchema } from "@/application/dtos/comercial/Venda/VendaAt
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
 import { z, ZodError } from "zod";
+import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebaseProdutoRepository";
 
 export class VendaController {
-  private _vendaService = new VendaService(new FirebaseVendaRepository());
+  private _vendaService = new VendaService(
+    new FirebaseVendaRepository(),
+    new FirebaseProdutoRepository()
+
+  );
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
@@ -65,12 +70,12 @@ export class VendaController {
     const router = Router();
     const controller = new VendaController();
 
-    router.use(
-      verificarPermissaoSetor(
-        UsuarioSetorEnum.ADMIN,
-        UsuarioSetorEnum.COMERCIAL
-      )
-    );
+    // router.use(
+    //   verificarPermissaoSetor(
+    //     UsuarioSetorEnum.ADMIN,
+    //     UsuarioSetorEnum.COMERCIAL
+    //   )
+    // );
     router.post("/", controller.buscarTodos.bind(controller));
     router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));

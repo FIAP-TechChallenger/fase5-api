@@ -57,24 +57,37 @@ export class ProducaoService {
   async atualizar(dto: ProducaoAtualizarDTO): Promise<void> {
     const producaoExistente = await this.producaoRepository.buscarPorId(dto.id);
     if (!producaoExistente) throw new Error("producao não encontrada");
+    // console.log("dto da producao existente", producaoExistente)
 
     const producaoAtualizada: Producao = {
       ...producaoExistente,
       ...dto,
       atualizadaEm: new Date(),
     };
+    // console.log("dto da producao atualizada", producaoAtualizada)
 
     await this.producaoRepository.atualizar(producaoAtualizada);
-
-    this.dashboardService.atualizar({
-      producaoId: producaoExistente.id,
-      qtdPlanejada: producaoExistente.quantidadePlanejada,
-      qtdColhida: producaoAtualizada.quantidadeColhida ?? 0,
-      statusAnterior: producaoExistente.status,
-      statusAtual: producaoAtualizada.status,
-      data: new Date(),
-    });
-    
+   
+    if (
+      producaoAtualizada.precoFinal === undefined ||
+      producaoAtualizada.custoProducao === undefined ||
+      producaoAtualizada.quantidadeColhida === undefined
+    ) {
+      throw new Error("Campos obrigatórios não preenchidos para calcular o preço unitário.");
+    }
+    const precoUnitario = producaoAtualizada.precoFinal / producaoAtualizada.quantidadeColhida;
+    // this.dashboardService.atualizar({
+    //   producaoId: producaoExistente.id,
+    //   qtdPlanejada: producaoExistente.quantidadePlanejada,
+    //   qtdColhida: producaoAtualizada.quantidadeColhida ?? 0,
+    //   statusAnterior: producaoExistente.status,
+    //   statusAtual: producaoAtualizada.status,
+    //   data: new Date(),
+    // });
+    console.log("preco final", producaoAtualizada.precoFinal);
+    console.log("producao custo", producaoAtualizada.custoProducao);
+    console.log("quantiade colhida", producaoAtualizada.quantidadeColhida);
+    console.log("preco unitario", precoUnitario);
 
     if (producaoAtualizada.status === ProducaoStatusEnum.COLHIDA) {
       const novoEstoqueProduto: EstoqueProduto = {
@@ -82,12 +95,14 @@ export class ProducaoService {
         produtoId: producaoAtualizada.produtoId,
         fazendaId: producaoAtualizada.fazendaId,
         quantidade: producaoAtualizada.quantidadePlanejada,
-        preco: producaoAtualizada.precoPlanejado,
+        preco: producaoAtualizada.precoPlanejado??0,
         lote: producaoAtualizada.lote ?? "",
         criadaEm: new Date(),
         atualizadaEm: new Date(),
         producaoId: producaoAtualizada.id,
+        precoUnitario: precoUnitario
       };
+      // console.log("novo estoque Produto ", novoEstoqueProduto)
 
       await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
 
@@ -122,13 +137,13 @@ export class ProducaoService {
 
     await this.producaoRepository.insert(novaProducao);
 
-    await this.dashboardService.atualizar({
-      producaoId: novaProducao.id,
-      qtdPlanejada: novaProducao.quantidadePlanejada,
-      qtdColhida: novaProducao.quantidadeColhida ?? 0,
-      statusAnterior: novaProducao.status,
-      statusAtual: novaProducao.status,
-      data: new Date(),
-    });
+    // await this.dashboardService.atualizar({
+    //   producaoId: novaProducao.id,
+    //   qtdPlanejada: novaProducao.quantidadePlanejada,
+    //   qtdColhida: novaProducao.quantidadeColhida ?? 0,
+    //   statusAnterior: novaProducao.status,
+    //   statusAtual: novaProducao.status,
+    //   data: new Date(),
+    // });
   }
 }
