@@ -47,15 +47,19 @@ export class VendaService {
   }
 
   async inserir(dto: VendaInserirDTO): Promise<void> {
-    const itensCalculados = dto.itens.map(item => ({
-      id: gerarUUID(),
-      desconto: item.desconto,
-      quantidade: item.quantidade,
-      produtoId: item.produtoId,
-      fazendaId: item.fazendaId === null ? undefined : item.fazendaId,
-      precoUnitario: item.precoUnitario,
-      lucroUnitario: item.lucroUnitario,
-    }));
+    const itensCalculados = dto.itens.map(item => {
+      const lucroTotal = item.precoUnitario  * item.quantidade;
+  
+      return {
+        id: gerarUUID(),
+        desconto: item.desconto,
+        quantidade: item.quantidade,
+        produtoId: item.produtoId,
+        fazendaId: item.fazendaId === null ? undefined : item.fazendaId,
+        precoUnitario: item.precoUnitario,
+        lucroUnitario: lucroTotal,
+      };
+    });
   
     const valorTotal = itensCalculados.reduce((total, item) => {
       return total + (item.quantidade * item.precoUnitario);
