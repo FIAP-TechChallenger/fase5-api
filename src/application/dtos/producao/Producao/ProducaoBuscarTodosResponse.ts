@@ -6,8 +6,7 @@ export type ProducaoItemDTO = Producao & {
 };
 
 export interface ProducaoBuscarTodosResponseDTO {
-    dados: ProducaoItemDTO[];
-    ultimoId: string;
-    temMais: boolean;
-  }
-  
+  dados: ProducaoItemDTO[];
+  ultimoId: string;
+  temMais: boolean;
+}

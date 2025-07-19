@@ -18,6 +18,10 @@ export class FirebaseMetaRepository implements IMetaRepository {
       .orderBy("__name__")
       .limit(limite);
 
+    if (dto?.tipo) {
+      query = query.where("tipo", "==", dto.tipo);
+    }
+
     if (dto?.ultimoId) {
       const lastSnap = await this._getCollection().doc(dto.ultimoId).get();
       if (lastSnap.exists) {

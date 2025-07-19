@@ -6,10 +6,7 @@ export const ProducaoInserirSchema = z.object({
     .number()
     .positive("Quantidade deve ser positiva")
     .min(0.1, "Quantidade mínima não atingida"),
-  precoPlanejado: z
-    .number()
-    .positive("Preço deve ser positivo")
-    .optional(), 
+  precoPlanejado: z.number().positive("Preço deve ser positivo").optional(),
   status: ProducaoStatusEnumZod,
   produtoId: z.string().uuid("ID do produto inválido"),
   fazendaId: z.string().uuid("ID da fazenda inválido"),
