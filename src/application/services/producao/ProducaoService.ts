@@ -55,7 +55,6 @@ export class ProducaoService {
   }
 
   async atualizar(dto: ProducaoAtualizarDTO): Promise<void> {
-   
     const producaoExistente = await this.producaoRepository.buscarPorId(dto.id);
     if (!producaoExistente) throw new Error("producao não encontrada");
 
@@ -70,30 +69,32 @@ export class ProducaoService {
     this.dashboardService.atualizar({
       producaoId: producaoExistente.id,
       qtdPlanejada: producaoExistente.quantidadePlanejada,
-      qtdColhida: producaoAtualizada.quantidadeColhida ?? 0, 
+      qtdColhida: producaoAtualizada.quantidadeColhida ?? 0,
       statusAnterior: producaoExistente.status,
       statusAtual: producaoAtualizada.status,
       data: new Date(),
     });
 
     if (producaoAtualizada.status === ProducaoStatusEnum.COLHIDA) {
-      const novoEstoqueProduto : EstoqueProduto = {
+      const novoEstoqueProduto: EstoqueProduto = {
         id: gerarUUID(),
         produtoId: producaoAtualizada.produtoId,
         quantidade: producaoAtualizada.quantidadePlanejada,
         preco: producaoAtualizada.precoPlanejado,
         lote: producaoAtualizada.lote ?? "",
         criadaEm: new Date(),
-        atualizadaEm: new Date(),            
-        producaoId: producaoAtualizada.id, 
+        atualizadaEm: new Date(),
+        producaoId: producaoAtualizada.id,
       };
 
       await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
 
-      // this.metaAtualizarValorTipoProducaoService.executar({
-      //   qtdColhida: 0, //adicionar
-      //   data: novoEstoqueProduto.criadaEm,
-      // });
+      if (!!dto.quantidadeColhida && dto.quantidadeColhida > 0) {
+        this.metaAtualizarValorTipoProducaoService.executar({
+          qtdColhida: dto.quantidadeColhida,
+          data: dto.dataFim,
+        });
+      }
     }
   }
 
@@ -111,10 +112,10 @@ export class ProducaoService {
       atualizadaEm: new Date(),
       dataInicio: dto.dataInicio,
       dataFim: dto.dataFim,
-      perdas:dto.perdas ,
+      perdas: dto.perdas,
       custoProducao: dto.custoProducao,
       precoFinal: dto.precoFinal,
-      quantidadeColhida: dto.quantidadeColhida
+      quantidadeColhida: dto.quantidadeColhida,
     };
 
     await this.producaoRepository.insert(novaProducao);
@@ -128,5 +129,4 @@ export class ProducaoService {
       data: new Date(),
     });
   }
-  
 }
