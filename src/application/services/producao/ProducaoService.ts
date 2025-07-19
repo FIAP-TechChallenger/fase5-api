@@ -74,11 +74,13 @@ export class ProducaoService {
       statusAtual: producaoAtualizada.status,
       data: new Date(),
     });
+    
 
     if (producaoAtualizada.status === ProducaoStatusEnum.COLHIDA) {
       const novoEstoqueProduto: EstoqueProduto = {
         id: gerarUUID(),
         produtoId: producaoAtualizada.produtoId,
+        fazendaId: producaoAtualizada.fazendaId,
         quantidade: producaoAtualizada.quantidadePlanejada,
         preco: producaoAtualizada.precoPlanejado,
         lote: producaoAtualizada.lote ?? "",

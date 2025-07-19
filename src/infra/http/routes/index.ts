@@ -13,6 +13,7 @@ import { InsumoController } from "../controllers/producao/InsumoController";
 import { NotificacaoController } from "../controllers/outros/NotificacaoController";
 import { DashboardController } from "../controllers/outros/DashboardController";
 import { ColheitaController } from "../controllers/producao/ColheitaController";
+import { VendaController } from "../controllers/comercial/VendaController";
 
 const router = Router();
 
@@ -29,5 +30,6 @@ router.use("/unidadeMedida", authenticate, UnidadeMedidaController.routes());
 router.use("/estoqueProduto", authenticate, EstqueProdutoController.routes());
 router.use("/estoqueInsumo", authenticate, EstoqueInsumoController.routes());
 router.use("/colheita", authenticate, ColheitaController.routes());
+router.use("/venda",  VendaController.routes());
 
 export default router;

@@ -9,4 +9,5 @@ export interface EstoqueProdutoFirebase {
     criadaEm?: Timestamp | null;
     atualizadaEm?: Timestamp | null;
     producaoId: string;
+    fazendaId:string;
   }

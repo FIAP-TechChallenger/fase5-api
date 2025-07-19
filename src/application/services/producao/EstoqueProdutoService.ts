@@ -52,6 +52,7 @@ export class EstoqueProdutoService {
     const novoEstoque: EstoqueProduto = {
       id: gerarUUID(),
       produtoId: dto.produtoId,
+      fazendaId:dto.fazendaId,
       quantidade: dto.quantidade,
       preco: dto.preco,
       lote: dto.lote ?? "",

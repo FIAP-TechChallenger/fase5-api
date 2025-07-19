@@ -8,6 +8,7 @@ export class EstoqueProduto {
     criadaEm: Date;
     atualizadaEm: Date;
     producaoId: string;
+    fazendaId:string;
     
 
     constructor(obj: EstoqueProduto) {
@@ -18,5 +19,6 @@ export class EstoqueProduto {
         this.criadaEm = obj.criadaEm;
         this.atualizadaEm = obj.atualizadaEm;
         this.producaoId = obj.producaoId;
+        this.fazendaId = obj.fazendaId;
     }
 } 

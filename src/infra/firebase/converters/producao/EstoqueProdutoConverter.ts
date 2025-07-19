@@ -10,6 +10,7 @@ export class EstoqueProdutoConverter {
       preco: estoqueProduto.preco ?? 0,
       lote: estoqueProduto.lote,
       producaoId: estoqueProduto.producaoId,
+      fazendaId:estoqueProduto.fazendaId,
       criadaEm: this._toTimestamp(estoqueProduto.criadaEm),
       atualizadaEm: this._toTimestamp(estoqueProduto.atualizadaEm),
     };
@@ -23,6 +24,7 @@ export class EstoqueProdutoConverter {
       preco: data.preco,
       lote: data.lote,
       producaoId: data.producaoId,
+      fazendaId:data.fazendaId,
       criadaEm: data.criadaEm?.toDate() || new Date(),
       atualizadaEm: data.atualizadaEm?.toDate() || new Date(),
     });
