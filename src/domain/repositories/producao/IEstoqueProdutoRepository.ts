@@ -7,4 +7,6 @@ export interface IEstoqueProdutoRepository {
     buscarTodos(dto : EstoqueProdutoBuscarTodosDTO): Promise<EstoqueProdutoBuscarTodosResponseDTO>
     insert( estoqueProduto : EstoqueProduto ): Promise<void>;
     atualizar(estoque: EstoqueProduto ): Promise<void>;
+    buscarPorProdutoOrdenado(produtoId: string): Promise<EstoqueProduto[]>;
+    debitarQuantidade(estoqueId: string, quantidade: number): Promise<void>;
 } 

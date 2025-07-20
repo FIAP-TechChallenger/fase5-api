@@ -11,6 +11,9 @@ import { z, ZodError } from "zod";
 import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebaseProdutoRepository";
 import { DashboardComercialService } from "@/application/services/outros/dashboard/DashboardComercialService";
 import { FirebaseDashboardComercialRepository } from "@/infra/repositories/outros/FirebaseDashboardComercialRepository";
+import { EstoqueProdutoService } from "@/application/services/producao/EstoqueProdutoService";
+import { FirebaseEstoqueProdutoRepository } from "@/infra/repositories/producao/firebaseEstoqueProdutoRepository";
+import { FirebaseMedidaRepository } from "@/infra/repositories/producao/firebaseMedidaRepository";
 
 export class VendaController {
   private _vendaService = new VendaService(
@@ -18,8 +21,13 @@ export class VendaController {
     new FirebaseProdutoRepository(),
     new DashboardComercialService(
       new FirebaseDashboardComercialRepository(),
-      new FirebaseProdutoRepository())
-
+      new FirebaseProdutoRepository()
+    ),
+    new EstoqueProdutoService( 
+      new FirebaseEstoqueProdutoRepository(),
+      new FirebaseProdutoRepository(),
+      new FirebaseMedidaRepository()
+    )
   );
 
   async buscarTodos(req: Request, res: Response): Promise<void> {
@@ -43,6 +51,7 @@ export class VendaController {
       await this._vendaService.inserir(dto);
       res.status(201).json({ message: "Venda criada com sucesso" });
     } catch (error: any) {
+      console.log("ERRO AO INSERIR VENDA:", error); // <-- ADICIONE ESTA LINHA
       if (error instanceof z.ZodError) {
         res.status(400).json({
           message: "Erro de validação",

@@ -76,6 +76,34 @@ export class EstoqueProdutoService {
 
     await this.estoqueProdutoRepository.atualizar(metaAtualizada);
   }
+  async verificarEDebitarEstoque(produtoId: string, quantidadeNecessaria: number): Promise<void> {
+   
+    const lotes = await this.estoqueProdutoRepository.buscarPorProdutoOrdenado(produtoId);
+    
   
+    const totalDisponivel = lotes.reduce((acc, lote) => acc + (lote.quantidade ?? 0), 0);
+    
+    if (totalDisponivel < quantidadeNecessaria) {
+   
+      throw new Error(`Estoque insuficiente para o produto ${produtoId}`);
+    }
+  
+    let restante = quantidadeNecessaria;
+  
+    for (const lote of lotes) {
+      if (restante <= 0) break;
+  
+      const quantidadeDisponivel = lote.quantidade ?? 0;
+      const quantidadeADebitar = Math.min(restante, quantidadeDisponivel);
+  
+      
+      await this.estoqueProdutoRepository.debitarQuantidade(lote.id, quantidadeADebitar);
+  
+      restante -= quantidadeADebitar;
+    
+    }
+  
+    console.log("✅ Estoque debitado com sucesso");
+  }
 }
 

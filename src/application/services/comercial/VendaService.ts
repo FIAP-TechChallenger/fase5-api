@@ -7,32 +7,27 @@ import { gerarUUID } from "@/shared/utils/gerarUUID";
 import { VendaAtualizarDTO } from "@/application/dtos/comercial/Venda/VendaAtualizarDTO";
 import { IProdutoRepository } from "@/domain/repositories/producao/IProdutoRepository";
 import { IDashboardComercialService } from "@/domain/interfaces/IDashboardComercialService";
+import { IEstoqueProdutoService } from "@/domain/interfaces/IEstoqueProdutoService";
 
 export class VendaService {
   constructor(
     private readonly vendaRepository: IVendaRepository,
     private readonly produtoRepository: IProdutoRepository,
-    private readonly dashboardService: IDashboardComercialService 
-   ) {}
+    private readonly dashboardService: IDashboardComercialService,
+    private readonly estoqueProdutoService: IEstoqueProdutoService
+  ) {}
 
-  async buscarTodos(
-    dto: VendaBuscarTodosDTO
-  ): Promise<VendaBuscarTodosResponseDTO> {
+  async buscarTodos(dto: VendaBuscarTodosDTO): Promise<VendaBuscarTodosResponseDTO> {
     const response = await this.vendaRepository.buscarTodos(dto);
-    
-  
+
     const vendasComNomeProduto = await Promise.all(
       response.dados.map(async (venda) => {
-       
         const itensComNome = await Promise.all(
           venda.itens.map(async (item) => {
-            
             let produtoNome = "";
             try {
               produtoNome = await this.produtoRepository.buscarNome(item.produtoId);
-              
             } catch (error) {
-              
               produtoNome = "Produto não encontrado";
             }
             return {
@@ -47,8 +42,7 @@ export class VendaService {
         };
       })
     );
-  
-    console.log("Vendas processadas com nomes dos produtos");
+
     return {
       ...response,
       dados: vendasComNomeProduto
@@ -56,26 +50,34 @@ export class VendaService {
   }
 
   async inserir(dto: VendaInserirDTO): Promise<void> {
-   
-  const produtosInvalidos: string[] = [];
-  
-  for (const item of dto.itens) {
-    try {
-      const produto = await this.produtoRepository.buscarPorId(item.produtoId);
-      if (!produto) {
+    
+    const produtosInvalidos: string[] = [];
+
+    for (const item of dto.itens) {
+      try {
+      
+        const produto = await this.produtoRepository.buscarPorId(item.produtoId);
+        if (!produto) {
+        
+          produtosInvalidos.push(item.produtoId);
+        } else {
+          console.log(`Produto encontrado: ${item.produtoId}`);
+        }
+
+      
+        await this.estoqueProdutoService.verificarEDebitarEstoque(item.produtoId, item.quantidade);
+      } catch (error: any) {
+       
         produtosInvalidos.push(item.produtoId);
       }
-    } catch (error) {
-      produtosInvalidos.push(item.produtoId);
     }
-  }
-  
-  if (produtosInvalidos.length > 0) {
-    throw new Error(`Produtos não encontrados: ${produtosInvalidos.join(', ')}`);
-  }
+
+    if (produtosInvalidos.length > 0) {
+      throw new Error(`Produtos não encontrados ou com estoque insuficiente: ${produtosInvalidos.join(', ')}`);
+    }
+
     const itensCalculados = dto.itens.map(item => {
-      const lucroTotal = item.precoUnitario  * item.quantidade;
-  
+      const lucroTotal = item.precoUnitario * item.quantidade;
       return {
         id: gerarUUID(),
         desconto: item.desconto,
@@ -86,11 +88,11 @@ export class VendaService {
         lucroUnitario: lucroTotal,
       };
     });
-  
+
     const valorTotal = itensCalculados.reduce((total, item) => {
       return total + (item.quantidade * item.precoUnitario);
     }, 0);
-  
+
     const novaVenda: Venda = {
       id: gerarUUID(),
       criadaEm: new Date(),
@@ -101,8 +103,9 @@ export class VendaService {
       status: dto.status,
       itens: itensCalculados,
     };
-  
+
     await this.vendaRepository.inserir(novaVenda);
+
     for (const item of itensCalculados) {
       await this.dashboardService.atualizar({
         produtoId: item.produtoId,
@@ -116,24 +119,24 @@ export class VendaService {
   async atualizar(dto: VendaAtualizarDTO): Promise<void> {
     const vendaExistente = await this.vendaRepository.buscarPorId(dto.id);
     if (!vendaExistente) throw new Error("Venda não encontrada");
-  
+
     const itensAtualizados = dto.itens.map(item => ({
-      id: item.id ?? gerarUUID(), // Usa o id do DTO ou gera um novo
+      id: item.id ?? gerarUUID(),
       desconto: item.desconto,
       quantidade: item.quantidade,
       produtoId: item.produtoId,
-      fazendaId: item.fazendaId === null ? undefined : item.fazendaId, // <-- aqui!
+      fazendaId: item.fazendaId === null ? undefined : item.fazendaId,
       precoUnitario: item.precoUnitario,
       lucroUnitario: item.lucroUnitario,
     }));
-  
+
     const vendaAtualizada: Venda = {
       ...vendaExistente,
       ...dto,
       itens: itensAtualizados,
       criadaEm: vendaExistente.criadaEm,
     };
-  
+
     await this.vendaRepository.atualizar(vendaAtualizada);
   }
 }

@@ -78,15 +78,29 @@ export class FirebaseEstoqueProdutoRepository implements IEstoqueProdutoReposito
       const doc = await transaction.get(docRef);
       if (!doc.exists) throw new Error("Estoque não encontrado");
   
-      const data = doc.data() as EstoqueInsumoFirebase;
-      const novaQuantidade = (data.quantidade ?? 0) - quantidade;
+      const data = doc.data() as EstoqueProdutoFirebase;
+      const quantidadeAtual = data.quantidade ?? 0;
+      const novaQuantidade = quantidadeAtual - quantidade;
   
-      if (novaQuantidade < 0) throw new Error("Estoque insuficiente");
+      if (novaQuantidade < 0) {
+        throw new Error("Estoque insuficiente");
+      }
   
       transaction.update(docRef, {
         quantidade: novaQuantidade,
         atualizadaEm: new Date(),
       });
+    });
+  }
+  async buscarPorProdutoOrdenado(produtoId: string): Promise<EstoqueProduto[]> {
+    const snapshot = await this._getCollection()
+      .where("produtoId", "==", produtoId)
+      .orderBy("criadaEm", "asc") // FIFO
+      .get();
+      console.log(`[Repository] Lotes encontrados para produto ${produtoId}:`, snapshot.docs.length);
+    return snapshot.docs.map((doc) => {
+      const data = doc.data() as EstoqueProdutoFirebase;
+      return EstoqueProdutoConverter.fromFirestore(data, doc.id);
     });
   }
 
