@@ -51,7 +51,7 @@ export class FirebaseProdutoRepository implements IProdutoRepository {
     const doc = await this._getCollection().doc(nomeId).get();
   
     if (!doc.exists) {
-      throw new Error(`Medida com ID ${nomeId} não encontrada`);
+      throw new Error(`Produto com ID ${nomeId} não encontrada`);
     }
     const data = doc.data() as ProdutoFirebase;
     return data.nome;

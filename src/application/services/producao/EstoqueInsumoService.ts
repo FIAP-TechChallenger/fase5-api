@@ -74,24 +74,39 @@ export class EstoqueInsumoService {
   }
   async debitarQuantidade(insumoId: string, quantidadeNecessaria: number): Promise<void> {
     return admin.firestore().runTransaction(async (transaction) => {
-      const estoque = await this.estoqueInsumoRepository.buscarPorInsumoId(insumoId);
-      
-      if (!estoque) {
-        throw new Error("Estoque do insumo não encontrado");
+      const estoques = await this.estoqueInsumoRepository.buscarTodosPorInsumo(insumoId);
+  
+      if (!estoques || estoques.length === 0) {
+        throw new Error("Nenhum estoque encontrado para o insumo.");
       }
-      
-      if (estoque.quantidade < quantidadeNecessaria) {
-        throw new Error(`Estoque insuficiente para insumo ${insumoId}. 
-                         Disponível: ${estoque.quantidade}, 
-                         Necessário: ${quantidadeNecessaria}`);
+  
+      const totalDisponivel = estoques.reduce((soma, e) => soma + e.quantidade, 0);
+      if (totalDisponivel < quantidadeNecessaria) {
+        throw new Error(`Estoque insuficiente para o insumo ${insumoId}. Disponível: ${totalDisponivel}, Necessário: ${quantidadeNecessaria}`);
       }
-      
-      const novaQuantidade = estoque.quantidade - quantidadeNecessaria;
-      await this.estoqueInsumoRepository.atualizarQuantidade(estoque.id, novaQuantidade);
+  
+      let restante = quantidadeNecessaria;
+  
+      for (const estoque of estoques) {
+        if (restante <= 0) break;
+  
+        const debitar = Math.min(estoque.quantidade, restante);
+        const novaQuantidade = estoque.quantidade - debitar;
+  
+        await this.estoqueInsumoRepository.atualizarQuantidadeTransacional(
+          transaction,
+          estoque.id,
+          novaQuantidade
+        );
+  
+        restante -= debitar;
+      }
+  
+      if (restante > 0) {
+        throw new Error("Erro inesperado: débito parcial não finalizou corretamente.");
+      }
     });
   }
-
-  
 }
 
 

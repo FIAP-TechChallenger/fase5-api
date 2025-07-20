@@ -75,12 +75,12 @@ export class VendaController {
     const router = Router();
     const controller = new VendaController();
 
-    // router.use(
-    //   verificarPermissaoSetor(
-    //     UsuarioSetorEnum.ADMIN,
-    //     UsuarioSetorEnum.COMERCIAL
-    //   )
-    // );
+    router.use(
+      verificarPermissaoSetor(
+        UsuarioSetorEnum.ADMIN,
+        UsuarioSetorEnum.COMERCIAL
+      )
+    );
     router.post("/", controller.buscarTodos.bind(controller));
     router.post("/inserir", controller.inserir.bind(controller));
     router.post("/atualizar", controller.atualizar.bind(controller));

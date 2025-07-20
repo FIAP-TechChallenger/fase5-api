@@ -19,15 +19,20 @@ export class VendaService {
     dto: VendaBuscarTodosDTO
   ): Promise<VendaBuscarTodosResponseDTO> {
     const response = await this.vendaRepository.buscarTodos(dto);
+    
   
     const vendasComNomeProduto = await Promise.all(
       response.dados.map(async (venda) => {
+       
         const itensComNome = await Promise.all(
           venda.itens.map(async (item) => {
+            
             let produtoNome = "";
             try {
               produtoNome = await this.produtoRepository.buscarNome(item.produtoId);
-            } catch {
+              
+            } catch (error) {
+              
               produtoNome = "Produto não encontrado";
             }
             return {
@@ -43,6 +48,7 @@ export class VendaService {
       })
     );
   
+    console.log("Vendas processadas com nomes dos produtos");
     return {
       ...response,
       dados: vendasComNomeProduto
@@ -50,6 +56,23 @@ export class VendaService {
   }
 
   async inserir(dto: VendaInserirDTO): Promise<void> {
+   
+  const produtosInvalidos: string[] = [];
+  
+  for (const item of dto.itens) {
+    try {
+      const produto = await this.produtoRepository.buscarPorId(item.produtoId);
+      if (!produto) {
+        produtosInvalidos.push(item.produtoId);
+      }
+    } catch (error) {
+      produtosInvalidos.push(item.produtoId);
+    }
+  }
+  
+  if (produtosInvalidos.length > 0) {
+    throw new Error(`Produtos não encontrados: ${produtosInvalidos.join(', ')}`);
+  }
     const itensCalculados = dto.itens.map(item => {
       const lucroTotal = item.precoUnitario  * item.quantidade;
   

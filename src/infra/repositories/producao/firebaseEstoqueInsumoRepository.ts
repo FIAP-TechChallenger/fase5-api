@@ -71,7 +71,28 @@ export class FirebaseEstoqueInsumoRepository implements IEstoqueInsumoRepository
       .doc(estoque.id)
       .update({ ...data });
   }
-
+  async buscarTodosPorInsumo(insumoId: string): Promise<EstoqueInsumo[]> {
+    const snapshot = await this._getCollection()
+      .where("insumoId", "==", insumoId)
+      .orderBy("criadaEm", "asc") // ou outro critério de prioridade
+      .get();
+  
+    return snapshot.docs.map((doc) => {
+      const data = doc.data() as EstoqueInsumoFirebase;
+      return EstoqueInsumoConverter.fromFirestore(data, doc.id);
+    });
+  }
+  async atualizarQuantidadeTransacional(
+    transaction: FirebaseFirestore.Transaction,
+    estoqueId: string,
+    novaQuantidade: number
+  ): Promise<void> {
+    const ref = this._getCollection().doc(estoqueId);
+    transaction.update(ref, {
+      quantidade: novaQuantidade,
+      atualizadaEm: new Date()
+    });
+  }
   
 
   private _getCollection() {

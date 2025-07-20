@@ -9,6 +9,14 @@ export interface IEstoqueInsumoRepository{
    atualizar(estoque: EstoqueInsumo): Promise<void>;
    buscarPorInsumoId(insumoId: string): Promise<EstoqueInsumo | null>;
    atualizarQuantidade(estoqueId: string, novaQuantidade: number): Promise<void>;
+   buscarTodosPorInsumo(insumoId: string): Promise<EstoqueInsumo[]>;
+
+// Atualiza quantidade dentro de uma transação
+atualizarQuantidadeTransacional(
+  transaction: FirebaseFirestore.Transaction,
+  estoqueId: string,
+  novaQuantidade: number
+): Promise<void>;
  }
 
 

@@ -12,24 +12,22 @@ import { EstqueProdutoController } from "../controllers/producao/EstoqueProdutoC
 import { InsumoController } from "../controllers/producao/InsumoController";
 import { NotificacaoController } from "../controllers/outros/NotificacaoController";
 import { DashboardController } from "../controllers/outros/DashboardController";
-import { ColheitaController } from "../controllers/producao/ColheitaController";
 import { VendaController } from "../controllers/comercial/VendaController";
 
 const router = Router();
 
-router.use("/auth", AuthController.routes());
-router.use("/usuario",  UsuarioController.routes());
-router.use("/meta",  MetaController.routes());
-router.use("/dashboard",  DashboardController.routes());
-router.use("/notificacao",  NotificacaoController.routes());
-router.use("/fazenda", FazendaController.routes());
-router.use("/produto",  ProdutoController.routes());
-router.use("/insumo",  InsumoController.routes());
-router.use("/producao",  ProducaoController.routes());
-router.use("/unidadeMedida",  UnidadeMedidaController.routes());
-router.use("/estoqueProduto",  EstqueProdutoController.routes());
-router.use("/estoqueInsumo",  EstoqueInsumoController.routes());
-router.use("/colheita",  ColheitaController.routes());
-router.use("/venda",  VendaController.routes());
+router.use("/auth", authenticate, AuthController.routes());
+router.use("/usuario",authenticate,  UsuarioController.routes());
+router.use("/meta",authenticate,  MetaController.routes());
+router.use("/dashboard",authenticate,  DashboardController.routes());
+router.use("/notificacao", authenticate, NotificacaoController.routes());
+router.use("/fazenda",authenticate, FazendaController.routes());
+router.use("/produto",authenticate,  ProdutoController.routes());
+router.use("/insumo", authenticate, InsumoController.routes());
+router.use("/producao",authenticate,  ProducaoController.routes());
+router.use("/unidadeMedida",authenticate,  UnidadeMedidaController.routes());
+router.use("/estoqueProduto", authenticate, EstqueProdutoController.routes());
+router.use("/estoqueInsumo",authenticate,  EstoqueInsumoController.routes());
+router.use("/venda",authenticate,  VendaController.routes());
 
 export default router;

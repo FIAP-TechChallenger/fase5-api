@@ -57,14 +57,13 @@ export class ProducaoService {
   async atualizar(dto: ProducaoAtualizarDTO): Promise<void> {
     const producaoExistente = await this.producaoRepository.buscarPorId(dto.id);
     if (!producaoExistente) throw new Error("producao não encontrada");
-    // console.log("dto da producao existente", producaoExistente)
 
     const producaoAtualizada: Producao = {
       ...producaoExistente,
       ...dto,
       atualizadaEm: new Date(),
     };
-    // console.log("dto da producao atualizada", producaoAtualizada)
+    console.log("dto da producao atualizada", producaoAtualizada)
 
     await this.producaoRepository.atualizar(producaoAtualizada);
    
@@ -99,7 +98,7 @@ export class ProducaoService {
         producaoId: producaoAtualizada.id,
         precoUnitario: precoUnitario
       };
-      // console.log("novo estoque Produto ", novoEstoqueProduto)
+      console.log("novo estoque Produto ", novoEstoqueProduto)
 
       await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
 
