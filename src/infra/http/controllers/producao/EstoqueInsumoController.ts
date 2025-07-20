@@ -82,7 +82,7 @@ export class EstoqueInsumoController {
   async debitar(req: Request, res: Response): Promise<void> {
     try {
       const dto = EstoqueInsumoDebitarSchema.parse(req.body);
-      await this._EstoqueInsumoService.debitarQuantidade(dto.insumoId, dto.quantidade);
+      await this._EstoqueInsumoService.verificarEDebitarEstoque(dto.insumoId, dto.quantidade);
       
       res.status(200).json({ message: "Débito realizado com sucesso" });
     } catch (error: any) {

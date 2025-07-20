@@ -5,6 +5,9 @@ import { EstoqueProdutoFirebase } from "@/infra/firebase/models/producao/Estoque
 import { EstoqueProdutoConverter } from "@/infra/firebase/converters/producao/EstoqueProdutoConverter";
 import { EstoqueProdutoBuscarTodosDTO } from "@/application/dtos/producao/EstoqueProduto/EstoqueProdutoBuscarTodosDTO";
 import { EstoqueProdutoBuscarTodosResponseDTO } from "@/application/dtos/producao/EstoqueProduto/EstoqueProdutoBuscarTodosResponseDTO";
+import { EstoqueInsumo } from "@/domain/entities/producao/EstoqueInsumo";
+import { EstoqueInsumoFirebase } from "@/infra/firebase/models/producao/EstoqueInsumoFirebase";
+import { EstoqueInsumoConverter } from "@/infra/firebase/converters/producao/EstoqueInsumoConverter";
 
 export class FirebaseEstoqueProdutoRepository implements IEstoqueProdutoRepository {
   async buscarTodos(
@@ -57,7 +60,35 @@ export class FirebaseEstoqueProdutoRepository implements IEstoqueProdutoReposito
       .doc(estoque.id)
       .update({ ...data });
   }
-
+  async buscarPorInsumoOrdenado(insumoId: string): Promise<EstoqueInsumo[]> {
+    const snapshot = await this._getCollection()
+      .where("insumoId", "==", insumoId)
+      .orderBy("criadaEm", "asc") // FIFO, por exemplo
+      .get();
+  
+    return snapshot.docs.map((doc) => {
+      const data = doc.data() as EstoqueInsumoFirebase;
+      return EstoqueInsumoConverter.fromFirestore(data, doc.id);
+    });
+  }
+  
+  async debitarQuantidade(estoqueId: string, quantidade: number): Promise<void> {
+    const docRef = this._getCollection().doc(estoqueId);
+    await admin.firestore().runTransaction(async (transaction) => {
+      const doc = await transaction.get(docRef);
+      if (!doc.exists) throw new Error("Estoque não encontrado");
+  
+      const data = doc.data() as EstoqueInsumoFirebase;
+      const novaQuantidade = (data.quantidade ?? 0) - quantidade;
+  
+      if (novaQuantidade < 0) throw new Error("Estoque insuficiente");
+  
+      transaction.update(docRef, {
+        quantidade: novaQuantidade,
+        atualizadaEm: new Date(),
+      });
+    });
+  }
 
   private _getCollection() {
     return admin.firestore().collection("estoqueProduto");

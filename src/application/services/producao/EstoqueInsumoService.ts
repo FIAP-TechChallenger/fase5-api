@@ -72,40 +72,27 @@ export class EstoqueInsumoService {
 
     await this.estoqueInsumoRepository.atualizar(estoqueAtualizado);
   }
-  async debitarQuantidade(insumoId: string, quantidadeNecessaria: number): Promise<void> {
-    return admin.firestore().runTransaction(async (transaction) => {
-      const estoques = await this.estoqueInsumoRepository.buscarTodosPorInsumo(insumoId);
-  
-      if (!estoques || estoques.length === 0) {
-        throw new Error("Nenhum estoque encontrado para o insumo.");
-      }
-  
-      const totalDisponivel = estoques.reduce((soma, e) => soma + e.quantidade, 0);
-      if (totalDisponivel < quantidadeNecessaria) {
-        throw new Error(`Estoque insuficiente para o insumo ${insumoId}. Disponível: ${totalDisponivel}, Necessário: ${quantidadeNecessaria}`);
-      }
-  
-      let restante = quantidadeNecessaria;
-  
-      for (const estoque of estoques) {
-        if (restante <= 0) break;
-  
-        const debitar = Math.min(estoque.quantidade, restante);
-        const novaQuantidade = estoque.quantidade - debitar;
-  
-        await this.estoqueInsumoRepository.atualizarQuantidadeTransacional(
-          transaction,
-          estoque.id,
-          novaQuantidade
-        );
-  
-        restante -= debitar;
-      }
-  
-      if (restante > 0) {
-        throw new Error("Erro inesperado: débito parcial não finalizou corretamente.");
-      }
-    });
+  async verificarEDebitarEstoque(insumoId: string, quantidadeNecessaria: number): Promise<void> {
+    const lotes = await this.estoqueInsumoRepository.buscarPorInsumoOrdenado(insumoId);
+    // console.log("[DEBUG] Lotes encontrados para insumoId", insumoId, lotes);
+    const totalDisponivel = lotes.reduce((total, lote) => total + lote.quantidade, 0);
+    // console.log("[DEBUG] Total disponível:", totalDisponivel, "| Quantidade necessária:", quantidadeNecessaria);
+    if (totalDisponivel < quantidadeNecessaria) {
+      console.error(`[ERRO] Estoque insuficiente para o insumo ${insumoId}. Total disponível: ${totalDisponivel}, necessário: ${quantidadeNecessaria}`);
+      throw new Error(`Estoque insuficiente para o insumo ${insumoId}`);
+    }
+
+    let quantidadeRestante = quantidadeNecessaria;
+
+    for (const lote of lotes) {
+      if (quantidadeRestante === 0) break;
+      const quantidadeParaDebitar = Math.min(lote.quantidade, quantidadeRestante);
+      // console.log(`[DEBUG] Debitando do lote ${lote.id}: ${quantidadeParaDebitar} (antes: ${lote.quantidade})`);
+      await this.estoqueInsumoRepository.debitarQuantidade(lote.id, quantidadeParaDebitar);
+      quantidadeRestante -= quantidadeParaDebitar;
+      // console.log(`[DEBUG] Restante a debitar: ${quantidadeRestante}`);
+    }
+    // console.log(`[DEBUG] Débito de insumo ${insumoId} concluído.`);
   }
 }
 

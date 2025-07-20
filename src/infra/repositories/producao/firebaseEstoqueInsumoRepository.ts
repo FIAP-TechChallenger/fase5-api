@@ -71,10 +71,10 @@ export class FirebaseEstoqueInsumoRepository implements IEstoqueInsumoRepository
       .doc(estoque.id)
       .update({ ...data });
   }
-  async buscarTodosPorInsumo(insumoId: string): Promise<EstoqueInsumo[]> {
+  async buscarPorInsumoOrdenado(insumoId: string): Promise<EstoqueInsumo[]> {
     const snapshot = await this._getCollection()
       .where("insumoId", "==", insumoId)
-      .orderBy("criadaEm", "asc") // ou outro critério de prioridade
+      .orderBy("criadaEm", "asc") // FIFO, por exemplo
       .get();
   
     return snapshot.docs.map((doc) => {
@@ -82,18 +82,24 @@ export class FirebaseEstoqueInsumoRepository implements IEstoqueInsumoRepository
       return EstoqueInsumoConverter.fromFirestore(data, doc.id);
     });
   }
-  async atualizarQuantidadeTransacional(
-    transaction: FirebaseFirestore.Transaction,
-    estoqueId: string,
-    novaQuantidade: number
-  ): Promise<void> {
-    const ref = this._getCollection().doc(estoqueId);
-    transaction.update(ref, {
-      quantidade: novaQuantidade,
-      atualizadaEm: new Date()
+  
+  async debitarQuantidade(estoqueId: string, quantidade: number): Promise<void> {
+    const docRef = this._getCollection().doc(estoqueId);
+    await admin.firestore().runTransaction(async (transaction) => {
+      const doc = await transaction.get(docRef);
+      if (!doc.exists) throw new Error("Estoque não encontrado");
+  
+      const data = doc.data() as EstoqueInsumoFirebase;
+      const novaQuantidade = (data.quantidade ?? 0) - quantidade;
+  
+      if (novaQuantidade < 0) throw new Error("Estoque insuficiente");
+  
+      transaction.update(docRef, {
+        quantidade: novaQuantidade,
+        atualizadaEm: new Date(),
+      });
     });
   }
-  
 
   private _getCollection() {
     return admin.firestore().collection("estoqueInsumo");

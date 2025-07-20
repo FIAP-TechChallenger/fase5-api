@@ -15,6 +15,8 @@ import { ProducaoAtualizarDTO } from "@/application/dtos/producao/Producao/Produ
 import { IMetaAtualizarValorTipoProducaoService } from "@/domain/interfaces/IMetaAtualizarValorTipoProducaoService";
 import { IDashboardProducaoService } from "@/domain/interfaces/IDashboardProducaoService";
 import { EstoqueProduto } from "@/domain/entities/producao/EstoqueProduto";
+import { IEstoqueInsumoRepository } from "@/domain/repositories/producao/IEstoqueInsumoRepository";
+import { IEstoqueInsumoService } from "@/domain/interfaces/IEstoqueInsumoService";
 
 export class ProducaoService {
   constructor(
@@ -23,7 +25,8 @@ export class ProducaoService {
     private readonly produtoRepository: IProdutoRepository,
     private readonly estoqueProdutoRepository: IEstoqueProdutoRepository,
     private readonly metaAtualizarValorTipoProducaoService: IMetaAtualizarValorTipoProducaoService,
-    private readonly dashboardService: IDashboardProducaoService
+    private readonly dashboardService: IDashboardProducaoService,
+    private readonly estoqueInsumoService: IEstoqueInsumoService // <--- adicionado
   ) {}
 
   async buscarTodos(
@@ -63,7 +66,7 @@ export class ProducaoService {
       ...dto,
       atualizadaEm: new Date(),
     };
-    console.log("dto da producao atualizada", producaoAtualizada)
+   
 
     await this.producaoRepository.atualizar(producaoAtualizada);
    
@@ -112,6 +115,13 @@ export class ProducaoService {
   }
 
   async inserir(dto: ProducaoInserirDTO): Promise<void> {
+      // // 🔁 1. Verificar e debitar os insumos antes de inserir
+      for (const insumo of dto.insumos) {
+        console.log("insumo", insumo),
+        console.log("dto insumos", dto.insumos),
+        console.log("insumo quantidade", insumo),
+        await this.estoqueInsumoService.verificarEDebitarEstoque(insumo.insumoId, insumo.quantidade);
+      }
     const novaProducao: Producao = {
       id: gerarUUID(),
       quantidadePlanejada: dto.quantidadePlanejada,
