@@ -6,11 +6,14 @@ import { Venda } from "@/domain/entities/comercial/Venda";
 import { gerarUUID } from "@/shared/utils/gerarUUID";
 import { VendaAtualizarDTO } from "@/application/dtos/comercial/Venda/VendaAtualizarDTO";
 import { IProdutoRepository } from "@/domain/repositories/producao/IProdutoRepository";
+import { IDashboardComercialService } from "@/domain/interfaces/IDashboardComercialService";
 
 export class VendaService {
   constructor(
     private readonly vendaRepository: IVendaRepository,
-    private readonly produtoRepository: IProdutoRepository) {}
+    private readonly produtoRepository: IProdutoRepository,
+    private readonly dashboardService: IDashboardComercialService 
+   ) {}
 
   async buscarTodos(
     dto: VendaBuscarTodosDTO
@@ -77,6 +80,14 @@ export class VendaService {
     };
   
     await this.vendaRepository.inserir(novaVenda);
+    for (const item of itensCalculados) {
+      await this.dashboardService.atualizar({
+        produtoId: item.produtoId,
+        dataVenda: dto.dataVenda,
+        lucro: item.lucroUnitario,
+        qtdVendida: item.quantidade,
+      });
+    }
   }
 
   async atualizar(dto: VendaAtualizarDTO): Promise<void> {

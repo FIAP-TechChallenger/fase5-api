@@ -84,10 +84,7 @@ export class ProducaoService {
     //   statusAtual: producaoAtualizada.status,
     //   data: new Date(),
     // });
-    console.log("preco final", producaoAtualizada.precoFinal);
-    console.log("producao custo", producaoAtualizada.custoProducao);
-    console.log("quantiade colhida", producaoAtualizada.quantidadeColhida);
-    console.log("preco unitario", precoUnitario);
+  
 
     if (producaoAtualizada.status === ProducaoStatusEnum.COLHIDA) {
       const novoEstoqueProduto: EstoqueProduto = {

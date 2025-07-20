@@ -9,11 +9,16 @@ import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
 import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
 import { z, ZodError } from "zod";
 import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebaseProdutoRepository";
+import { DashboardComercialService } from "@/application/services/outros/dashboard/DashboardComercialService";
+import { FirebaseDashboardComercialRepository } from "@/infra/repositories/outros/FirebaseDashboardComercialRepository";
 
 export class VendaController {
   private _vendaService = new VendaService(
     new FirebaseVendaRepository(),
-    new FirebaseProdutoRepository()
+    new FirebaseProdutoRepository(),
+    new DashboardComercialService(
+      new FirebaseDashboardComercialRepository(),
+      new FirebaseProdutoRepository())
 
   );
 
