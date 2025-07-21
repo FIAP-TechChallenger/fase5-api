@@ -8,6 +8,7 @@ import { EstoqueProdutoBuscarTodosResponseDTO } from "@/application/dtos/produca
 import { EstoqueInsumo } from "@/domain/entities/producao/EstoqueInsumo";
 import { EstoqueInsumoFirebase } from "@/infra/firebase/models/producao/EstoqueInsumoFirebase";
 import { EstoqueInsumoConverter } from "@/infra/firebase/converters/producao/EstoqueInsumoConverter";
+import { getFirebaseTimeStamp } from "@/shared/utils/getFirebaseTimeStamp";
 
 export class FirebaseEstoqueProdutoRepository
   implements IEstoqueProdutoRepository
@@ -96,10 +97,11 @@ export class FirebaseEstoqueProdutoRepository
 
       transaction.update(docRef, {
         quantidade: novaQuantidade,
-        atualizadaEm: new Date(),
+        atualizadaEm: getFirebaseTimeStamp(new Date()),
       });
     });
   }
+
   async buscarPorProdutoOrdenado(produtoId: string): Promise<EstoqueProduto[]> {
     const snapshot = await this._getCollection()
       .where("produtoId", "==", produtoId)

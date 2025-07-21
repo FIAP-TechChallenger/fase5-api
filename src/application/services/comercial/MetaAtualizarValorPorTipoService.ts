@@ -69,8 +69,8 @@ export class MetaAtualizarValorPorTipoService
   ) {
     NotificacaoSendService.instance.send({
       tipo: NotificacaoTipoEnum.META_CONCLUIDA,
-      titulo: "Meta concluída",
-      descricao: `A meta de "${tipo}" com título "${metaTitulo}" foi alcançada.`,
+      titulo: `Meta de ${tipo} concluída`,
+      descricao: `A meta "${metaTitulo}" foi alcançada, verifique na tela de metas.`,
     });
   }
 }
