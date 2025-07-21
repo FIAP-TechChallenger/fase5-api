@@ -16,18 +16,18 @@ import { VendaController } from "../controllers/comercial/VendaController";
 
 const router = Router();
 
-router.use("/auth", authenticate, AuthController.routes());
-router.use("/usuario",authenticate,  UsuarioController.routes());
-router.use("/meta",authenticate,  MetaController.routes());
-router.use("/dashboard",authenticate,  DashboardController.routes());
+router.use("/auth", AuthController.routes());
+router.use("/usuario", authenticate, UsuarioController.routes());
+router.use("/meta", authenticate, MetaController.routes());
+router.use("/dashboard", authenticate, DashboardController.routes());
 router.use("/notificacao", authenticate, NotificacaoController.routes());
-router.use("/fazenda",authenticate, FazendaController.routes());
-router.use("/produto",authenticate,  ProdutoController.routes());
+router.use("/fazenda", authenticate, FazendaController.routes());
+router.use("/produto", authenticate, ProdutoController.routes());
 router.use("/insumo", authenticate, InsumoController.routes());
-router.use("/producao",authenticate,  ProducaoController.routes());
-router.use("/unidadeMedida",authenticate,  UnidadeMedidaController.routes());
+router.use("/producao", authenticate, ProducaoController.routes());
+router.use("/unidadeMedida", authenticate, UnidadeMedidaController.routes());
 router.use("/estoqueProduto", authenticate, EstqueProdutoController.routes());
-router.use("/estoqueInsumo",authenticate,  EstoqueInsumoController.routes());
-router.use("/venda",authenticate,  VendaController.routes());
+router.use("/estoqueInsumo", authenticate, EstoqueInsumoController.routes());
+router.use("/venda", authenticate, VendaController.routes());
 
 export default router;
