@@ -9,8 +9,7 @@ import { IProdutoRepository } from "@/domain/repositories/producao/IProdutoRepos
 export class DashboardComercialService implements IDashboardComercialService {
   constructor(
     private readonly _dashRepo: IDashboardComercialRepository,
-    private produtoRepo: IProdutoRepository,
-   
+    private produtoRepo: IProdutoRepository
   ) {}
 
   async getLucroPorProduto(): Promise<DashboardLucroPorProdutoDTO[]> {

@@ -109,7 +109,7 @@ export class VendaService {
     await this.vendaRepository.inserir(novaVenda);
 
     for (const item of itensCalculados) {
-      await this.dashboardService.atualizar({
+      this.dashboardService.atualizar({
         produtoId: item.produtoId,
         dataVenda: dto.dataVenda,
         lucro: item.lucroUnitario,

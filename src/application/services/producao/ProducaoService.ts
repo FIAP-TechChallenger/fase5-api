@@ -79,32 +79,18 @@ export class ProducaoService {
         "Campos obrigatórios não preenchidos para calcular o preço unitário."
       );
     }
-    const precoUnitario =
-      producaoAtualizada.precoFinal / producaoAtualizada.quantidadeColhida;
-    // this.dashboardService.atualizar({
-    //   producaoId: producaoExistente.id,
-    //   qtdPlanejada: producaoExistente.quantidadePlanejada,
-    //   qtdColhida: producaoAtualizada.quantidadeColhida ?? 0,
-    //   statusAnterior: producaoExistente.status,
-    //   statusAtual: producaoAtualizada.status,
-    //   data: new Date(),
-    // });
+
+    this.dashboardService.atualizar({
+      producaoId: producaoExistente.id,
+      qtdPlanejada: producaoExistente.quantidadePlanejada,
+      qtdColhida: producaoAtualizada.quantidadeColhida ?? 0,
+      statusAnterior: producaoExistente.status,
+      statusAtual: producaoAtualizada.status,
+      data: new Date(),
+    });
 
     if (producaoAtualizada.status === ProducaoStatusEnum.COLHIDA) {
-      const novoEstoqueProduto: EstoqueProduto = {
-        id: gerarUUID(),
-        produtoId: producaoAtualizada.produtoId,
-        fazendaId: producaoAtualizada.fazendaId,
-        quantidade: producaoAtualizada.quantidadePlanejada,
-        preco: producaoAtualizada.precoPlanejado ?? 0,
-        lote: producaoAtualizada.lote ?? "",
-        criadaEm: new Date(),
-        atualizadaEm: new Date(),
-        producaoId: producaoAtualizada.id,
-        precoUnitario: precoUnitario,
-      };
-
-      await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
+      await this._addEstoqueProduto(producaoAtualizada);
 
       if (!!dto.quantidadeColhida && dto.quantidadeColhida > 0) {
         this.metaAtualizarValorPorTipoService.executar(MetaTipoEnum.PRODUCAO, {
@@ -115,13 +101,6 @@ export class ProducaoService {
   }
 
   async inserir(dto: ProducaoInserirDTO): Promise<void> {
-    // // 🔁 1. Verificar e debitar os insumos antes de inserir
-    for (const insumo of dto.insumos) {
-      await this.estoqueInsumoService.verificarEDebitarEstoque(
-        insumo.insumoId,
-        insumo.quantidade
-      );
-    }
     const novaProducao: Producao = {
       id: gerarUUID(),
       quantidadePlanejada: dto.quantidadePlanejada,
@@ -141,15 +120,63 @@ export class ProducaoService {
       quantidadeColhida: dto.quantidadeColhida,
     };
 
+    if (
+      novaProducao.status === ProducaoStatusEnum.COLHIDA &&
+      (novaProducao.precoFinal === undefined ||
+        novaProducao.custoProducao === undefined ||
+        novaProducao.quantidadeColhida === undefined)
+    ) {
+      throw new Error(
+        "Campos obrigatórios não preenchidos para calcular o preço unitário."
+      );
+    }
+
+    // // 🔁 1. Verificar e debitar os insumos antes de inserir
+    for (const insumo of dto.insumos) {
+      await this.estoqueInsumoService.verificarEDebitarEstoque(
+        insumo.insumoId,
+        insumo.quantidade
+      );
+    }
+
+    if (novaProducao.status === ProducaoStatusEnum.COLHIDA) {
+      await this._addEstoqueProduto(novaProducao);
+
+      if (!!dto.quantidadeColhida && dto.quantidadeColhida > 0) {
+        this.metaAtualizarValorPorTipoService.executar(MetaTipoEnum.PRODUCAO, {
+          quantidade: dto.quantidadeColhida,
+        });
+      }
+    }
+
     await this.producaoRepository.insert(novaProducao);
 
-    // await this.dashboardService.atualizar({
-    //   producaoId: novaProducao.id,
-    //   qtdPlanejada: novaProducao.quantidadePlanejada,
-    //   qtdColhida: novaProducao.quantidadeColhida ?? 0,
-    //   statusAnterior: novaProducao.status,
-    //   statusAtual: novaProducao.status,
-    //   data: new Date(),
-    // });
+    this.dashboardService.atualizar({
+      producaoId: novaProducao.id,
+      qtdPlanejada: novaProducao.quantidadePlanejada,
+      qtdColhida: novaProducao.quantidadeColhida ?? 0,
+      statusAnterior: null,
+      statusAtual: novaProducao.status,
+      data: new Date(),
+    });
+  }
+
+  private async _addEstoqueProduto(producao: Producao) {
+    const precoUnitario = producao.precoFinal! / producao.quantidadeColhida!;
+
+    const novoEstoqueProduto: EstoqueProduto = {
+      id: gerarUUID(),
+      produtoId: producao.produtoId,
+      fazendaId: producao.fazendaId,
+      quantidade: producao.quantidadeColhida!,
+      preco: producao.precoPlanejado ?? 0,
+      lote: producao.lote ?? "",
+      criadaEm: new Date(),
+      atualizadaEm: new Date(),
+      producaoId: producao.id,
+      precoUnitario: precoUnitario,
+    };
+
+    await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
   }
 }

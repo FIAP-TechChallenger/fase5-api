@@ -34,17 +34,18 @@ export class DashboardProducaoService implements IDashboardProducaoService {
   }
 
   async atualizar(params: DashboardProducaoAtualizarParams): Promise<void> {
-    await Promise.all([
-      this._dashRepo.updateStatusChange(
-        params.statusAnterior,
-        params.statusAtual
-      ),
-      this._dashRepo.addPerdas(
+    await this._dashRepo.updateStatusChange(
+      params.statusAnterior,
+      params.statusAtual
+    );
+
+    if (params.statusAtual === ProducaoStatusEnum.COLHIDA) {
+      await this._dashRepo.addPerdas(
         params.producaoId,
         params.qtdPlanejada,
         params.qtdColhida,
         params.data
-      ),
-    ]);
+      );
+    }
   }
 }
