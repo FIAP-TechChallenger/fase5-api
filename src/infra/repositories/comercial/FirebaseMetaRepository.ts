@@ -5,7 +5,19 @@ import { MetaConverter } from "@/infra/firebase/converters/comercial/MetaConvert
 import { MetaFirebase } from "@/infra/firebase/models/comercial/MetaFirebase";
 import { MetaBuscarTodosDTO } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
 import { MetaBuscarTodosResponseDTO } from "@/application/dtos/comercial/MetaBuscarTodosResponseDTO";
-import { MetaTipoEnum } from "@/domain/types/meta.enum";
+import {
+  MetaStatusEnum,
+  MetaStatusFiltroEnum,
+  MetaTipoEnum,
+} from "@/domain/types/meta.enum";
+import { firestore } from "firebase-admin";
+import { getFirebaseTimeStamp } from "@/shared/utils/getFirebaseTimeStamp";
+import {
+  DocumentData,
+  DocumentReference,
+  Timestamp,
+} from "firebase-admin/firestore";
+import { DateUtils } from "@/shared/utils/date.utils";
 
 export class FirebaseMetaRepository implements IMetaRepository {
   async buscarTodos(
@@ -13,27 +25,52 @@ export class FirebaseMetaRepository implements IMetaRepository {
   ): Promise<MetaBuscarTodosResponseDTO> {
     const limite = dto?.limite ?? 10;
 
-    let query = this._getCollection()
+    let baseQuery = this._getCollection()
       .orderBy("criadaEm", "desc")
-      .orderBy("__name__")
-      .limit(limite);
+      .orderBy("__name__");
 
-    if (dto?.tipo) {
-      query = query.where("tipo", "==", dto.tipo);
-    }
-
-    if (dto?.ultimoId) {
+    if (dto.ultimoId) {
       const lastSnap = await this._getCollection().doc(dto.ultimoId).get();
-      if (lastSnap.exists) {
-        query = query.startAfter(lastSnap);
-      }
+      if (lastSnap.exists) baseQuery = baseQuery.startAfter(lastSnap);
     }
 
-    const snapshot = await query.get();
-    const dados = snapshot.docs.map((doc) => {
+    if (dto.tipo) {
+      baseQuery = baseQuery.where("tipo", "==", dto.tipo);
+    }
+
+    // Filtar por status
+    switch (dto.status) {
+      case MetaStatusFiltroEnum.ALCANCADA:
+        baseQuery = baseQuery.where("status", "==", MetaStatusEnum.ALCANCADA);
+        break;
+      case MetaStatusFiltroEnum.EM_ANDAMENTO:
+        baseQuery = baseQuery.where(
+          "status",
+          "==",
+          MetaStatusEnum.EM_ANDAMENTO
+        );
+        break;
+      case MetaStatusFiltroEnum.NAO_ALCANCADA:
+        baseQuery = baseQuery.where(
+          "status",
+          "==",
+          MetaStatusEnum.NAO_ALCANCADA
+        );
+        break;
+    }
+
+    const snapshot = await baseQuery.get();
+    let dados = snapshot.docs.map((doc) => {
       const data = doc.data() as MetaFirebase;
       return MetaConverter.fromFirestore(data, doc.id);
     });
+
+    // Atualiza informações das metas EM_ANDAMENTO
+    if (dto.status !== MetaStatusFiltroEnum.TODOS) {
+      const { ativas, naoAtendidas } = this._separarAtivas(dados);
+      dados = ativas;
+      if (naoAtendidas.length) this._atualizarNaoAtendidas(naoAtendidas);
+    }
 
     const lastVisible = dados[dados.length - 1];
     return {
@@ -41,6 +78,12 @@ export class FirebaseMetaRepository implements IMetaRepository {
       ultimoId: lastVisible?.id ?? null,
       temMais: dados.length === limite,
     };
+  }
+
+  buscarRefPorId(
+    metaId: string
+  ): DocumentReference<DocumentData, DocumentData> {
+    return this._getCollection().doc(metaId);
   }
 
   async buscarPorId(metaId: string): Promise<Meta | null> {
@@ -51,11 +94,13 @@ export class FirebaseMetaRepository implements IMetaRepository {
     return MetaConverter.fromFirestore(data, doc.id);
   }
 
-  async buscarPorPeriodoETipo(data: Date, tipo: MetaTipoEnum): Promise<Meta[]> {
+  async buscarAtivasHojePorTipo(tipo: MetaTipoEnum): Promise<Meta[]> {
+    const dataLimite = DateUtils.getStartOfDay(new Date());
+
     const snapshot = await this._getCollection()
       .where("tipo", "==", tipo)
-      .where("dataInicio", "<=", data)
-      .where("dataFim", ">=", data)
+      .where("status", "==", MetaStatusEnum.EM_ANDAMENTO)
+      .where("dataFim", ">=", Timestamp.fromDate(dataLimite))
       .get();
 
     return snapshot.docs.map((doc) => {
@@ -74,6 +119,35 @@ export class FirebaseMetaRepository implements IMetaRepository {
     await this._getCollection()
       .doc(meta.id)
       .update({ ...data });
+  }
+
+  private _separarAtivas(metas: Meta[]) {
+    const agora = Date.now();
+    const ativas: Meta[] = [];
+    const naoAtendidas: Meta[] = [];
+
+    metas.forEach((m) => {
+      const prazoFim = new Date(m.dataFim).getTime();
+      prazoFim < agora && m.status === MetaStatusEnum.EM_ANDAMENTO
+        ? naoAtendidas.push(m)
+        : ativas.push(m);
+    });
+    return { ativas, naoAtendidas };
+  }
+
+  private async _atualizarNaoAtendidas(metas: Meta[]) {
+    const agora = Date.now();
+    const batch = firestore().batch();
+
+    metas.forEach((m) => {
+      const prazoFim = new Date(m.dataFim).getTime();
+      if (prazoFim < agora && m.status === MetaStatusEnum.EM_ANDAMENTO) {
+        const docRef = this.buscarRefPorId(m.id);
+        batch.update(docRef, { status: MetaStatusEnum.NAO_ALCANCADA });
+        m.status = MetaStatusEnum.NAO_ALCANCADA;
+      }
+    });
+    await batch.commit();
   }
 
   private _getCollection() {

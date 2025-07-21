@@ -5,6 +5,7 @@ import { Meta } from "@/domain/entities/comercial/Meta";
 import { gerarUUID } from "@/shared/utils/gerarUUID";
 import { MetaBuscarTodosDTO } from "@/application/dtos/comercial/MetaBuscarTodosDTO";
 import { MetaBuscarTodosResponseDTO } from "@/application/dtos/comercial/MetaBuscarTodosResponseDTO";
+import { MetaStatusEnum } from "@/domain/types/meta.enum";
 
 export class MetaService {
   constructor(private readonly metaRepository: IMetaRepository) {}
@@ -27,9 +28,9 @@ export class MetaService {
       dataInicio: dto.dataInicio,
       dataFim: dto.dataFim,
       usuarioId: usuarioId,
-      fazendaId: dto.fazendaId ?? null,
       criadaEm: new Date(),
       atualizadaEm: new Date(),
+      status: MetaStatusEnum.EM_ANDAMENTO,
     };
     await this.metaRepository.inserir(novaMeta);
   }

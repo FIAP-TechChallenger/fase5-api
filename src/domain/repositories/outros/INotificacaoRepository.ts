@@ -6,7 +6,8 @@ import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
 export interface INotificacaoRepository {
   buscarPorTipos(
     tipos: NotificacaoTipoEnum[],
-    dto: NotificacaoBuscarTodasDTO
+    dto: NotificacaoBuscarTodasDTO,
+    userId: string
   ): Promise<NotificacaoBuscarTodasResponseDTO>;
   inserir(dados: Notificacao): Promise<void>;
   marcarTodasComoLidas(userId: string): Promise<void>;

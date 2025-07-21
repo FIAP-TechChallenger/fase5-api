@@ -66,18 +66,20 @@ export class ProducaoService {
       ...dto,
       atualizadaEm: new Date(),
     };
-   
 
     await this.producaoRepository.atualizar(producaoAtualizada);
-   
+
     if (
       producaoAtualizada.precoFinal === undefined ||
       producaoAtualizada.custoProducao === undefined ||
       producaoAtualizada.quantidadeColhida === undefined
     ) {
-      throw new Error("Campos obrigatórios não preenchidos para calcular o preço unitário.");
+      throw new Error(
+        "Campos obrigatórios não preenchidos para calcular o preço unitário."
+      );
     }
-    const precoUnitario = producaoAtualizada.precoFinal / producaoAtualizada.quantidadeColhida;
+    const precoUnitario =
+      producaoAtualizada.precoFinal / producaoAtualizada.quantidadeColhida;
     // this.dashboardService.atualizar({
     //   producaoId: producaoExistente.id,
     //   qtdPlanejada: producaoExistente.quantidadePlanejada,
@@ -86,7 +88,6 @@ export class ProducaoService {
     //   statusAtual: producaoAtualizada.status,
     //   data: new Date(),
     // });
-  
 
     if (producaoAtualizada.status === ProducaoStatusEnum.COLHIDA) {
       const novoEstoqueProduto: EstoqueProduto = {
@@ -94,34 +95,36 @@ export class ProducaoService {
         produtoId: producaoAtualizada.produtoId,
         fazendaId: producaoAtualizada.fazendaId,
         quantidade: producaoAtualizada.quantidadePlanejada,
-        preco: producaoAtualizada.precoPlanejado??0,
+        preco: producaoAtualizada.precoPlanejado ?? 0,
         lote: producaoAtualizada.lote ?? "",
         criadaEm: new Date(),
         atualizadaEm: new Date(),
         producaoId: producaoAtualizada.id,
-        precoUnitario: precoUnitario
+        precoUnitario: precoUnitario,
       };
-      console.log("novo estoque Produto ", novoEstoqueProduto)
+      console.log("novo estoque Produto ", novoEstoqueProduto);
 
       await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
 
       if (!!dto.quantidadeColhida && dto.quantidadeColhida > 0) {
         this.metaAtualizarValorTipoProducaoService.executar({
           qtdColhida: dto.quantidadeColhida,
-          data: dto.dataFim,
         });
       }
     }
   }
 
   async inserir(dto: ProducaoInserirDTO): Promise<void> {
-      // // 🔁 1. Verificar e debitar os insumos antes de inserir
-      for (const insumo of dto.insumos) {
-        console.log("insumo", insumo),
+    // // 🔁 1. Verificar e debitar os insumos antes de inserir
+    for (const insumo of dto.insumos) {
+      console.log("insumo", insumo),
         console.log("dto insumos", dto.insumos),
         console.log("insumo quantidade", insumo),
-        await this.estoqueInsumoService.verificarEDebitarEstoque(insumo.insumoId, insumo.quantidade);
-      }
+        await this.estoqueInsumoService.verificarEDebitarEstoque(
+          insumo.insumoId,
+          insumo.quantidade
+        );
+    }
     const novaProducao: Producao = {
       id: gerarUUID(),
       quantidadePlanejada: dto.quantidadePlanejada,

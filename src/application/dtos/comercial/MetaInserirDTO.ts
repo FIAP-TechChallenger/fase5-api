@@ -17,7 +17,6 @@ export const MetaInserirBaseSchema = z.object({
   dataFim: z.coerce.date({
     required_error: "A data final é obrigatória",
   }),
-  fazendaId: z.string().optional().nullable(),
 });
 
 export const MetaInserirSchema = MetaInserirBaseSchema.superRefine(

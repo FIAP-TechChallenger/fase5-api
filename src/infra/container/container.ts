@@ -50,25 +50,38 @@ const emailService = new NodeMailerEmailService();
 const authCookieService = new AuthCookieService();
 const authService = new AuthService(authRepository, usuarioRepository);
 const notificacaoService = new NotificacaoService(notificacaoRepository);
-const usuarioCadastroService = new UsuarioCadastroService(emailService, usuarioRepository);
+const usuarioCadastroService = new UsuarioCadastroService(
+  emailService,
+  usuarioRepository
+);
 const usuarioConsultaService = new UsuarioConsultaService(usuarioRepository);
 
 const metaService = new MetaService(metaRepository);
-const metaAtualizarValorTipoProducaoService = new MetaAtualizarValorTipoProducaoService(metaRepository);
+const metaAtualizarValorTipoProducaoService =
+  new MetaAtualizarValorTipoProducaoService(metaRepository);
 
-const dashboardProducaoService = new DashboardProducaoService(dashboardProducaoRepository);
-const dashboardComercialService = new DashboardComercialService(dashboardComercialRepository, produtoRepository);
+const dashboardProducaoService = new DashboardProducaoService(
+  dashboardProducaoRepository
+);
+const dashboardComercialService = new DashboardComercialService(
+  dashboardComercialRepository,
+  produtoRepository
+);
 
 const insumoService = new InsumoService(insumoRepository, medidaRepository);
-const estoqueInsumoService = new EstoqueInsumoService(estoqueInsumoRepository, insumoRepository, medidaRepository);
+const estoqueInsumoService = new EstoqueInsumoService(
+  estoqueInsumoRepository,
+  insumoRepository,
+  medidaRepository
+);
 const producaoService = new ProducaoService(
   producaoRepository,
   fazendaRepository,
   produtoRepository,
   estoqueProdutoRepository,
   metaAtualizarValorTipoProducaoService,
-  dashboardProducaoService,     
-  estoqueInsumoService          
+  dashboardProducaoService,
+  estoqueInsumoService
 );
 
 // === Exportando o container ===

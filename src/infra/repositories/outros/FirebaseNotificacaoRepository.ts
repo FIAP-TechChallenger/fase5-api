@@ -16,7 +16,8 @@ export class FirebaseNotificacaoRepository implements INotificacaoRepository {
 
   async buscarPorTipos(
     tipos: NotificacaoTipoEnum[],
-    dto: NotificacaoBuscarTodasDTO
+    dto: NotificacaoBuscarTodasDTO,
+    userId: string
   ): Promise<NotificacaoBuscarTodasResponseDTO> {
     if (!tipos?.length) return { dados: [], ultimoId: null, temMais: false };
 
@@ -35,10 +36,22 @@ export class FirebaseNotificacaoRepository implements INotificacaoRepository {
     }
 
     const snapshot = await query.get();
-    const dados = snapshot.docs.map((doc) => {
+    const dados: Notificacao[] = [];
+
+    for (const doc of snapshot.docs) {
       const data = doc.data() as NotificacaoFirebase;
-      return NotificacaoConverter.fromFirestore(data, doc.id);
-    });
+
+      const leituraDoc = await doc.ref
+        .collection("leituraPorUsuario")
+        .doc(userId)
+        .get();
+
+      const lida = leituraDoc.exists && leituraDoc.data()?.lida === true;
+      const notificacao = NotificacaoConverter.fromFirestore(data, doc.id);
+      notificacao.lida = lida;
+
+      dados.push(notificacao);
+    }
 
     const lastVisible = dados[dados.length - 1];
     return {

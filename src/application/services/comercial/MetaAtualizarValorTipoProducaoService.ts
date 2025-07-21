@@ -1,5 +1,5 @@
 import { IMetaRepository } from "@/domain/repositories/comercial/IMetaRepository";
-import { MetaCalculoPorEnum, MetaTipoEnum } from "@/domain/types/meta.enum";
+import { MetaStatusEnum, MetaTipoEnum } from "@/domain/types/meta.enum";
 import { DateUtils } from "@/shared/utils/date.utils";
 import { NotificacaoSendService } from "../outros/notificacao/NotificacaoSendService";
 import { NotificacaoTipoEnum } from "@/domain/types/notificacao.enum";
@@ -7,6 +7,8 @@ import {
   IMetaAtualizarValorTipoProducaoService,
   MetaAtualizarValorTipoProducaoParams,
 } from "@/domain/interfaces/IMetaAtualizarValorTipoProducaoService";
+import { firestore } from "firebase-admin";
+import { DocumentData } from "firebase-admin/firestore";
 
 export class MetaAtualizarValorTipoProducaoService
   implements IMetaAtualizarValorTipoProducaoService
@@ -14,40 +16,46 @@ export class MetaAtualizarValorTipoProducaoService
   constructor(private readonly metaRepository: IMetaRepository) {}
 
   async executar(dados: MetaAtualizarValorTipoProducaoParams): Promise<void> {
-    const hoje = DateUtils.getStartOfDay(dados.data ?? new Date());
+    const hoje = DateUtils.getStartOfDay(new Date());
 
-    // Buscar metas de PRODUCAO no período atual
-    const metas = await this.metaRepository.buscarPorPeriodoETipo(
-      hoje,
+    const metas = await this.metaRepository.buscarAtivasHojePorTipo(
       MetaTipoEnum.PRODUCAO
     );
 
+    const batch = firestore().batch();
+    const notify: string[] = [];
+
     for (const meta of metas) {
-      meta.valorAtual += dados.qtdColhida;
+      const docRef = this.metaRepository.buscarRefPorId(meta.id);
 
-      // valor sera apenas para venda
-      // if (meta.calculoPor === MetaCalculoPorEnum.QUANTIDADE) {
-      //   meta.valorAtual += dados.quantidade;
-      // } else if (meta.calculoPor === MetaCalculoPorEnum.VALOR) {
-      //   meta.valorAtual += dados.valorTotal;
-      // }
+      if (meta.dataFim < hoje) {
+        batch.update(docRef, { status: MetaStatusEnum.NAO_ALCANCADA });
+      } else {
+        meta.valorAtual += dados.qtdColhida;
+        const atendida = meta.valorAtual >= meta.valorAlvo;
 
-      await this.metaRepository.atualizar(meta);
+        batch.update(docRef, {
+          valorAtual: atendida ? meta.valorAlvo : meta.valorAtual,
+          status: atendida ? MetaStatusEnum.ALCANCADA : meta.status,
+        });
 
-      if (meta.valorAtual >= meta.valorAlvo) {
-        await this._notificarMetaConcluida(meta.tipo, meta.titulo);
+        if (atendida) notify.push(meta.titulo);
+      }
+    }
+    await batch.commit();
+
+    if (notify.length) {
+      for await (const metaTitle of notify) {
+        await this._notificarMetaConcluida(metaTitle);
       }
     }
   }
 
-  private async _notificarMetaConcluida(
-    metaTipo: MetaTipoEnum,
-    metaTitulo: string
-  ) {
+  private async _notificarMetaConcluida(metaTitulo: string) {
     NotificacaoSendService.instance.send({
       tipo: NotificacaoTipoEnum.META_CONCLUIDA,
       titulo: "Meta concluída",
-      descricao: `A meta de "${metaTipo}" com título "${metaTitulo}" foi alcançada.`,
+      descricao: `A meta de "${MetaTipoEnum.PRODUCAO}" com título "${metaTitulo}" foi alcançada.`,
     });
   }
 }

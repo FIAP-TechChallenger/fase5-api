@@ -1,4 +1,8 @@
-import { MetaTipoEnum, MetaCalculoPorEnum } from "@/domain/types/meta.enum";
+import {
+  MetaTipoEnum,
+  MetaCalculoPorEnum,
+  MetaStatusEnum,
+} from "@/domain/types/meta.enum";
 
 export class Meta {
   id: string;
@@ -13,7 +17,7 @@ export class Meta {
   usuarioId: string;
   criadaEm: Date;
   atualizadaEm: Date;
-  fazendaId: string | null;
+  status: MetaStatusEnum;
 
   constructor(obj: Meta) {
     this.id = obj.id;
@@ -28,6 +32,6 @@ export class Meta {
     this.usuarioId = obj.usuarioId;
     this.criadaEm = obj.criadaEm;
     this.atualizadaEm = obj.atualizadaEm;
-    this.fazendaId = obj.fazendaId;
+    this.status = obj.status;
   }
 }

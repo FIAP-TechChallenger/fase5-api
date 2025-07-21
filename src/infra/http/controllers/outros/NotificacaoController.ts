@@ -59,7 +59,6 @@ export class NotificacaoController {
       "/marcarTodasComoLidas",
       controller.marcarTodasComoLidas.bind(controller)
     );
-    // router.post("/enviar", controller.enviar.bind(controller));
     return router;
   }
 }

@@ -1,4 +1,8 @@
-import { MetaCalculoPorEnum, MetaTipoEnum } from "@/domain/types/meta.enum";
+import {
+  MetaCalculoPorEnum,
+  MetaStatusEnum,
+  MetaTipoEnum,
+} from "@/domain/types/meta.enum";
 import { Timestamp } from "firebase-admin/firestore";
 
 export interface MetaFirebase {
@@ -13,5 +17,5 @@ export interface MetaFirebase {
   usuarioId: string;
   criadaEm: Timestamp;
   atualizadaEm: Timestamp;
-  fazendaId: string | null;
+  status: MetaStatusEnum;
 }

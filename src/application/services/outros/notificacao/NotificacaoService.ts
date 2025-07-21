@@ -21,7 +21,7 @@ export class NotificacaoService {
         break;
     }
 
-    return this.authRepo.buscarPorTipos(tipos, dto);
+    return this.authRepo.buscarPorTipos(tipos, dto, usuario.id);
   }
 
   async marcarTodasComoLidas(userId: string): Promise<void> {
