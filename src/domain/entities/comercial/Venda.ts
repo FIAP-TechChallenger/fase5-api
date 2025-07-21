@@ -1,7 +1,6 @@
 import { VendaStatusEnum } from "@/domain/types/venda.enum";
 import { ItemVenda } from "./ItemVenda";
 
-
 export class Venda {
   id: string;
   criadaEm: Date;
@@ -12,8 +11,6 @@ export class Venda {
   status: VendaStatusEnum;
   itens: ItemVenda[];
 
-  
-
   constructor(obj: Venda) {
     this.id = obj.id;
     this.criadaEm = obj.criadaEm;
@@ -23,6 +20,5 @@ export class Venda {
     this.valorTotal = obj.valorTotal;
     this.status = obj.status;
     this.itens = obj.itens;
-
   }
 }

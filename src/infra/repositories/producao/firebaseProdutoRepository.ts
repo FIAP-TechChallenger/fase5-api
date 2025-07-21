@@ -1,4 +1,3 @@
-
 import { IProdutoRepository } from "@/domain/repositories/producao/IProdutoRepository";
 import { Produto } from "@/domain/entities/producao/Produto";
 import { ProdutoConverter } from "@/infra/firebase/converters/producao/ProdutoConverter";
@@ -12,25 +11,25 @@ export class FirebaseProdutoRepository implements IProdutoRepository {
     dto: ProdutoBuscarTodosDTO
   ): Promise<ProdutoBuscarTodosResponseDTO> {
     const limite = dto?.limite ?? 10;
-  
+
     let query = this._getCollection()
       .orderBy("criadaEm", "desc")
       .orderBy("__name__")
       .limit(limite);
-  
+
     if (dto?.ultimoId) {
       const lastSnap = await this._getCollection().doc(dto.ultimoId).get();
       if (lastSnap.exists) {
         query = query.startAfter(lastSnap);
       }
     }
-  
+
     const snapshot = await query.get();
     const dados = snapshot.docs.map((doc) => {
       const data = doc.data() as ProdutoFirebase;
       return ProdutoConverter.fromFirestore(data, doc.id);
     });
-  
+
     const lastVisible = dados[dados.length - 1];
     return {
       dados,
@@ -45,22 +44,23 @@ export class FirebaseProdutoRepository implements IProdutoRepository {
 
     const data = doc.data() as ProdutoFirebase;
     return ProdutoConverter.fromFirestore(data, doc.id);
-    
   }
+
   async buscarNome(nomeId: string): Promise<string> {
     const doc = await this._getCollection().doc(nomeId).get();
-  
+
     if (!doc.exists) {
       throw new Error(`Produto com ID ${nomeId} não encontrada`);
     }
     const data = doc.data() as ProdutoFirebase;
     return data.nome;
-    
   }
+
   async insert(produto: Produto): Promise<void> {
-    const data:ProdutoFirebase = ProdutoConverter.toFirestore(produto);
+    const data: ProdutoFirebase = ProdutoConverter.toFirestore(produto);
     await this._getCollection().doc(produto.id).set(data);
   }
+
   async atualizar(produto: Produto): Promise<void> {
     const data: ProdutoFirebase = ProdutoConverter.toFirestore(produto);
     await this._getCollection()
@@ -68,9 +68,7 @@ export class FirebaseProdutoRepository implements IProdutoRepository {
       .update({ ...data });
   }
 
-
   private _getCollection() {
     return admin.firestore().collection("produto");
   }
- 
 }

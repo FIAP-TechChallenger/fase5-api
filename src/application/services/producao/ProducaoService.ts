@@ -12,11 +12,12 @@ import { IProdutoRepository } from "@/domain/repositories/producao/IProdutoRepos
 import { IFazendaRepository } from "@/domain/repositories/producao/IFazendaRepository";
 import { IEstoqueProdutoRepository } from "@/domain/repositories/producao/IEstoqueProdutoRepository";
 import { ProducaoAtualizarDTO } from "@/application/dtos/producao/Producao/ProducaoAtualizarDTO";
-import { IMetaAtualizarValorTipoProducaoService } from "@/domain/interfaces/IMetaAtualizarValorTipoProducaoService";
+import { IMetaAtualizarValorPorTipoService } from "@/domain/interfaces/IMetaAtualizarValorPorTipoService";
 import { IDashboardProducaoService } from "@/domain/interfaces/IDashboardProducaoService";
 import { EstoqueProduto } from "@/domain/entities/producao/EstoqueProduto";
 import { IEstoqueInsumoRepository } from "@/domain/repositories/producao/IEstoqueInsumoRepository";
 import { IEstoqueInsumoService } from "@/domain/interfaces/IEstoqueInsumoService";
+import { MetaTipoEnum } from "@/domain/types/meta.enum";
 
 export class ProducaoService {
   constructor(
@@ -24,7 +25,7 @@ export class ProducaoService {
     private readonly fazendaRepository: IFazendaRepository,
     private readonly produtoRepository: IProdutoRepository,
     private readonly estoqueProdutoRepository: IEstoqueProdutoRepository,
-    private readonly metaAtualizarValorTipoProducaoService: IMetaAtualizarValorTipoProducaoService,
+    private readonly metaAtualizarValorPorTipoService: IMetaAtualizarValorPorTipoService,
     private readonly dashboardService: IDashboardProducaoService,
     private readonly estoqueInsumoService: IEstoqueInsumoService // <--- adicionado
   ) {}
@@ -102,13 +103,12 @@ export class ProducaoService {
         producaoId: producaoAtualizada.id,
         precoUnitario: precoUnitario,
       };
-      console.log("novo estoque Produto ", novoEstoqueProduto);
 
       await this.estoqueProdutoRepository.insert(novoEstoqueProduto);
 
       if (!!dto.quantidadeColhida && dto.quantidadeColhida > 0) {
-        this.metaAtualizarValorTipoProducaoService.executar({
-          qtdColhida: dto.quantidadeColhida,
+        this.metaAtualizarValorPorTipoService.executar(MetaTipoEnum.PRODUCAO, {
+          quantidade: dto.quantidadeColhida,
         });
       }
     }
@@ -117,13 +117,10 @@ export class ProducaoService {
   async inserir(dto: ProducaoInserirDTO): Promise<void> {
     // // 🔁 1. Verificar e debitar os insumos antes de inserir
     for (const insumo of dto.insumos) {
-      console.log("insumo", insumo),
-        console.log("dto insumos", dto.insumos),
-        console.log("insumo quantidade", insumo),
-        await this.estoqueInsumoService.verificarEDebitarEstoque(
-          insumo.insumoId,
-          insumo.quantidade
-        );
+      await this.estoqueInsumoService.verificarEDebitarEstoque(
+        insumo.insumoId,
+        insumo.quantidade
+      );
     }
     const novaProducao: Producao = {
       id: gerarUUID(),

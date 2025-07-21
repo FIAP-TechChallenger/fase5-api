@@ -20,13 +20,16 @@ import { NotificacaoService } from "@/application/services/outros/notificacao/No
 import { UsuarioCadastroService } from "@/application/services/outros/UsuarioCadastroService";
 import { UsuarioConsultaService } from "@/application/services/outros/UsuarioConsultaService";
 import { MetaService } from "@/application/services/comercial/MetaService";
-import { MetaAtualizarValorTipoProducaoService } from "@/application/services/comercial/MetaAtualizarValorTipoProducaoService";
 import { DashboardProducaoService } from "@/application/services/outros/dashboard/DashboardProducaoService";
 import { DashboardComercialService } from "@/application/services/outros/dashboard/DashboardComercialService";
 import { InsumoService } from "@/application/services/producao/InsumoService";
 import { EstoqueInsumoService } from "@/application/services/producao/EstoqueInsumoService";
 import { ProducaoService } from "@/application/services/producao/ProducaoService";
 import { NodeMailerEmailService } from "../email/NodeMailerEmailService";
+import { MetaAtualizarValorPorTipoService } from "@/application/services/comercial/MetaAtualizarValorPorTipoService";
+import { FirebaseVendaRepository } from "../repositories/comercial/FirebaseVendaRepository";
+import { EstoqueProdutoService } from "@/application/services/producao/EstoqueProdutoService";
+import { VendaService } from "@/application/services/comercial/VendaService";
 
 // === Instância de Repositórios ===
 const authRepository = new FirebaseAuthRepository();
@@ -44,6 +47,7 @@ const producaoRepository = new FirebaseProducaoRepository();
 const fazendaRepository = new FirebaseFazendaRepository();
 const produtoRepository = new FirebaseProdutoRepository();
 const estoqueProdutoRepository = new FirebaseEstoqueProdutoRepository();
+const vendaRepository = new FirebaseVendaRepository();
 
 // === Instância de Services ===
 const emailService = new NodeMailerEmailService();
@@ -55,10 +59,16 @@ const usuarioCadastroService = new UsuarioCadastroService(
   usuarioRepository
 );
 const usuarioConsultaService = new UsuarioConsultaService(usuarioRepository);
+const estoqueProdutoService = new EstoqueProdutoService(
+  estoqueProdutoRepository,
+  produtoRepository,
+  medidaRepository
+);
 
 const metaService = new MetaService(metaRepository);
-const metaAtualizarValorTipoProducaoService =
-  new MetaAtualizarValorTipoProducaoService(metaRepository);
+const metaAtualizarValorPorTipoService = new MetaAtualizarValorPorTipoService(
+  metaRepository
+);
 
 const dashboardProducaoService = new DashboardProducaoService(
   dashboardProducaoRepository
@@ -79,9 +89,17 @@ const producaoService = new ProducaoService(
   fazendaRepository,
   produtoRepository,
   estoqueProdutoRepository,
-  metaAtualizarValorTipoProducaoService,
+  metaAtualizarValorPorTipoService,
   dashboardProducaoService,
   estoqueInsumoService
+);
+
+const vendaService = new VendaService(
+  vendaRepository,
+  produtoRepository,
+  dashboardComercialService,
+  estoqueProdutoService,
+  metaAtualizarValorPorTipoService
 );
 
 // === Exportando o container ===
@@ -91,6 +109,7 @@ export const container = {
   usuarioRepository,
   notificacaoRepository,
   metaRepository,
+  vendaRepository,
 
   // Services
   emailService,
@@ -100,10 +119,12 @@ export const container = {
   usuarioCadastroService,
   usuarioConsultaService,
   metaService,
-  metaAtualizarValorTipoProducaoService,
+  metaAtualizarValorPorTipoService,
   dashboardProducaoService,
   dashboardComercialService,
   insumoService,
   estoqueInsumoService,
   producaoService,
+  vendaService,
+  estoqueProdutoService,
 };

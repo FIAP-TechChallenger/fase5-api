@@ -1,32 +1,17 @@
-// src/presentation/controllers/producao/FazendaController.ts
 import { EstoqueProdutoAtualizarSchema } from "@/application/dtos/producao/EstoqueProduto/EstoqueProdutoAtualizarDTO";
 import { EstoqueProdutoBuscarTodosSchema } from "@/application/dtos/producao/EstoqueProduto/EstoqueProdutoBuscarTodosDTO";
 import { EstoqueProdutoInserirSchema } from "@/application/dtos/producao/EstoqueProduto/EstoqueProdutoInserirDTO";
-import { EstoqueProdutoService } from "@/application/services/producao/EstoqueProdutoService";
-import { FirebaseEstoqueProdutoRepository } from "@/infra/repositories/producao/firebaseEstoqueProdutoRepository";
-import { FirebaseMedidaRepository } from "@/infra/repositories/producao/firebaseMedidaRepository";
-import { FirebaseProdutoRepository } from "@/infra/repositories/producao/firebaseProdutoRepository";
 import { Request, Response, Router } from "express";
-
 import { z, ZodError } from "zod";
 import { verificarPermissaoSetor } from "../../middlewares/SetorMiddleware";
 import { UsuarioSetorEnum } from "@/domain/types/usuario.enum";
+import { container } from "@/infra/container/container";
 
 export class EstqueProdutoController {
-  private _EstoqueProdutoService: EstoqueProdutoService;
-
-  constructor() {
-    this._EstoqueProdutoService = new EstoqueProdutoService(
-      new FirebaseEstoqueProdutoRepository(),
-      new FirebaseProdutoRepository(),
-      new FirebaseMedidaRepository()
-    );
-  }
-
   async buscarTodos(req: Request, res: Response): Promise<void> {
     try {
       const dto = EstoqueProdutoBuscarTodosSchema.parse(req.body);
-      const estoqueProdutos = await this._EstoqueProdutoService.buscarTodos(
+      const estoqueProdutos = await container.estoqueProdutoService.buscarTodos(
         dto
       );
       res.status(200).json(estoqueProdutos);
@@ -43,7 +28,7 @@ export class EstqueProdutoController {
   async inserir(req: Request, res: Response): Promise<void> {
     try {
       const dto = EstoqueProdutoInserirSchema.parse(req.body);
-      await this._EstoqueProdutoService.inserir(dto);
+      await container.estoqueProdutoService.inserir(dto);
 
       res.status(201).json({ message: "estoque produtos criado com sucesso" });
     } catch (error: any) {
@@ -64,7 +49,7 @@ export class EstqueProdutoController {
   async atualizar(req: Request, res: Response): Promise<void> {
     try {
       const dto = EstoqueProdutoAtualizarSchema.parse(req.body);
-      await this._EstoqueProdutoService.atualizar(dto);
+      await container.estoqueProdutoService.atualizar(dto);
 
       res
         .status(200)
